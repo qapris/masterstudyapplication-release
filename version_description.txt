@@ -1,0 +1,2 @@
+Fixed image caching
+Fixed styles caching

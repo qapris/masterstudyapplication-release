@@ -1,0 +1,93 @@
+name: masterstudy_app
+description: A new Flutter project.
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+version: 1.3.0+25
+
+environment:
+  sdk: ">=2.16.1 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  #networking
+  http: ^0.13.4
+  rxdart: ^0.27.3
+  dio: ^4.0.4
+#  dio_flutter_transformer: ^3.0.0
+
+
+#  #di
+  inject:
+    path: ./inject.dart/package/inject
+
+
+  #utils
+  meta: ^1.1.6
+  equatable: ^1.0.0
+  json_annotation: ^4.4.0
+  share: 0.6.3+6
+  package_info: ^0.4.1
+  device_info: 0.4.2+4
+  overlay_support: 1.0.4
+
+
+  #architecture
+  bloc: ^8.0.3
+  flutter_bloc: ^8.0.1
+
+  #storage
+  shared_preferences: 0.5.6+2
+  path_provider: ^2.0.9
+
+
+
+  #analytics
+  firebase_crashlytics: ^2.5.3
+  firebase_messaging: ^11.2.8
+
+  #ui
+  cupertino_icons: ^0.1.2
+  google_fonts: ^2.3.1
+  flutter_rating_bar: 3.0.1+1
+  flutter_svg: ^1.0.3
+  shimmer: 1.1.0
+  image_picker: 0.6.3+4
+  transparent_image: 1.0.0
+  flutter_staggered_grid_view: 0.3.0
+  flutter_html: ^0.11.1
+  file_picker: 1.6.3+2
+  video_player: 0.10.9
+  youtube_player_flutter: 6.1.1
+  url_launcher: ^6.0.20
+  cached_network_image: ^3.2.0
+  html_unescape: 1.0.1+3
+  page_transition: ^1.1.5
+  in_app_purchase: ^3.0.1
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  build_runner: ^2.1.7
+
+  json_serializable: ^6.1.4
+  inject_generator:
+    path: ./inject.dart/package/inject_generator
+
+flutter:
+
+
+  uses-material-design: true
+  assets:
+    - assets/icons/
+    - assets/localization/

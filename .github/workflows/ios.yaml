@@ -1,0 +1,50 @@
+name: IOs CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+    if: "!contains(github.event.head_commit.message, '[ci-skip]')"
+    steps:
+      - uses: actions/checkout@v2
+      name: Install and run xcodegen
+        run: |
+          brew install xcodegen
+          xcodegen generate
+      - uses: subosito/flutter-action@v1
+        with:
+          flutter-version: '1.12.13+hotfix.8'
+      - run: flutter pub get
+      - run: flutter build ios --release --no-codesign
+
+      - uses: maierj/fastlane-action@v1.4.0
+      - run: fastlane add_plugin firebase_app_distribution
+
+
+
+      - name: upload artifact to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1.1.1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          token: ${{secrets.FIREBASE_TOKEN}}
+          groups: testers
+          file: build/ios/Runner.build/Release-iphoneos/Runner.build/dgph
+
+      - name: Copying the version description
+        uses: pCYSl5EDgo/cat@1.0.0
+        id: version_desc
+        with:
+          path: version_description.txt
+
+      - run: echo $TEXT
+        env:
+          TEXT: ${{ steps.version_desc.outputs.text }}
+
+      - name: Send Telegram notification
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          args:  Новая версия готова к тестированию! \n ${{ steps.version_desc.outputs.text }} firebase app distribution
