@@ -19,7 +19,7 @@ class QuestionBean {
   String content;
   QuestionAuthorBean? author;
   String datetime;
-  String replies_count;
+  String? replies_count;
   List<ReplyBean?> replies;
 
   QuestionBean({
@@ -39,7 +39,7 @@ class QuestionBean {
 @JsonSerializable()
 class QuestionAuthorBean {
   int id;
-  String login;
+  dynamic login;
   String avatar_url;
   String url;
   String email;

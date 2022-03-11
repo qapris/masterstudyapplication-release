@@ -7,6 +7,7 @@ import 'package:masterstudy_app/data/repository/courses_repository.dart';
 import 'package:rxdart/rxdart.dart';
 
 import './bloc.dart';
+
 @provide
 class SearchDetailBloc extends Bloc<SearchDetailEvent, SearchDetailState> {
   final CoursesRepository _coursesRepository;
@@ -16,8 +17,7 @@ class SearchDetailBloc extends Bloc<SearchDetailEvent, SearchDetailState> {
   @override
   SearchDetailState get initialState => InitialSearchDetailState();
 
-  @override
-  Stream<SearchDetailState> transformEvents(
+  /*Stream<SearchDetailState> transformEvents(
     Stream<SearchDetailEvent> events,
     Stream<SearchDetailState> Function(SearchDetailEvent event) next,
   ) {
@@ -27,14 +27,12 @@ class SearchDetailBloc extends Bloc<SearchDetailEvent, SearchDetailState> {
       ),
       next,
     );
-  }
+  }*/
 
   @override
-  void onTransition(
-      Transition<SearchDetailEvent, SearchDetailState> transition) {
-  }
+  // ignore: must_call_super
+  void onTransition(Transition<SearchDetailEvent, SearchDetailState> transition) {}
 
-  @override
   Stream<SearchDetailState> mapEventToState(
     SearchDetailEvent event,
   ) async* {
@@ -42,8 +40,9 @@ class SearchDetailBloc extends Bloc<SearchDetailEvent, SearchDetailState> {
       if (event.query.isNotEmpty) {
         try {
           yield LoadingSearchDetailState();
-          CourcesResponse response =
-              await _coursesRepository.getCourses(searchQuery: event.query);
+
+          CourcesResponse response = await _coursesRepository.getCourses(searchQuery: event.query);
+
           yield LoadedSearchDetailState(response.courses);
         } catch (error, stacktrace) {
           print(error);

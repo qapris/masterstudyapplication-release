@@ -1,7 +1,8 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
-
 import 'package:device_info/device_info.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -39,32 +40,32 @@ import 'package:masterstudy_app/ui/bloc/text_lesson/bloc.dart';
 import 'package:masterstudy_app/ui/bloc/user_course/bloc.dart';
 import 'package:masterstudy_app/ui/bloc/user_course_locked/bloc.dart';
 import 'package:masterstudy_app/ui/bloc/video/bloc.dart';
-import 'package:masterstudy_app/ui/screen/assignment/assignment_screen.dart';
-import 'package:masterstudy_app/ui/screen/auth/auth_screen.dart';
-import 'package:masterstudy_app/ui/screen/category_detail/category_detail_screen.dart';
-import 'package:masterstudy_app/ui/screen/course/course_screen.dart';
-import 'package:masterstudy_app/ui/screen/detail_profile/detail_profile_screen.dart';
-import 'package:masterstudy_app/ui/screen/final/final_screen.dart';
-import 'package:masterstudy_app/ui/screen/lesson_stream/lesson_stream_screen.dart';
-import 'package:masterstudy_app/ui/screen/lesson_video/lesson_video_screen.dart';
-import 'package:masterstudy_app/ui/screen/main/main_screens.dart';
-import 'package:masterstudy_app/ui/screen/plans/plans_screen.dart';
-import 'package:masterstudy_app/ui/screen/profile_assignment/profile_assignment_screen.dart';
-import 'package:masterstudy_app/ui/screen/profile_edit/profile_edit_screen.dart';
-import 'package:masterstudy_app/ui/screen/question_ask/question_ask_screen.dart';
-import 'package:masterstudy_app/ui/screen/question_details/question_details_screen.dart';
-import 'package:masterstudy_app/ui/screen/questions/questions_screen.dart';
-import 'package:masterstudy_app/ui/screen/quiz_lesson/quiz_lesson_screen.dart';
-import 'package:masterstudy_app/ui/screen/quiz_screen/quiz_screen.dart';
-import 'package:masterstudy_app/ui/screen/restore_password/restore_password_screen.dart';
-import 'package:masterstudy_app/ui/screen/review_write/review_write_screen.dart';
-import 'package:masterstudy_app/ui/screen/search_detail/search_detail_screen.dart';
-import 'package:masterstudy_app/ui/screen/splash/splash_screen.dart';
-import 'package:masterstudy_app/ui/screen/text_lesson/text_lesson_screen.dart';
-import 'package:masterstudy_app/ui/screen/user_course/user_course.dart';
-import 'package:masterstudy_app/ui/screen/user_course_locked/user_course_locked_screen.dart';
-import 'package:masterstudy_app/ui/screen/video_screen/video_screen.dart';
-import 'package:masterstudy_app/ui/screen/web_checkout/web_checkout_screen.dart';
+import 'package:masterstudy_app/ui/screens/assignment/assignment_screen.dart';
+import 'package:masterstudy_app/ui/screens/auth/auth_screen.dart';
+import 'package:masterstudy_app/ui/screens/category_detail/category_detail_screen.dart';
+import 'package:masterstudy_app/ui/screens/course/course_screen.dart';
+import 'package:masterstudy_app/ui/screens/detail_profile/detail_profile_screen.dart';
+import 'package:masterstudy_app/ui/screens/final/final_screen.dart';
+import 'package:masterstudy_app/ui/screens/lesson_stream/lesson_stream_screen.dart';
+import 'package:masterstudy_app/ui/screens/lesson_video/lesson_video_screen.dart';
+import 'package:masterstudy_app/ui/screens/main_screens.dart';
+import 'package:masterstudy_app/ui/screens/plans/plans_screen.dart';
+import 'package:masterstudy_app/ui/screens/profile_assignment/profile_assignment_screen.dart';
+import 'package:masterstudy_app/ui/screens/profile_edit/profile_edit_screen.dart';
+import 'package:masterstudy_app/ui/screens/question_ask/question_ask_screen.dart';
+import 'package:masterstudy_app/ui/screens/question_details/question_details_screen.dart';
+import 'package:masterstudy_app/ui/screens/questions/questions_screen.dart';
+import 'package:masterstudy_app/ui/screens/quiz_lesson/quiz_lesson_screen.dart';
+import 'package:masterstudy_app/ui/screens/quiz_screen/quiz_screen.dart';
+import 'package:masterstudy_app/ui/screens/restore_password/restore_password_screen.dart';
+import 'package:masterstudy_app/ui/screens/review_write/review_write_screen.dart';
+import 'package:masterstudy_app/ui/screens/search_detail/search_detail_screen.dart';
+import 'package:masterstudy_app/ui/screens/splash/splash_screen.dart';
+import 'package:masterstudy_app/ui/screens/text_lesson/text_lesson_screen.dart';
+import 'package:masterstudy_app/ui/screens/user_course/user_course.dart';
+import 'package:masterstudy_app/ui/screens/user_course_locked/user_course_locked_screen.dart';
+import 'package:masterstudy_app/ui/screens/video_screen/video_screen.dart';
+import 'package:masterstudy_app/ui/screens/web_checkout/web_checkout_screen.dart';
 import 'package:masterstudy_app/ui/widgets/message_notification.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:page_transition/page_transition.dart';
@@ -73,8 +74,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'data/push/push_manager.dart';
 import 'di/app_injector.dart';
-import 'ui/screen/orders/orders.dart';
-import 'ui/screen/user_course/user_course.dart';
+import 'ui/screens/orders/orders.dart';
+import 'ui/screens/user_course/user_course.dart';
 
 typedef Provider<T> = T Function();
 
@@ -92,49 +93,8 @@ bool appView = false;
 
 AndroidDeviceInfo? androidInfo;
 IosDeviceInfo? iosDeviceInfo;
-
-Future<dynamic>? myBackgroundMessageHandler(Map<String, dynamic> message) {
-  if (message.containsKey('data')) {
-    // Handle data message
-    final dynamic data = message['data'];
-  }
-
-  if (message.containsKey('notification')) {
-    // Handle notification message
-    final dynamic notification = message['notification'];
-  }
-  // Or do other work.
-  return null;
-}
-
+String? appLogoUrl;
 Directory? appDocDir;
-
-void main() async {
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarBrightness: Brightness.light,
-    statusBarColor: Colors.grey.withOpacity(0.4), //top bar color
-    statusBarIconBrightness: Brightness.light, //top bar icons
-  ));
-
-  FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
-
-  WidgetsFlutterBinding.ensureInitialized();
-  localizations = LocalizationRepositoryImpl(await getDefaultLocalization());
-  final SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
-  appView = _sharedPreferences.getBool("app_view") ?? false;
-  await setColors();
-  if (Platform.isAndroid) androidInfo = await DeviceInfoPlugin().androidInfo;
-  if (Platform.isIOS) iosDeviceInfo = await DeviceInfoPlugin().iosInfo;
-  PushNotificationsManager().init();
-  appDocDir = await getApplicationDocumentsDirectory();
-  runZoned(() async {
-    var container = await AppInjector.create();
-
-    runApp(container.app);
-    // ignore: deprecated_member_use
-  }, onError: FirebaseCrashlytics.instance.recordError);
-}
 
 Future<bool> setColors() async {
   final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -165,7 +125,48 @@ Future<String> getDefaultLocalization() async {
   return data;
 }
 
-String? appLogoUrl;
+Future<dynamic>? myBackgroundMessageHandler(Map<String, dynamic> message) {
+  if (message.containsKey('data')) {
+    // Handle data message
+    final dynamic data = message['data'];
+  }
+
+  if (message.containsKey('notification')) {
+    // Handle notification message
+    final dynamic notification = message['notification'];
+  }
+  // Or do other work.
+  return null;
+}
+
+void main() async {
+  //System style
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    statusBarBrightness: Brightness.light,
+    statusBarColor: Colors.grey.withOpacity(0.4), //top bar color
+    statusBarIconBrightness: Brightness.light, //top bar icons
+  ));
+
+  WidgetsFlutterBinding.ensureInitialized();
+  //Firebase
+  await Firebase.initializeApp();
+  FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+  localizations = LocalizationRepositoryImpl(await getDefaultLocalization());
+  final SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
+  appView = _sharedPreferences.getBool("app_view") ?? false;
+  await setColors();
+  if (Platform.isAndroid) androidInfo = await DeviceInfoPlugin().androidInfo;
+  if (Platform.isIOS) iosDeviceInfo = await DeviceInfoPlugin().iosInfo;
+  PushNotificationsManager().init();
+  appDocDir = await getApplicationDocumentsDirectory();
+  runZoned(() async {
+    var container = await AppInjector.create();
+
+    runApp(container.app);
+    // ignore: deprecated_member_use
+  }, onError: FirebaseCrashlytics.instance.recordError);
+}
 
 @provide
 class MyApp extends StatefulWidget {
@@ -384,7 +385,7 @@ class MyAppState extends State<MyApp> {
           notification["title"],
           notification["body"],
           onReplay: () {
-            OverlaySupportEntry.of(context).dismiss();
+            OverlaySupportEntry.of(context)?.dismiss();
           },
         );
       }, duration: Duration(seconds: 5));
@@ -402,7 +403,6 @@ class MyAppState extends State<MyApp> {
           onGenerateRoute: (routeSettings) {
             switch (routeSettings.name) {
               case SplashScreen.routeName:
-                // ignore: missing_return
                 return MaterialPageRoute(builder: (context) => widget.splashScreen());
               case AuthScreen.routeName:
                 return MaterialPageRoute(builder: (context) => widget.authScreen(), settings: routeSettings);
@@ -425,11 +425,7 @@ class MyAppState extends State<MyApp> {
               case ReviewWriteScreen.routeName:
                 return MaterialPageRoute(builder: (context) => ReviewWriteScreen(widget.reviewWriteBloc()), settings: routeSettings);
               case UserCourseScreen.routeName:
-                return MaterialPageRoute(
-                    builder: (context) => UserCourseScreen(
-                          widget.userCourseBloc(),
-                        ),
-                    settings: routeSettings);
+                return MaterialPageRoute(builder: (context) => UserCourseScreen(widget.userCourseBloc()), settings: routeSettings);
               case TextLessonScreen.routeName:
                 return PageTransition(child: TextLessonScreen(widget.textLessonBloc()), type: PageTransitionType.leftToRight, settings: routeSettings);
               case LessonVideoScreen.routeName:

@@ -25,7 +25,7 @@ void main() {
                 SymbolPath.parseAbsoluteUri('asset:foo/foo.dart#FooModule'), [
               new ProviderSummary(
                 new InjectedType(new LookupKey(
-                    SymbolPath.parseAbsoluteUri('asset:foo/foo.dart', 'Foo'))),
+                    SymbolPath.parseAbsoluteUri('asset:foo/foo.dart', 'Foo'), qualifier: SymbolPath.qualifier)),
                 'provideFoo',
                 ProviderKind.method,
               ),
@@ -37,7 +37,7 @@ void main() {
 
     test('should correctly resolve an object graph', () async {
       final foo = new InjectedType(
-          new LookupKey(SymbolPath.parseAbsoluteUri('asset:foo/foo.dart#Foo')));
+          new LookupKey(SymbolPath.parseAbsoluteUri('asset:foo/foo.dart#Foo'), qualifier: SymbolPath.qualifier));
       final injectorSummary = new InjectorSummary(
         new SymbolPath('foo', 'foo.dart', 'FooInjector'),
         [SymbolPath.parseAbsoluteUri('asset:foo/foo.dart#FooModule')],
@@ -109,7 +109,7 @@ void main() {
             [
               new ProviderSummary(
                 new InjectedType(new LookupKey(
-                    SymbolPath.parseAbsoluteUri('asset:foo/missing.dart#Foo'))),
+                    SymbolPath.parseAbsoluteUri('asset:foo/missing.dart#Foo'), qualifier: SymbolPath.qualifier)),
                 'getFoo',
                 ProviderKind.method,
               )
@@ -133,10 +133,10 @@ void main() {
 
   group('$Cycle', () {
     test('has order-independent hashCode and operator==', () {
-      var sA = new LookupKey(new SymbolPath('package', 'path.dart', 'A'));
-      var sB = new LookupKey(new SymbolPath('package', 'path.dart', 'B'));
-      var sC = new LookupKey(new SymbolPath('package', 'path.dart', 'C'));
-      var sD = new LookupKey(new SymbolPath('package', 'path.dart', 'D'));
+      var sA = new LookupKey(new SymbolPath('package', 'path.dart', 'A'), qualifier: SymbolPath.qualifier);
+      var sB = new LookupKey(new SymbolPath('package', 'path.dart', 'B'), qualifier: SymbolPath.qualifier);
+      var sC = new LookupKey(new SymbolPath('package', 'path.dart', 'C'), qualifier: SymbolPath.qualifier);
+      var sD = new LookupKey(new SymbolPath('package', 'path.dart', 'D'), qualifier: SymbolPath.qualifier);
 
       var cycle1 = new Cycle([sA, sB, sC, sA]);
       var cycle2 = new Cycle([sB, sC, sA, sB]);

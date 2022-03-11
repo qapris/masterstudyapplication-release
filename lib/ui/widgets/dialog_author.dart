@@ -5,7 +5,7 @@ import 'package:masterstudy_app/main.dart';
 import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/bloc/course/bloc.dart';
 import 'package:masterstudy_app/ui/bloc/user_course_locked/bloc.dart';
-import 'package:masterstudy_app/ui/screen/detail_profile/detail_profile_screen.dart';
+import 'package:masterstudy_app/ui/screens/detail_profile/detail_profile_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DialogAuthorWidget extends StatelessWidget {

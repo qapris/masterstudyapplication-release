@@ -6,12 +6,12 @@ part 'FinalResponse.g.dart';
 class FinalResponse {
   CourseBean? course;
   CurriculumBean? curriculum;
-  bool? course_completed;
+  bool course_completed = false;
   String? title;
   String? url;
   String? certificate_url;
 
-  FinalResponse({required this.title});
+  FinalResponse({required this.title,required this.course_completed} );
 
   factory FinalResponse.fromJson(Map<String, dynamic> json) => _$FinalResponseFromJson(json);
 
@@ -22,9 +22,9 @@ class FinalResponse {
 class CourseBean {
   num? user_course_id;
   num? user_id;
-  num? course_id;
+  int? course_id;
   num? current_lesson_id;
-  num? progress_percent;
+  int? progress_percent;
   String? status;
   num? subscription_id;
   String? start_time;

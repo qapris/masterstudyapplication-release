@@ -19,8 +19,9 @@ class EmptyCoursesState extends UserCoursesState {
   List<Object> get props => [];
 }
 
+// ignore: must_be_immutable
 class LoadedCoursesState extends UserCoursesState {
-   List<PostsBean?> courses;
+  List<PostsBean> courses;
 
   LoadedCoursesState(this.courses);
 

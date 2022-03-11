@@ -4,7 +4,7 @@ part 'category.g.dart';
 
 @JsonSerializable()
 class Category {
-  int id;
+  int? id;
   String name;
   int count;
   dynamic color;

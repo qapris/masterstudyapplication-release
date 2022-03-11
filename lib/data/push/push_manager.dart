@@ -31,11 +31,12 @@ class PushNotificationsManager {
       pushStreamController.add(message);
     });
 
-    FirebaseMessaging.onBackgroundMessage((message) async {
+    // TODO: Нужно исправить onbackgroundMessage
+    /*FirebaseMessaging.onBackgroundMessage((message) async {
       print("onMessage: $message");
       //_showItemDialog(message);
       pushStreamController.add(message);
-    });
+    });*/
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       print("onLaunch: $message");

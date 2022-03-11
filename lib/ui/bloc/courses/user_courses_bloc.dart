@@ -12,13 +12,11 @@ import './bloc.dart';
 class UserCoursesBloc extends Bloc<UserCoursesEvent, UserCoursesState> {
   UserCoursesBloc(this._userCourseRepository, this._cacheManager) : super(InitialUserCoursesState());
 
-  @override
   UserCoursesState get initialState => InitialUserCoursesState();
 
   final UserCourseRepository _userCourseRepository;
   final CacheManager _cacheManager;
 
-  @override
   Stream<UserCoursesState> mapEventToState(
     UserCoursesEvent event,
   ) async* {
@@ -30,14 +28,12 @@ class UserCoursesBloc extends Bloc<UserCoursesEvent, UserCoursesState> {
   Stream<UserCoursesState> _mapFetchToState() async* {
     if (state is ErrorUserCoursesState) yield InitialUserCoursesState();
     try {
-      UserCourseResponse response =
-          await _userCourseRepository.getUserCourses();
+      UserCourseResponse response = await _userCourseRepository.getUserCourses();
       if (response.posts.isEmpty) {
         yield EmptyCoursesState();
       } else {
         yield InitialUserCoursesState();
-        yield LoadedCoursesState(
-            response.posts.map((e) => e?.fromCache = false).toList());
+        // yield LoadedCoursesState(response.posts.map((e) => e.fromCache = false).toList());
         print(response.posts.length);
       }
     } catch (e, s) {
@@ -48,7 +44,7 @@ class UserCoursesBloc extends Bloc<UserCoursesEvent, UserCoursesState> {
         try {
           List<PostsBean> list = [];
           cache.courses.forEach((element) {
-            list.add(element?.postsBean?.fromCache = true);
+            // list.add(element.postsBean.fromCache = true);
           });
           yield LoadedCoursesState(list);
         } catch (e, s) {

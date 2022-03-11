@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 class LoggingInterceptors extends Interceptor {
   @override
   Future<dynamic> onRequests(RequestOptions options) async {
-    print("--> ${options.method != null ? options.method.toUpperCase() : 'METHOD'} ${"" + (options.baseUrl ?? "") + (options.path ?? "")}");
+    print("--> ${options.method != null ? options.method.toUpperCase() : 'METHOD'} ${"" + (options.baseUrl ) + (options.path)}");
     print("Headers:");
     options.headers.forEach((k, v) => print('$k: $v'));
     if (options.queryParameters != null) {
@@ -30,7 +30,7 @@ class LoggingInterceptors extends Interceptor {
   Future<dynamic> onResponses(Response response) async {
     print("<-- ${response.statusCode} ${(response.data != null ? (response.data.baseUrl + response.data.path) : 'URL')}");
     print("Headers:");
-    response.headers?.forEach((k, v) => print('$k: $v'));
+    response.headers.forEach((k, v) => print('$k: $v'));
     print("Response: ${response.data}");
     print("<-- END HTTP");
     return response;

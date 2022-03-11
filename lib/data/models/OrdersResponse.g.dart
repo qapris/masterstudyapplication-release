@@ -64,7 +64,7 @@ Map<String, dynamic> _$UserBeanToJson(UserBean instance) => <String, dynamic>{
 
 Cart_itemsBean _$Cart_itemsBeanFromJson(Map<String, dynamic> json) {
   return Cart_itemsBean(
-    cart_item_id: json['cart_item_id'] as num,
+    cart_item_id: json['cart_item_id'] as int,
     title: json['title'] as String,
     image: json['image'] as String,
     price: json['price'] as String,

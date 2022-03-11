@@ -84,7 +84,7 @@ class CourseBloc extends Bloc<CourseEvent, CourseState> {
   Stream<CourseState> _mapVerifyInAppToState(VerifyInAppPurchase event) async* {
     yield InitialCourseState();
     try {
-      await _coursesRepository.verifyInApp(event.serverVerificationData, event.price);
+      await _coursesRepository.verifyInApp(event.serverVerificationData!, event.price!);
     } catch (error) {
       print(error);
     } finally {

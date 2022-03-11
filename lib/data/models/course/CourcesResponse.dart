@@ -22,9 +22,7 @@ class CoursesBean {
   String? title;
   ImagesBean? images;
   List<String?> categories;
-
   PriceBean? price;
-
   RatingBean? rating;
   String? featured;
   StatusBean? status;
@@ -43,20 +41,19 @@ class CoursesBean {
 
   factory CoursesBean.fromJson(Map<String, dynamic> json) => _$CoursesBeanFromJson(json);
 
-
   Map<String, dynamic> toJson() => _$CoursesBeanToJson(this);
 }
 
 @JsonSerializable()
 class PriceBean {
-  bool free;
-  String price;
-  late String old_price;
+  final dynamic free;
+  final dynamic price;
+  final dynamic old_price;
 
   PriceBean({
-    required this.free,
-    required this.price,
-    required this.old_price,
+    this.free,
+    this.price,
+    this.old_price,
   });
 
   factory PriceBean.fromJson(Map<String, dynamic> json) => _$PriceBeanFromJson(json);
@@ -78,8 +75,8 @@ class StatusBean {
 
 @JsonSerializable()
 class RatingBean {
-  num average;
-  late num total;
+  num? average;
+   num? total;
   num percent;
 
   RatingBean({required this.average, required this.total, required this.percent});
@@ -91,8 +88,8 @@ class RatingBean {
 
 @JsonSerializable()
 class ImagesBean {
-  String full;
-  String small;
+  String? full;
+  String? small;
 
   ImagesBean({required this.full, required this.small});
 
