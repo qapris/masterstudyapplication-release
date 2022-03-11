@@ -18,7 +18,7 @@ void main() {
   group(LookupKey, () {
     group('toPrettyString', () {
       test('only root', () {
-        final type = new LookupKey(typeSymbolPath1);
+        final type = new LookupKey(typeSymbolPath1, qualifier: qualifier);
 
         final prettyString = type.toPrettyString();
 
@@ -44,7 +44,7 @@ void main() {
       });
 
       test('without qualifier', () {
-        final type = new LookupKey(typeSymbolPath1);
+        final type = new LookupKey(typeSymbolPath1, qualifier: qualifier);
 
         final deserialized = deserialize(type);
 
@@ -55,8 +55,8 @@ void main() {
     test('equality', () {
       expect({
         'only root': [
-          new LookupKey(typeSymbolPath1),
-          new LookupKey(typeSymbolPath1)
+          new LookupKey(typeSymbolPath1, qualifier: qualifier),
+          new LookupKey(typeSymbolPath1, qualifier: qualifier)
         ],
         'with qualifier': [
           new LookupKey(typeSymbolPath1, qualifier: qualifier),

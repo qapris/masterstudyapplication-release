@@ -9,6 +9,7 @@ part of 'FinalResponse.dart';
 FinalResponse _$FinalResponseFromJson(Map<String, dynamic> json) {
   return FinalResponse(
     title: json['title'] as String,
+    course_completed: false,
   )
     ..course = json['course'] == null ? null : CourseBean.fromJson(json['course'] as Map<String, dynamic>)
     ..curriculum = json['curriculum'] == null ? null : CurriculumBean.fromJson(json['curriculum'] as Map<String, dynamic>)
@@ -31,9 +32,9 @@ CourseBean _$CourseBeanFromJson(Map<String, dynamic> json) {
     user_course_id: json['user_course_id'] as num,
   )
     ..user_id = json['user_id'] as num
-    ..course_id = json['course_id'] as num
+    ..course_id = json['course_id'] as int
     ..current_lesson_id = json['current_lesson_id'] as num
-    ..progress_percent = json['progress_percent'] as num
+    ..progress_percent = json['progress_percent'] as int
     ..status = json['status'] as String
     ..subscription_id = json['subscription_id'] as num
     ..start_time = json['start_time'] as String

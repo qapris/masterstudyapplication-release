@@ -24,10 +24,10 @@ class AppSettings {
 @JsonSerializable()
 class HomeLayoutBean {
   num id;
-  String name;
+  String? name;
   bool enabled;
 
-  HomeLayoutBean({required this.id, required this.name, required this.enabled});
+  HomeLayoutBean({required this.id, this.name, required this.enabled});
 
   factory HomeLayoutBean.fromJson(Map<String, dynamic> json) => _$HomeLayoutBeanFromJson(json);
 

@@ -21,7 +21,7 @@ Map<String, dynamic> _$CachedCourseToJson(CachedCourse instance) => <String, dyn
       'hash': instance.hash,
       'postsBean': instance.postsBean?.toJson(),
       'curriculumResponse': instance.curriculumResponse?.toJson(),
-      'lessons': instance.lessons?.map((e) => e?.toJson())?.toList(),
+      'lessons': instance.lessons.map((e) => e?.toJson()).toList(),
     };
 
 CachedCourses _$CachedCoursesFromJson(Map<String, dynamic> json) {
@@ -31,5 +31,5 @@ CachedCourses _$CachedCoursesFromJson(Map<String, dynamic> json) {
 }
 
 Map<String, dynamic> _$CachedCoursesToJson(CachedCourses instance) => <String, dynamic>{
-      'courses': instance.courses?.map((e) => e?.toJson())?.toList(),
+      'courses': instance.courses.map((e) => e?.toJson()).toList(),
     };

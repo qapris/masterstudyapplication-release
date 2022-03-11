@@ -9,7 +9,7 @@ abstract class LocalizationRepository {
 
   String getLocalization(String key) {
     if (customLocalization.containsKey(key)) return customLocalization[key];
-    if (localization.containsKey(key)) return localization![key];
+    if (localization.containsKey(key)) return localization[key];
     return "UnknownLetter";
   }
 
@@ -18,7 +18,7 @@ abstract class LocalizationRepository {
 
 class LocalizationRepositoryImpl extends LocalizationRepository {
   final dynamic defaultString;
-  late final dynamic customString;
+  late dynamic customString;
 
   LocalizationRepositoryImpl(
     String s, {

@@ -387,14 +387,14 @@ class UserApiProvider {
   }
 
   Future<bool> verifyInApp(String serverVerificationData, String price) async {
-    Response respose = await _dio.post(
+    Response response = await _dio.post(
       apiEndpoint + "verify_purchase",
       data: {"receipt": serverVerificationData, "price": price},
       options: Options(
         headers: {"requirestoken": "true"},
       ),
     );
-    if (respose.statusCode == 200) return true;
+    if (response.statusCode == 200) return true;
     return false;
   }
 }

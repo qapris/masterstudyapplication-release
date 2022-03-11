@@ -41,9 +41,9 @@ class UsePlan extends CourseEvent {
 }
 
 class VerifyInAppPurchase extends CourseEvent {
-  final String serverVerificationData;
-  final String price;
-  final int courseId;
+  final String? serverVerificationData;
+  final String? price;
+  final int? courseId;
 
   VerifyInAppPurchase(this.serverVerificationData, this.price, this.courseId);
 }

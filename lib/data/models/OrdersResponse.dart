@@ -70,7 +70,7 @@ class UserBean {
 
 @JsonSerializable()
 class Cart_itemsBean {
-  num cart_item_id;
+  int cart_item_id;
   String title;
   String image;
   String image_url;

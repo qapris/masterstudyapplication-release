@@ -26,27 +26,27 @@ class UserCourseResponse {
 
 @JsonSerializable()
 class PostsBean {
-  String image_id;
-  String title;
-  String link;
-  String image;
-  List<String?> terms;
-  List<String?> terms_list;
-  String views;
-  String price;
-  String sale_price;
+  dynamic image_id;
+  dynamic title;
+  dynamic link;
+  dynamic image;
+  List<dynamic> terms;
+  List<dynamic> terms_list;
+  dynamic views;
+  dynamic price;
+  dynamic sale_price;
   PostStatusBean? post_status;
-  String progress;
-  String progress_label;
-  String current_lesson_id;
-  String course_id;
-  String lesson_id;
-  String start_time;
-  String duration;
-  String app_image;
+  dynamic progress;
+  dynamic progress_label;
+  dynamic current_lesson_id;
+  dynamic course_id;
+  dynamic lesson_id;
+  dynamic start_time;
+  dynamic duration;
+  dynamic app_image;
   PostAuthorBean? author;
-  String lesson_type;
-  String hash;
+  String? lesson_type;
+  String? hash;
   List<Category?> categories_object;
   bool fromCache = false;
 
@@ -94,10 +94,10 @@ class PostStatusBean {
 
 @JsonSerializable()
 class PostAuthorBean {
-  String id;
-  String login;
-  String avatar_url;
-  String url;
+  String? id;
+  String? login;
+  String? avatar_url;
+  String? url;
   AuthorMetaBean? meta;
 
   //RatingBean rating;

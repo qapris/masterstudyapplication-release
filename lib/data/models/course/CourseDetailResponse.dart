@@ -5,8 +5,8 @@ part 'CourseDetailResponse.g.dart';
 
 @JsonSerializable()
 class CourseDetailResponse {
-  num? id;
-  String? title;
+  final dynamic id;
+  dynamic title;
   ImagesBean? images;
   List<String?> categories;
   PriceBean? price;
@@ -22,18 +22,18 @@ class CourseDetailResponse {
   List<CurriculumBean?>? curriculum;
   List<FaqBean?> faq;
   bool? is_favorite;
-  bool? trial;
-  num? first_lesson;
+  dynamic trial;
+  dynamic first_lesson;
   String? first_lesson_type;
-  bool? has_access;
+  bool has_access;
   List<Category?> categories_object;
 
   CourseDetailResponse({
     required this.id,
     required this.title,
-    required this.images,
+    this.images,
     required this.categories,
-    required this.price,
+    this.price,
     required this.rating,
     required this.featured,
     required this.status,
@@ -60,8 +60,8 @@ class CourseDetailResponse {
 
 @JsonSerializable()
 class FaqBean {
-  String question;
-  String answer;
+  String? question;
+  String? answer;
 
   FaqBean({required this.question, required this.answer});
 
@@ -102,8 +102,8 @@ class MetaBean {
 @JsonSerializable()
 class AuthorBean {
   num? id;
-  String? login;
-  String? avatar_url;
+  dynamic login;
+  dynamic avatar_url;
   String? url;
   AuthorMetaBean? meta;
   AuthorRatingBean? rating;
@@ -173,7 +173,7 @@ class AuthorRatingBean {
 
 @JsonSerializable()
 class RatingBean {
-  num? total;
+  dynamic total;
   num? average;
   num? percent;
   DetailsBean? details;
@@ -231,10 +231,10 @@ class PriceBean {
 
 @JsonSerializable()
 class ImagesBean {
-  String full;
-  String small;
+  dynamic full;
+  String? small;
 
-  ImagesBean({required this.full, required this.small});
+  ImagesBean({this.full, required this.small});
 
   factory ImagesBean.fromJson(Map<String, dynamic> json) => _$ImagesBeanFromJson(json);
 

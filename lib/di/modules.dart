@@ -75,6 +75,7 @@ class AppModule {
     var dio = Dio();
     dio.interceptors.add(AppInterceptors());
     dio.interceptors.add(LoggingInterceptors());
+    // dio.transformer = FlutterTransformer();
     return dio;
   }
 

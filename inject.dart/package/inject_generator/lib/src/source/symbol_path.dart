@@ -99,8 +99,8 @@ class SymbolPath implements Comparable<SymbolPath> {
         path = null;
 
   /// Create a [SymbolPath] using [assetUri].
-  factory SymbolPath.fromAbsoluteUri(Uri assetUri, [String symbolName]) {
-    assetUri = toAssetUri(assetUri);
+  factory SymbolPath.fromAbsoluteUri(Uri? assetUri, [String? symbolName]) {
+    assetUri = toAssetUri(assetUri!);
     symbolName ??= assetUri.fragment;
     if (assetUri.scheme == _dartPackage) {
       return new SymbolPath.dartSdk(assetUri.path, symbolName);

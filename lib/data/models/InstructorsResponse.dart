@@ -69,12 +69,12 @@ class RatingBean {
 
 @JsonSerializable()
 class MetaBean {
-  String facebook;
+  String? facebook;
   String twitter;
   String instagram;
   @JsonKey(name: "google-plus")
   String google_plus;
-  String position;
+  String? position;
   String description;
   String first_name;
   String last_name;

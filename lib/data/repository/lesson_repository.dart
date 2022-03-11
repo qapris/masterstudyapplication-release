@@ -17,7 +17,7 @@ abstract class LessonRepository {
 
   Future completeLesson(int courseId, int lessonId);
 
-  Future<List<LessonResponse>> getAllLessons(int courseId, List<int> lessonIds);
+  Future<List<LessonResponse>> getAllLessons(int courseId, List<int?> lessonIds);
 }
 
 @provide

@@ -4,8 +4,8 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:masterstudy_app/data/models/course/CourcesResponse.dart';
 import 'package:masterstudy_app/theme/theme.dart';
-import 'package:masterstudy_app/ui/screen/category_detail/category_detail_screen.dart';
-import 'package:masterstudy_app/ui/screen/course/course_screen.dart';
+import 'package:masterstudy_app/ui/screens/category_detail/category_detail_screen.dart';
+import 'package:masterstudy_app/ui/screens/course/course_screen.dart';
 
 import '../../main.dart';
 
@@ -31,7 +31,7 @@ class CourseGridItem extends StatelessWidget {
   _buildCard(context) {
     double? rating = 0.0;
     num? reviews = 0;
-    rating = coursesBean?.rating?.average.toDouble();
+    rating = coursesBean?.rating?.average?.toDouble();
     reviews = coursesBean?.rating?.total;
 
     var unescape = new HtmlUnescape();
@@ -63,7 +63,7 @@ class CourseGridItem extends StatelessWidget {
                         Navigator.pushNamed(
                           context,
                           CategoryDetailScreen.routeName,
-                          arguments: CategoryDetailScreenArgs(coursesBean.categories_object.first),
+                          arguments: CategoryDetailScreenArgs(coursesBean?.categories_object.first),
                         );
                       },
                       child: Text(
@@ -126,19 +126,19 @@ class CourseGridItem extends StatelessWidget {
       child: Row(
         children: <Widget>[
           Text(
-            coursesBean.price.free ? localizations.getLocalization("free_course_item") : coursesBean.price.price,
+            coursesBean?.price?.free ? localizations.getLocalization("free_course_item") : coursesBean?.price?.price,
             textScaleFactor: 1.0,
             style: Theme.of(context).primaryTextTheme.subtitle1!.copyWith(color: dark, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
           ),
           Padding(
             padding: const EdgeInsets.only(left: 8.0),
             child: Text(
-              (coursesBean.price.old_price != null) ? coursesBean.price.old_price.toString() : " ",
+              (coursesBean?.price?.old_price != null) ? coursesBean?.price?.old_price : " ",
               textScaleFactor: 1.0,
               style: Theme.of(context)
                   .primaryTextTheme
                   .subtitle1!
-                  .copyWith(color: HexColor.fromHex("#999999"), fontStyle: FontStyle.normal, decoration: (coursesBean.price.old_price != null) ? TextDecoration.lineThrough : TextDecoration.none),
+                  .copyWith(color: HexColor.fromHex("#999999"), fontStyle: FontStyle.normal, decoration: (coursesBean?.price?.old_price != null) ? TextDecoration.lineThrough : TextDecoration.none),
             ),
           )
         ],
