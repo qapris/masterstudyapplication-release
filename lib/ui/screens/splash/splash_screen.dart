@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -11,7 +9,6 @@ import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/bloc/splash/bloc.dart';
 import 'package:masterstudy_app/ui/screens/auth/auth_screen.dart';
 import 'package:masterstudy_app/ui/widgets/loading_error_widget.dart';
-
 import '../../screenS/main_screens.dart';
 
 @provide
@@ -49,7 +46,7 @@ class SplashWidgetState extends State<SplashWidget> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SplashBloc, SplashState>(
-      builder: (BuildContext context, SplashState state) {
+      builder: (context,state) {
         return Center(child: _buildLogoBlock(state));
       },
     );
@@ -80,7 +77,7 @@ class SplashWidgetState extends State<SplashWidget> {
       appLogoUrl = imgUrl;
 
       if (state.appSettings != null) {
-        imgUrl = (state.appSettings.options?.logo == null) ? "" : state.appSettings.options!.logo;
+        imgUrl = state.appSettings.options?.logo == null ? "" : state.appSettings.options!.logo;
         if (state.appSettings.demo != null) {
           demoEnabled = state.appSettings.demo;
         }
@@ -95,7 +92,7 @@ class SplashWidgetState extends State<SplashWidget> {
         children: <Widget>[
           CachedNetworkImage(
             imageUrl: imgUrl,
-            placeholder: (context, url) => CircularProgressIndicator(),
+            placeholder: (context, url) => Center(child: CircularProgressIndicator()),
             errorWidget: (context, url, error) => SizedBox(width: 83.0, child: Image(image: AssetImage('assets/icons/logo.png'))),
             width: 83.0,
           ),

@@ -11,63 +11,56 @@ import './bloc.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _repository;
 
-  AuthBloc(this._repository) : super(InitialAuthState());
-
   AuthState get initialState => InitialAuthState();
 
-  Stream<AuthState> mapEventToState(
-    AuthEvent event,
-  ) async* {
+  AuthBloc(this._repository) : super(InitialAuthState()) {
+    on<AuthEvent>((event, emit) async {
+      await _authMap(event, emit);
+    });
+  }
+
+  Future<void> _authMap(AuthEvent event, Emitter<AuthState> emit) async {
     if (event is RegisterEvent) {
-      yield* _mapRegisterEventToState(event);
+      emit(LoadingAuthState());
+      try {
+        await _repository.register(event.login, event.email, event.password);
+        emit(SuccessAuthState());
+      } catch (error, stacktrace) {
+        var errorData = json.decode(error.toString());
+        emit(_errorToState(errorData['message']));
+      }
     }
+
     if (event is LoginEvent) {
-      yield* _mapSignInEventToState(event);
+      emit(LoadingAuthState());
+      try {
+        await _repository.authUser(event.login, event.password);
+        emit(SuccessAuthState());
+      } catch (error, stacktrace) {
+        var errorData = json.decode(error.toString());
+
+        emit(_errorToState(errorData['message']));
+      }
     }
+
     if (event is DemoAuthEvent) {
-      yield* _mapDemoEventToState(event);
+      emit(LoadingAuthState());
+      try {
+        await _repository.demoAuth();
+        emit(SuccessAuthState());
+      } catch (error) {
+        var errorData = json.decode(error.toString());
+        emit(_errorToState(errorData['message']));
+      }
     }
+
     if (event is CloseDialogEvent) {
-      yield InitialAuthState();
+      emit(InitialAuthState());
     }
   }
 
-  Stream<AuthState> _errorToState(message) async* {
-    yield ErrorAuthState(message);
+  _errorToState(message) async* {
+    emit(ErrorAuthState(message));
     //yield InitialAuthState();
-  }
-
-  Stream<AuthState> _mapRegisterEventToState(event) async* {
-    yield LoadingAuthState();
-    try {
-      await _repository.register(event.login, event.email, event.password);
-      yield SuccessAuthState();
-    } catch (error, stacktrace) {
-      var errorData = json.decode(error.toString());
-      yield* _errorToState(errorData['message']);
-    }
-  }
-
-  Stream<AuthState> _mapDemoEventToState(event) async* {
-    yield LoadingAuthState();
-    try {
-      await _repository.demoAuth();
-      yield SuccessAuthState();
-    } catch (error, stacktrace) {
-      var errorData = json.decode(error.toString());
-      yield* _errorToState(errorData['message']);
-    }
-  }
-
-  Stream<AuthState> _mapSignInEventToState(event) async* {
-    yield LoadingAuthState();
-    try {
-      await _repository.authUser(event.login, event.password);
-      yield SuccessAuthState();
-    } catch (error, stacktrace) {
-      var errorData = json.decode(error.toString());
-
-      yield* _errorToState(errorData['message']);
-    }
   }
 }

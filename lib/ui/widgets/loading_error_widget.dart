@@ -11,24 +11,11 @@ class LoadingErrorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-//    return Center(
-//        child: MaterialButton(
-//      height: 40,
-//      color: mainColor,
-//      onPressed: onRetry,
-//    ));
 
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-//          SizedBox(
-//            width: 150,
-//            height: 150,
-//            child: SvgPicture.asset(
-//              "assets/icons/empty_courses.svg",
-//            ),
-//          ),
           Text(
             localizations.getLocalization("network_error"),
             textScaleFactor: 1.0,

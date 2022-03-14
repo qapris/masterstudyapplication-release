@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:inject/inject.dart';
@@ -13,40 +14,33 @@ class DetailProfileBloc extends Bloc<DetailProfileEvent, DetailProfileState> {
   final AccountRepository _repository;
   final CoursesRepository _coursesRepository;
 
-  DetailProfileBloc(this._repository, this._coursesRepository) : super(InitialDetailProfileState());
-
-  @override
   DetailProfileState get initialState => InitialDetailProfileState();
 
-  late Account account;
-  late int _teacherId;
+  DetailProfileBloc(this._repository, this._coursesRepository) : super(InitialDetailProfileState()) {
+    on<DetailProfileEvent>((event, emit) async => await _detailProfile(event, emit));
+  }
+
+  Account? account;
+  int? _teacherId;
 
   void setAccount(Account account) {
     this.account = account;
   }
 
-  @override
-  Stream<DetailProfileState> mapEventToState(
-    DetailProfileEvent event,
-  ) async* {
+  Future<void> _detailProfile(DetailProfileEvent event, Emitter<DetailProfileState> emit) async {
     if (event is LoadDetailProfile) {
-      yield* _mapLoadToState();
-    }
-  }
-
-  Stream<DetailProfileState> _mapLoadToState() async* {
-    if (account == null) {
-      try {
-        account = await _repository.getAccountById(_teacherId);
-        var courses = await _coursesRepository.getCourses(authorId: _teacherId);
-        yield LoadedDetailProfileState(courses.courses, true);
-      } catch (e, s) {
-        print(e);
-        print(s);
+      if (account == null) {
+        try {
+          account = await _repository.getAccountById(_teacherId!);
+          var courses = await _coursesRepository.getCourses(authorId: _teacherId!);
+          emit(LoadedDetailProfileState(courses.courses, true));
+        } catch (e, s) {
+          print(e);
+          print(s);
+        }
+      } else {
+        emit(LoadedDetailProfileState(null, false));
       }
-    } else {
-      var courses = await _coursesRepository.getCourses(authorId: _teacherId);
-      yield LoadedDetailProfileState(courses.courses, false);
     }
   }
 

@@ -12,36 +12,30 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
   final AccountRepository _repository;
   late Account account;
 
-  EditProfileBloc(this._repository) : super(InitialEditProfileState());
-
-  @override
   EditProfileState get initialState => InitialEditProfileState();
 
-  @override
-  Stream<EditProfileState> mapEventToState(
-    EditProfileEvent event,
-  ) async* {
-    if (event is SaveEvent) {
-      yield* _mapSaveEventToState(event);
-    }
-    if (event is CloseScreenEvent) {
-      yield CloseEditProfileState();
-    }
+  EditProfileBloc(this._repository) : super(InitialEditProfileState()) {
+    on<EditProfileEvent>((event, emit) async {
+      await _editProfile(event, emit);
+    });
   }
 
-  Stream<EditProfileState> _mapSaveEventToState(event) async* {
-    try {
-      yield LoadingEditProfileState();
-      await _repository.editProfile(event.firstName, event.lastName,
-          event.password, event.description, event.position, event.facebook,event.twitter,event.instagram,
-          photo: event.photo);
-      await Future.delayed(Duration(milliseconds: 1000));
-      yield CloseEditProfileState();
-    } catch (e, s) {
-      print(e);
-      print(s);
-      yield ErrorEditProfileState();
-      yield InitialEditProfileState();
+  Future<void> _editProfile(EditProfileEvent event, Emitter<EditProfileState> emit) async {
+    if (event is SaveEvent) {
+      try {
+        emit(LoadingEditProfileState());
+        await _repository.editProfile(event.firstName, event.lastName, event.password, event.description, event.position, event.facebook, event.twitter, event.instagram, photo: event.photo);
+        await Future.delayed(Duration(milliseconds: 1000));
+        emit(CloseEditProfileState());
+      } catch (e, s) {
+        print(e);
+        print(s);
+        emit(ErrorEditProfileState());
+        emit(InitialEditProfileState());
+      }
+    }
+    if (event is CloseScreenEvent) {
+      emit(CloseEditProfileState());
     }
   }
 }

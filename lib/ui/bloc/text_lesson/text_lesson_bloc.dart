@@ -12,10 +12,11 @@ class TextLessonBloc extends Bloc<TextLessonEvent, TextLessonState> {
   final LessonRepository repository;
   final CacheManager cacheManager;
 
+  TextLessonState get initialState => InitialTextLessonState();
+
   TextLessonBloc(this.repository, this.cacheManager) : super(InitialTextLessonState());
 
-  @override
-  TextLessonState get initialState => InitialTextLessonState();
+
 
   @override
   Stream<TextLessonState> mapEventToState(

@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 extension QueryParameterAdd on Map {
   addParam(key, value) {
     if (value != null) {
@@ -5,3 +7,6 @@ extension QueryParameterAdd on Map {
     }
   }
 }
+
+var dio = Dio();
+

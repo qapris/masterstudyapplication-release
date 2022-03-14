@@ -11,42 +11,40 @@ import './bloc.dart';
 
 @provide
 class QuestionsBloc extends Bloc<QuestionsEvent, QuestionsState> {
-    final QuestionsRepository _questionsRepository;
+  final QuestionsRepository _questionsRepository;
 
-    QuestionsBloc (this._questionsRepository) : super(InitialQuestionsState());
+  QuestionsState get initialState => InitialQuestionsState();
 
-    @override
-    QuestionsState get initialState => InitialQuestionsState();
+  QuestionsBloc(this._questionsRepository) : super(InitialQuestionsState()) {
+    on<QuestionsEvent>((event, emit) async => await _questionsBloc(event, emit));
+  }
 
-    @override
-    Stream<QuestionsState> mapEventToState(
-        QuestionsEvent event
-        ) async* {
-        if(event is FetchEvent) {
-            try {
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                var currentUserId = prefs.get("apiToken").split('|');
-                QuestionsResponse questions = await _questionsRepository.getQuestions(event.lessonId, event.page, event.search, "");
-                QuestionsResponse questionsMy = await _questionsRepository.getQuestions(event.lessonId, event.page, event.search, currentUserId[0]);
+  Future<void> _questionsBloc(QuestionsEvent event, Emitter<QuestionsState> emit) async {
+    if (event is FetchEvent) {
+      try {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        var currentUserId = prefs.get("apiToken").split('|');
+        QuestionsResponse questions = await _questionsRepository.getQuestions(event.lessonId, event.page, event.search, "");
+        QuestionsResponse questionsMy = await _questionsRepository.getQuestions(event.lessonId, event.page, event.search, currentUserId[0]);
 
-                yield LoadedQuestionsState(questions, questionsMy);
-            } catch (error) {
-                print(error);
-            }
-        }
-
-        if(event is MyQuestionAddEvent) {
-            try {
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                var currentUserId = prefs.get("apiToken").split('|');
-
-                QuestionAddResponse addAnswer = await _questionsRepository.addQuestion(event.lessonId, event.comment, event.parent);
-                QuestionsResponse questionsMy = await _questionsRepository.getQuestions(event.lessonId, 1, "", currentUserId[0]);
-
-                yield LoadedQuestionsState(event.questionsResponse, questionsMy);
-            } catch (error) {
-                print(error);
-            }
-        }
+        emit(LoadedQuestionsState(questions, questionsMy));
+      } catch (error) {
+        print(error);
+      }
     }
+
+    if (event is MyQuestionAddEvent) {
+      try {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        var currentUserId = prefs.get("apiToken").split('|');
+
+        QuestionAddResponse addAnswer = await _questionsRepository.addQuestion(event.lessonId, event.comment, event.parent);
+        QuestionsResponse questionsMy = await _questionsRepository.getQuestions(event.lessonId, 1, "", currentUserId[0]);
+
+        emit(LoadedQuestionsState(event.questionsResponse, questionsMy));
+      } catch (error) {
+        print(error);
+      }
+    }
+  }
 }

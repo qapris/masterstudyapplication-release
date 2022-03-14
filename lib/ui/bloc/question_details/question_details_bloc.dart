@@ -11,28 +11,25 @@ import './bloc.dart';
 
 @provide
 class QuestionDetailsBloc extends Bloc<QuestionDetailsEvent, QuestionDetailsState> {
-    final QuestionsRepository _questionsRepository;
+  final QuestionsRepository _questionsRepository;
 
-    QuestionDetailsBloc (this._questionsRepository) : super(InitialQuestionDetailsState());
+  QuestionDetailsState get initialState => InitialQuestionDetailsState();
 
-    @override
-    QuestionDetailsState get initialState => InitialQuestionDetailsState();
+  QuestionDetailsBloc(this._questionsRepository) : super(InitialQuestionDetailsState()) {
+    on<QuestionDetailsEvent>((event, emit) async => await _questionDetail(event, emit));
+  }
 
-    @override
-    Stream<QuestionDetailsState> mapEventToState(
-        QuestionDetailsEvent event
-    ) async* {
-        if(event is QuestionAddEvent) {
-            try {
-                yield ReplyAddingState();
-                QuestionAddResponse addAnswer = await _questionsRepository
-                    .addQuestion(event.lessonId, event.comment, event.parent);
-                yield ReplyAddedState(addAnswer);
-            } catch(error) {
-                print(error);
-            }
-        }
-
-        yield LoadedQuestionDetailsState();
+  Future<void> _questionDetail(QuestionDetailsEvent event, Emitter<QuestionDetailsState> emit) async {
+    if (event is QuestionAddEvent) {
+      try {
+        emit(ReplyAddingState());
+        QuestionAddResponse addAnswer = await _questionsRepository.addQuestion(event.lessonId, event.comment, event.parent);
+        emit(ReplyAddedState(addAnswer));
+      } catch (error) {
+        print(error);
+      }
     }
+
+    emit(LoadedQuestionDetailsState());
+  }
 }

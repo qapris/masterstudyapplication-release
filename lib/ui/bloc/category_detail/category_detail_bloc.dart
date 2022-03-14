@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:inject/inject.dart';
-import 'package:masterstudy_app/data/models/category.dart';
 import 'package:masterstudy_app/data/repository/courses_repository.dart';
 import 'package:masterstudy_app/data/repository/home_repository.dart';
 
@@ -13,27 +12,27 @@ class CategoryDetailBloc extends Bloc<CategoryDetailEvent, CategoryDetailState> 
   final HomeRepository _homeRepository;
   final CoursesRepository _coursesRepository;
 
-  CategoryDetailBloc(this._homeRepository, this._coursesRepository) : super(InitialCategoryDetailState());
-
-  @override
   CategoryDetailState get initialState => InitialCategoryDetailState();
 
-  @override
-  Stream<CategoryDetailState> mapEventToState(
-    CategoryDetailEvent event,
-  ) async* {
+  CategoryDetailBloc(this._homeRepository, this._coursesRepository) : super(InitialCategoryDetailState()) {
+    on<CategoryDetailEvent>((event, emit) async {
+      await _getCategoryDetail(event, emit);
+    });
+  }
+
+  Future<void> _getCategoryDetail(CategoryDetailEvent event, Emitter<CategoryDetailState> emit) async {
     if (event is FetchEvent) {
-      yield InitialCategoryDetailState();
+      emit(InitialCategoryDetailState());
       try {
         var categories = await _homeRepository.getCategories();
 
         var courses = await _coursesRepository.getCourses(categoryId: event.categoryId);
 
-        yield LoadedCategoryDetailState(categories, courses.courses);
+        emit(LoadedCategoryDetailState(categories, courses.courses));
       } catch (error, stackTrace) {
         print(error);
         print(stackTrace);
-        yield ErrorCategoryDetailState(event.categoryId);
+        emit(ErrorCategoryDetailState(event.categoryId));
       }
     }
   }

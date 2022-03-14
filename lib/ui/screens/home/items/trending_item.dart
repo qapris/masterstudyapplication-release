@@ -1,13 +1,13 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:masterstudy_app/data/models/category.dart';
 import 'package:masterstudy_app/data/models/course/CourcesResponse.dart';
-import 'package:masterstudy_app/main.dart';
 import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/screens/category_detail/category_detail_screen.dart';
 import 'package:masterstudy_app/ui/screens/course/course_screen.dart';
+
+import '../../../../main.dart';
 
 class TrendingWidget extends StatefulWidget {
   final bool darkMode;
@@ -31,11 +31,6 @@ class _TrendingWidget extends State<TrendingWidget> {
   var backgroundColor;
   var primaryTextColor;
   var secondaryTextColor;
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -192,11 +187,10 @@ class _TrendingWidget extends State<TrendingWidget> {
   _buildPrice(price, oldPrice, free) {
     if (free)
       return Text(
-        localizations.getLocalization("free_course_item"),
+        localizations.getLocalization("course_free_price"),
         textScaleFactor: 1.0,
         style: Theme.of(context).primaryTextTheme.subtitle1?.copyWith(color: primaryTextColor, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
       );
-    print(oldPrice.toString());
     return Padding(
       padding: const EdgeInsets.only(top: 8.0, left: 0.0, right: 16.0),
       child: Row(

@@ -11,44 +11,38 @@ import './bloc.dart';
 
 @provide
 class ReviewWriteBloc extends Bloc<ReviewWriteEvent, ReviewWriteState> {
-    final AccountRepository _accountRepository;
-    final ReviewRepository _reviewRepository;
-    late Account accountObj;
+  final AccountRepository _accountRepository;
+  final ReviewRepository _reviewRepository;
+  late Account accountObj;
 
-    ReviewWriteBloc(this._accountRepository, this._reviewRepository) : super(InitialReviewWriteState());
+  ReviewWriteState get initialState => InitialReviewWriteState();
 
-    @override
-    ReviewWriteState get initialState => InitialReviewWriteState();
+  ReviewWriteBloc(this._accountRepository, this._reviewRepository) : super(InitialReviewWriteState()) {
+    on<ReviewWriteEvent>((event, emit) async {
+      await _reviewWrite(event, emit);
+    });
+  }
 
-    @override
-    Stream<ReviewWriteState> mapEventToState(
-        ReviewWriteEvent event
-        ) async* {
-            if(event is SaveReviewEvent) {
-                yield* _mapEventAddReview(event);
-            }
+  Future<void> _reviewWrite(ReviewWriteEvent event, Emitter<ReviewWriteState> emit) async {
+    if (event is SaveReviewEvent) {
+      try {
+        ReviewAddResponse reviewAddResponse = await _reviewRepository.addReview(event.id, event.mark, event.review);
 
-            if(event is FetchEvent) {
-                try {
-                    Account account = await _accountRepository.getUserAccount();
-                    accountObj = account;
-                    yield LoadedReviewWriteState(account);
-                } catch (error) {
-                    print('Account resp error');
-                    print(error);
-                }
-            }
+        emit(ReviewResponseState(reviewAddResponse, accountObj));
+      } catch (error) {
+        print(error);
+      }
     }
 
-    @override
-    Stream<ReviewWriteState> _mapEventAddReview(event) async* {
-        try {
-
-            ReviewAddResponse reviewAddResponse = await _reviewRepository.addReview(event.id, event.mark, event.review);
-
-            yield ReviewResponseState(reviewAddResponse, accountObj);
-        } catch(error) {
-            print(error);
-        }
+    if (event is FetchEvent) {
+      try {
+        Account account = await _accountRepository.getUserAccount();
+        accountObj = account;
+        emit(LoadedReviewWriteState(account));
+      } catch (error) {
+        print('Account resp error');
+        print(error);
+      }
     }
+  }
 }

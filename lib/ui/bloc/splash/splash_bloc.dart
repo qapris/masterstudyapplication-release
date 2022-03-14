@@ -10,13 +10,13 @@ import './bloc.dart';
 
 @provide
 class SplashBloc extends Bloc<SplashEvent, SplashState> {
-  final AuthRepository _repository;
+  final AuthRepository _authRepository;
   final HomeRepository _homeRepository;
   final UserApiProvider _apiProvider;
 
   SplashState get initialState => InitialSplashState();
 
-  SplashBloc(this._repository, this._homeRepository, this._apiProvider) : super(InitialSplashState()) {
+  SplashBloc(this._authRepository, this._homeRepository, this._apiProvider) : super(InitialSplashState()) {
     on<CheckAuthSplashEvent>((event, emit) async {
       await _splash(event, emit);
     });
@@ -24,7 +24,7 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
 
   Future<void> _splash(CheckAuthSplashEvent event, Emitter<SplashState> emit) async {
     emit(InitialSplashState());
-    bool signed = await _repository.isSigned();
+    bool signed = await _authRepository.isSigned();
     try {
       AppSettings appSettings = await _homeRepository.getAppSettings();
       try {

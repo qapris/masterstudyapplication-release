@@ -126,7 +126,7 @@ class CourseGridItem extends StatelessWidget {
       child: Row(
         children: <Widget>[
           Text(
-            coursesBean?.price?.free ? localizations.getLocalization("free_course_item") : coursesBean?.price?.price,
+            coursesBean?.price?.free ? localizations.getLocalization("course_free_price") : coursesBean?.price?.price,
             textScaleFactor: 1.0,
             style: Theme.of(context).primaryTextTheme.subtitle1!.copyWith(color: dark, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
           ),

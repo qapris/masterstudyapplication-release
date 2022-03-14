@@ -10,22 +10,18 @@ import './bloc.dart';
 class QuizScreenBloc extends Bloc<QuizScreenEvent, QuizScreenState> {
   final LessonRepository _repository;
 
-  QuizScreenBloc(this._repository) : super (InitialQuizScreenState());
-
-  @override
   QuizScreenState get initialState => InitialQuizScreenState();
 
-  @override
-  Stream<QuizScreenState> mapEventToState(
-    QuizScreenEvent event,
-  ) async* {
+  QuizScreenBloc(this._repository) : super(InitialQuizScreenState()) {
+    on<QuizScreenEvent>((event, emit) async => await _quiz(event, emit));
+  }
+
+  Future<void> _quiz(QuizScreenEvent event, Emitter<QuizScreenState> emit) async {
     if (event is FetchEvent) {
       try {
-        if (event.quizResponse != null)
-          yield LoadedQuizScreenState(event.quizResponse);
-        var response =
-            await _repository.getLesson(event.courseId, event.lessonId);
-        yield LoadedQuizScreenState(response);
+        if (event.quizResponse != null) emit(LoadedQuizScreenState(event.quizResponse));
+        var response = await _repository.getLesson(event.courseId, event.lessonId);
+        emit(LoadedQuizScreenState(response));
       } catch (e, s) {
         print(e);
         print(s);

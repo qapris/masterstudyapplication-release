@@ -8,13 +8,12 @@ import './bloc.dart';
 @provide
 class VideoBloc extends Bloc<VideoEvent, VideoState> {
 
-    VideoBloc() : super(InitialVideoState());
-
-    @override
     VideoState get initialState => InitialVideoState();
 
-    @override
-    Stream<VideoState> mapEventToState(
-        VideoEvent event,
-        ) async* { yield LoadedVideoState(); }
+    VideoBloc() : super(InitialVideoState()) {
+        on<VideoEvent>((event, emit) async => await _videoBloc(event,emit));
+    }
+
+
+    Future<void> _videoBloc(VideoEvent event, Emitter<VideoState> emit) async { emit(LoadedVideoState());  }
 }

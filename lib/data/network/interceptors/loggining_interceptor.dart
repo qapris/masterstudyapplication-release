@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 
 class LoggingInterceptors extends Interceptor {
-  @override
   Future<dynamic> onRequests(RequestOptions options) async {
     print("--> ${options.method != null ? options.method.toUpperCase() : 'METHOD'} ${"" + (options.baseUrl ) + (options.path)}");
     print("Headers:");
@@ -18,7 +17,6 @@ class LoggingInterceptors extends Interceptor {
     return options;
   }
 
-  @override
   Future<dynamic> onErrors(DioError dioError) async {
     print("<-- ${dioError.message} ${(dioError.response?.data != null ? (dioError.response?.data.baseUrl + dioError.response?.data.path) : 'URL')}");
     print("${dioError.response != null ? dioError.response?.data : 'Unknown Error'}");
@@ -26,7 +24,6 @@ class LoggingInterceptors extends Interceptor {
     return dioError;
   }
 
-  @override
   Future<dynamic> onResponses(Response response) async {
     print("<-- ${response.statusCode} ${(response.data != null ? (response.data.baseUrl + response.data.path) : 'URL')}");
     print("Headers:");

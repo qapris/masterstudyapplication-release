@@ -7,7 +7,7 @@ abstract class DetailProfileState {}
 class InitialDetailProfileState extends DetailProfileState {}
 
 class LoadedDetailProfileState extends DetailProfileState {
-  final List<CoursesBean?> courses;
+  final List<CoursesBean?>? courses;
   final bool isTeacher;
 
   LoadedDetailProfileState(

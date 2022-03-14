@@ -28,18 +28,17 @@ class NewCoursesWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Padding(
-                  padding:
-                      const EdgeInsets.only(top: 30.0, left: 30.0, bottom: 20),
-                  child: Text(title!,
-                      textScaleFactor: 1.0,
-                      style: Theme.of(context)
-                          .primaryTextTheme
-                          .headline6
-                          ?.copyWith(color: dark, fontStyle: FontStyle.normal))),
+                padding: const EdgeInsets.only(top: 30.0, left: 30.0, bottom: 20),
+                child: Text(
+                  title!,
+                  textScaleFactor: 1.0,
+                  style: Theme.of(context).primaryTextTheme.headline6?.copyWith(color: dark, fontStyle: FontStyle.normal),
+                ),
+              ),
               _buildList(context)
             ],
           )
-        : Center();
+        : SizedBox();
   }
 
   _buildList(context) {
@@ -69,16 +68,7 @@ class NewCoursesWidget extends StatelessWidget {
                 },
                 child: Padding(
                   padding: EdgeInsets.only(left: padding),
-                  child: _buildCard(
-                      context,
-                      item?.images?.small,
-                      item?.categories_object.first,
-                      "${item?.title}",
-                      rating,
-                      reviews,
-                      item?.price?.price,
-                      item?.price?.old_price,
-                      item?.price?.free),
+                  child: _buildCard(context, item?.images?.small, item?.categories_object.first, "${item?.title}", rating, reviews, item?.price?.price, item?.price?.old_price, item?.price?.free),
                 ),
               );
             },
@@ -90,11 +80,9 @@ class NewCoursesWidget extends StatelessWidget {
     );
   }
 
-  _buildCard(context, image, Category? category, title, stars, reviews, price,
-      oldPrice, free) {
+  _buildCard(context, image, Category? category, title, stars, reviews, price, oldPrice, free) {
     var unescape = new HtmlUnescape();
-    String categoryName =
-        category != null ? "${unescape.convert(category.name)} >" : "";
+    String categoryName = category != null ? "${unescape.convert(category.name)} >" : "";
     return SizedBox(
       width: 300,
       child: Card(
@@ -112,8 +100,7 @@ class NewCoursesWidget extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
               Padding(
-                padding:
-                    const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+                padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
                 child: GestureDetector(
                   onTap: () {
                     Navigator.pushNamed(
@@ -125,17 +112,14 @@ class NewCoursesWidget extends StatelessWidget {
                   child: Text(
                     categoryName,
                     textScaleFactor: 1.0,
-                    style: TextStyle(
-                        fontSize: 18,
-                        color: HexColor.fromHex("#2a3045").withOpacity(0.5)),
+                    style: TextStyle(fontSize: 18, color: HexColor.fromHex("#2a3045").withOpacity(0.5)),
                   ),
                 ),
               ),
               Container(
                 height: 60,
                 child: Padding(
-                  padding:
-                      const EdgeInsets.only(top: 6.0, left: 16.0, right: 16.0),
+                  padding: const EdgeInsets.only(top: 6.0, left: 16.0, right: 16.0),
                   child: Text(
                     unescape.convert(title),
                     textScaleFactor: 1.0,
@@ -145,16 +129,14 @@ class NewCoursesWidget extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding:
-                    const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+                padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
                 child: Divider(
                   color: HexColor.fromHex("#e0e0e0"),
                   thickness: 1.3,
                 ),
               ),
               Padding(
-                padding:
-                    const EdgeInsets.only(top: 16.0, left: 15.0, right: 16.0),
+                padding: const EdgeInsets.only(top: 16.0, left: 15.0, right: 16.0),
                 child: Row(
                   children: <Widget>[
                     RatingBar(
@@ -199,15 +181,11 @@ class NewCoursesWidget extends StatelessWidget {
       return Padding(
         padding: const EdgeInsets.only(left: 18.0),
         child: Text(
-          localizations.getLocalization("free_course_item"),
+          localizations.getLocalization("course_free_price"),
           textScaleFactor: 1.0,
-          style: Theme.of(context).primaryTextTheme.headline5?.copyWith(
-              color: dark,
-              fontStyle: FontStyle.normal,
-              fontWeight: FontWeight.bold),
+          style: Theme.of(context).primaryTextTheme.headline5?.copyWith(color: dark, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
         ),
       );
-    print(oldPrice.toString());
     return Padding(
       padding: const EdgeInsets.only(top: 8.0, left: 16.0, right: 16.0),
       child: Row(
@@ -215,10 +193,7 @@ class NewCoursesWidget extends StatelessWidget {
           Text(
             price,
             textScaleFactor: 1.0,
-            style: Theme.of(context).primaryTextTheme.headline5?.copyWith(
-                color: dark,
-                fontStyle: FontStyle.normal,
-                fontWeight: FontWeight.bold),
+            style: Theme.of(context).primaryTextTheme.headline5?.copyWith(color: dark, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
           ),
           Visibility(
             visible: oldPrice != null,
@@ -227,10 +202,7 @@ class NewCoursesWidget extends StatelessWidget {
               child: Text(
                 oldPrice.toString(),
                 textScaleFactor: 1.0,
-                style: Theme.of(context).primaryTextTheme.headline5?.copyWith(
-                    color: HexColor.fromHex("#999999"),
-                    fontStyle: FontStyle.normal,
-                    decoration: TextDecoration.lineThrough),
+                style: Theme.of(context).primaryTextTheme.headline5?.copyWith(color: HexColor.fromHex("#999999"), fontStyle: FontStyle.normal, decoration: TextDecoration.lineThrough),
               ),
             ),
           )
