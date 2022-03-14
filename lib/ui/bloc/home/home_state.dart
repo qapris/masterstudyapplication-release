@@ -17,8 +17,14 @@ class LoadedHomeState extends HomeState {
   final List<InstructorBean?> instructors;
   final List<HomeLayoutBean?> layout;
 
-  LoadedHomeState(this.categoryList, this.coursesTranding, this.layout,
-      this.coursesNew, this.coursesFree, this.instructors);
+  LoadedHomeState(
+    this.categoryList,
+    this.coursesTranding,
+    this.layout,
+    this.coursesNew,
+    this.coursesFree,
+    this.instructors,
+  );
 }
 
 class ErrorHomeState extends HomeState {}

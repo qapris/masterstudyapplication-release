@@ -1,5 +1,7 @@
+import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/models/AppSettings.dart';
@@ -8,7 +10,8 @@ import 'package:masterstudy_app/ui/bloc/auth/auth_bloc.dart';
 import 'package:masterstudy_app/ui/bloc/auth/auth_event.dart';
 import 'package:masterstudy_app/ui/bloc/auth/auth_state.dart';
 import 'package:masterstudy_app/ui/screens/main_screens.dart';
-import 'package:masterstudy_app/ui/screens/restore_password/restore_password_screen.dart';
+
+import '../restore_password/restore_password_screen.dart';
 
 class AuthScreenArgs {
   final OptionsBean optionsBean;
@@ -30,23 +33,17 @@ class AuthScreen extends StatelessWidget {
   }
 }
 
+//Auth Tabs
 class AuthScreenWidget extends StatefulWidget {
   final OptionsBean optionsBean;
 
   const AuthScreenWidget(this.optionsBean) : super();
 
   @override
-  State<StatefulWidget> createState() {
-    return AuthScreenWidgetState();
-  }
+  State<StatefulWidget> createState() => AuthScreenWidgetState();
 }
 
 class AuthScreenWidgetState extends State<AuthScreenWidget> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -55,20 +52,14 @@ class AuthScreenWidgetState extends State<AuthScreenWidget> {
       child: Scaffold(
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(110.0), // here th
-          child: new AppBar(
-            brightness: Brightness.light,
+          child: AppBar(
             title: Center(
               child: Padding(
-                padding: const EdgeInsets.only(top:0.0),
+                padding: const EdgeInsets.only(top: 0.0),
                 child: CachedNetworkImage(
                   imageUrl: appLogoUrl!,
-                  placeholder: (context, url) => CircularProgressIndicator(),
-                  errorWidget: (context, url, error) => SizedBox(
-                      width: 50.0,
-                      child: Image(
-                          image: AssetImage('assets/icons/logo.png')
-                      )
-                  ),
+                  placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) => SizedBox(width: 50.0, child: Image(image: AssetImage('assets/icons/logo.png'))),
                   width: 50.0,
                 ),
               ),
@@ -89,38 +80,42 @@ class AuthScreenWidgetState extends State<AuthScreenWidget> {
                   ),
                 ),
                 Tab(
-                    icon: Text(
-                      localizations.getLocalization("auth_sign_in_tab"),
-                      textScaleFactor: 1.0,
-                  style: TextStyle(color: mainColor),
-                )),
+                  icon: Text(
+                    localizations.getLocalization("auth_sign_in_tab"),
+                    textScaleFactor: 1.0,
+                    style: TextStyle(color: mainColor),
+                  ),
+                ),
               ],
             ),
+            systemOverlayStyle: SystemUiOverlayStyle.dark,
           ),
         ),
-        body: TabBarView(
-          children: <Widget>[
-            ListView(
-              children: <Widget>[_SignUpPage(widget.optionsBean)],
-            ),
-            ListView(children: <Widget>[_SignInPage(widget.optionsBean)]),
-          ],
+        body: SafeArea(
+          child: TabBarView(
+            children: <Widget>[
+              ListView(
+                children: <Widget>[_SignUpPage(widget.optionsBean)],
+              ),
+              ListView(
+                children: <Widget>[_SignInPage(widget.optionsBean)],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
+//Registration
 class _SignUpPage extends StatefulWidget {
-
   final OptionsBean optionsBean;
 
   const _SignUpPage(this.optionsBean) : super();
 
   @override
-  State<StatefulWidget> createState() {
-    return _SignUpPageState();
-  }
+  State<StatefulWidget> createState() => _SignUpPageState();
 }
 
 class _SignUpPageState extends State<_SignUpPage> {
@@ -147,13 +142,10 @@ class _SignUpPageState extends State<_SignUpPage> {
         var enableInputs = !(state is LoadingAuthState);
 
         if (state is SuccessAuthState) {
-          WidgetsBinding.instance?.addPostFrameCallback((_) =>
-              Navigator.pushReplacementNamed(context, MainScreen.routeName,
-                  arguments: MainScreenArgs(widget.optionsBean)));
+          WidgetsBinding.instance?.addPostFrameCallback((_) => Navigator.pushReplacementNamed(context, MainScreen.routeName, arguments: MainScreenArgs(widget.optionsBean)));
         }
         if (state is ErrorAuthState) {
-          WidgetsBinding.instance?.addPostFrameCallback(
-              (_) => showDialogError(context, state.message));
+          WidgetsBinding.instance?.addPostFrameCallback((_) => showDialogError(context, state.message));
         }
 
         return Form(
@@ -161,15 +153,11 @@ class _SignUpPageState extends State<_SignUpPage> {
           child: Column(
             children: <Widget>[
               Padding(
-                padding:
-                    const EdgeInsets.only(left: 18.0, right: 18.0, top: 30.0),
+                padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 30.0),
                 child: TextFormField(
                   controller: _loginController,
                   enabled: enableInputs,
-                  decoration: InputDecoration(
-                      labelText: localizations.getLocalization("login_label_text"),
-                      helperText: localizations.getLocalization("login_registration_helper_text"),
-                      filled: true),
+                  decoration: InputDecoration(labelText: localizations.getLocalization("login_label_text"), helperText: localizations.getLocalization("login_registration_helper_text"), filled: true),
                   validator: (value) {
                     if (value!.isEmpty) {
                       return localizations.getLocalization("login_empty_error_text");
@@ -179,21 +167,16 @@ class _SignUpPageState extends State<_SignUpPage> {
                 ),
               ),
               Padding(
-                padding:
-                    const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
+                padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
                 child: TextFormField(
                   controller: _emailController,
                   enabled: enableInputs,
-                  decoration: InputDecoration(
-                      labelText: localizations.getLocalization("email_label_text"),
-                      helperText: localizations.getLocalization("email_helper_text"),
-                      filled: true),
+                  decoration: InputDecoration(labelText: localizations.getLocalization("email_label_text"), helperText: localizations.getLocalization("email_helper_text"), filled: true),
                   validator: _validateEmail,
                 ),
               ),
               Padding(
-                padding:
-                    const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
+                padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
                 child: TextFormField(
                   controller: _passwordController,
                   enabled: enableInputs,
@@ -204,9 +187,7 @@ class _SignUpPageState extends State<_SignUpPage> {
                       filled: true,
                       suffixIcon: IconButton(
                         icon: Icon(
-                          passwordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
+                          passwordVisible ? Icons.visibility : Icons.visibility_off,
                         ),
                         onPressed: () {
                           setState(() {
@@ -227,10 +208,10 @@ class _SignUpPageState extends State<_SignUpPage> {
                   },
                 ),
               ),
+
               Padding(
-                padding:
-                    const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
-                child: new MaterialButton(
+                padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
+                child: MaterialButton(
                   minWidth: double.infinity,
                   color: mainColor,
                   onPressed: register,
@@ -241,8 +222,7 @@ class _SignUpPageState extends State<_SignUpPage> {
               Visibility(
                 visible: demoEnabled,
                 child: Padding(
-                  padding:
-                      const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
+                  padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
                   child: new MaterialButton(
                     minWidth: double.infinity,
                     color: mainColor,
@@ -265,18 +245,15 @@ class _SignUpPageState extends State<_SignUpPage> {
         builder: (context) {
           return AlertDialog(
             title: Text(
-                localizations.getLocalization("error_dialog_title"),
-                textScaleFactor: 1.0,
-                style: TextStyle(color: Colors.black, fontSize: 20.0)
-            ),
-            content: Text(
-              text,
+              localizations.getLocalization("error_dialog_title"),
               textScaleFactor: 1.0,
+              style: TextStyle(color: Colors.black, fontSize: 20.0),
             ),
+            content: Text(text, textScaleFactor: 1.0),
             actions: <Widget>[
-              FlatButton(
+              ElevatedButton(
                 child: Text(
-                    localizations.getLocalization("ok_dialog_button"),
+                  localizations.getLocalization("ok_dialog_button"),
                   textScaleFactor: 1.0,
                 ),
                 onPressed: () {
@@ -305,6 +282,7 @@ class _SignUpPageState extends State<_SignUpPage> {
       );
     }
   }
+
   Widget setUpButtonChildDemo(enable) {
     if (enable == true) {
       return new Text(
@@ -324,12 +302,11 @@ class _SignUpPageState extends State<_SignUpPage> {
 
   void register() {
     if (_formKey.currentState!.validate()) {
-      _bloc.add(RegisterEvent(_loginController.text, _emailController.text,
-          _passwordController.text));
+      _bloc.add(RegisterEvent(_loginController.text, _emailController.text, _passwordController.text));
     }
   }
 
-  void demoAuth(){
+  void demoAuth() {
     _bloc.add(DemoAuthEvent());
   }
 
@@ -339,13 +316,7 @@ class _SignUpPageState extends State<_SignUpPage> {
       return localizations.getLocalization("email_empty_error_text");
     }
     // This is just a regular expression for email addresses
-    String p = "[a-zA-Z0-9\+\.\_\%\-\+]{1,256}" +
-        "\\@" +
-        "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" +
-        "(" +
-        "\\." +
-        "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
-        ")+";
+    String p = "[a-zA-Z0-9\+\.\_\%\-\+]{1,256}" + "\\@" + "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" + "(" + "\\." + "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" + ")+";
     RegExp regExp = new RegExp(p);
 
     if (regExp.hasMatch(value)) {
@@ -359,6 +330,7 @@ class _SignUpPageState extends State<_SignUpPage> {
   }
 }
 
+//Login
 class _SignInPage extends StatefulWidget {
   final OptionsBean optionsBean;
 
@@ -392,28 +364,21 @@ class _SignInPageState extends State<_SignInPage> {
       builder: (context, state) {
         var enableInputs = !(state is LoadingAuthState);
         if (state is SuccessAuthState) {
-          WidgetsBinding.instance?.addPostFrameCallback((_) =>
-              Navigator.pushReplacementNamed(context, MainScreen.routeName,
-                  arguments: MainScreenArgs(widget.optionsBean)));
+          WidgetsBinding.instance?.addPostFrameCallback((_) => Navigator.pushReplacementNamed(context, MainScreen.routeName, arguments: MainScreenArgs(widget.optionsBean)));
         }
         if (state is ErrorAuthState) {
-          WidgetsBinding.instance?.addPostFrameCallback(
-              (_) => showDialogError(context, state.message));
+          WidgetsBinding.instance?.addPostFrameCallback((_) => showDialogError(context, state.message));
         }
         return Form(
           key: _formKey,
           child: Column(
             children: <Widget>[
               Padding(
-                padding:
-                    const EdgeInsets.only(left: 18.0, right: 18.0, top: 30.0),
+                padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 30.0),
                 child: TextFormField(
                   controller: _loginController,
                   enabled: enableInputs,
-                  decoration: InputDecoration(
-                      labelText: localizations.getLocalization("login_label_text"),
-                      helperText: localizations.getLocalization("login_sign_in_helper_text"),
-                      filled: true),
+                  decoration: InputDecoration(labelText: localizations.getLocalization("login_label_text"), helperText: localizations.getLocalization("login_sign_in_helper_text"), filled: true),
                   validator: (value) {
                     if (value!.isEmpty) {
                       return localizations.getLocalization("login_sign_in_helper_text");
@@ -423,8 +388,7 @@ class _SignInPageState extends State<_SignInPage> {
                 ),
               ),
               Padding(
-                padding:
-                    const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
+                padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
                 child: TextFormField(
                   controller: _passwordController,
                   enabled: enableInputs,
@@ -435,9 +399,7 @@ class _SignInPageState extends State<_SignInPage> {
                       filled: true,
                       suffixIcon: IconButton(
                         icon: Icon(
-                          passwordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
+                          passwordVisible ? Icons.visibility : Icons.visibility_off,
                         ),
                         onPressed: () {
                           setState(() {
@@ -458,10 +420,8 @@ class _SignInPageState extends State<_SignInPage> {
                   },
                 ),
               ),
-
               Padding(
-                padding:
-                    const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
+                padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
                 child: new MaterialButton(
                   minWidth: double.infinity,
                   color: mainColor,
@@ -470,16 +430,16 @@ class _SignInPageState extends State<_SignInPage> {
                   textColor: Colors.white,
                 ),
               ),
-              FlatButton(
+              // TODO Проверить Text на null
+              /*FlatButton(
                 child: Text(
                   localizations.getLocalization("restore_password_button"),
                   textScaleFactor: 1.0,
                 ),
                 onPressed: () {
                   Navigator.of(context).pushNamed(RestorePasswordScreen.routeName);
-
                 },
-              ),
+              ),*/
             ],
           ),
         );
@@ -492,16 +452,12 @@ class _SignInPageState extends State<_SignInPage> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text(
-                localizations.getLocalization("error_dialog_title"),
-                textScaleFactor: 1.0,
-                style: TextStyle(color: Colors.black, fontSize: 20.0)
-            ),
+            title: Text(localizations.getLocalization("error_dialog_title"), textScaleFactor: 1.0, style: TextStyle(color: Colors.black, fontSize: 20.0)),
             content: Text(text),
             actions: <Widget>[
               FlatButton(
                 child: Text(
-                    localizations.getLocalization("ok_dialog_button"),
+                  localizations.getLocalization("ok_dialog_button"),
                   textScaleFactor: 1.0,
                 ),
                 onPressed: () {

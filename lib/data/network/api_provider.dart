@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -23,16 +24,17 @@ import 'package:masterstudy_app/data/models/curriculum.dart';
 import 'package:masterstudy_app/data/models/purchase/UserPlansResponse.dart';
 import 'package:masterstudy_app/data/models/user_course.dart';
 
+import '../utils.dart';
+
 @provide
 @singleton
 class UserApiProvider {
   static const BASE_URL = "https://stylemixthemes.com/masterstudy/academy";
   static const String apiEndpoint = BASE_URL + "/wp-json/ms_lms/v1/";
-  final Dio _dio;
+  final _dio;
 
   UserApiProvider(this._dio);
 
-  /// Auth
   Future<AuthResponse> authUser(String login, String password) async {
     Response response = await _dio.post(apiEndpoint + "login", data: {"login": login, "password": password});
     return AuthResponse.fromJson(response.data);
@@ -44,7 +46,7 @@ class UserApiProvider {
   }
 
   Future<List<Category>> getCategories() async {
-    Response response = await _dio.get(apiEndpoint + "categories/");
+    Response response = await _dio.get(apiEndpoint + "categories");
     return (response.data as List).map((value) {
       return Category.fromJson(value);
     }).toList();
@@ -70,6 +72,7 @@ class UserApiProvider {
     return CourcesResponse.fromJson(response.data);
   }
 
+  // TODO: Проверить ссылку на добавление курсов
   Future addFavoriteCourse(int courseId) async {
     Response response = await _dio.put(
       apiEndpoint + "favorite",
@@ -99,11 +102,11 @@ class UserApiProvider {
 
   Future<Account> getAccount({int? accountId}) async {
     var params;
-    if (accountId != null) params = {"id": accountId};
-    Response response = await _dio.get(apiEndpoint + "account/",
+    if (accountId != null) params = {"id": '3213'};
+    Response response = await dio.get(apiEndpoint + "account/",
         queryParameters: params,
         options: Options(
-          headers: {"requirestoken": "true"},
+          headers: {"token": "105419|c30c4463a0acdac3a45fce72e764bcec"},
         ));
     return Account.fromJson(response.data);
   }
@@ -178,7 +181,7 @@ class UserApiProvider {
   }
 
   Future<UserCourseResponse> getUserCourses() async {
-    Response response = await _dio.post(apiEndpoint + "user_courses?page=0",
+    Response response = await _dio.post(apiEndpoint + "user_courses?page",
         options: Options(
           headers: {"requirestoken": "true"},
         ));
@@ -358,7 +361,7 @@ class UserApiProvider {
   }
 
   Future<Map<String, dynamic>> getLocalization() async {
-    var data = await _dio.get(UserApiProvider.apiEndpoint + "translations");
+    var data = await _dio.get(apiEndpoint + "translations");
     if (data.statusCode == 200) return Future.value(data.data);
     return Future.error("");
   }

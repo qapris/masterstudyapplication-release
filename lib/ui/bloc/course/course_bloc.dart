@@ -21,26 +21,41 @@ class CourseBloc extends Bloc<CourseEvent, CourseState> {
   // if payment id is -1, selected type is one time payment
   int selectedPaymetId = -1;
 
-  CourseBloc(this._coursesRepository, this._reviewRepository, this._purchaseRepository) : super(InitialCourseState());
-
-  @override
   CourseState get initialState => InitialCourseState();
 
-  @override
-  Stream<CourseState> mapEventToState(
-    CourseEvent event,
-  ) async* {
+  CourseBloc(this._coursesRepository, this._reviewRepository, this._purchaseRepository) : super(InitialCourseState()) {
+    on<CourseEvent>((event, emit) async {
+      await _getCourse(event, emit);
+    });
+  }
+
+  Future<void> _getCourse(CourseEvent event, Emitter<CourseState> emit) async {
     if (event is FetchEvent) {
-      yield* _mapFetchToState(event);
+      _fetchCourse(event.courseId);
     }
+
     if (event is DeleteFromFavorite) {
-      yield* _mapDeleteFavToState(event);
+      _fetchCourse(event.courseId);
     }
+
     if (event is AddToFavorite) {
-      yield* _mapAddFavToState(event);
+      try {
+        await _coursesRepository.addFavoriteCourse(event.courseId);
+        _fetchCourse(event.courseId);
+      } catch (error) {
+        print(error);
+      }
     }
+
     if (event is VerifyInAppPurchase) {
-      yield* _mapVerifyInAppToState(event);
+      emit(InitialCourseState());
+      try {
+        await _coursesRepository.verifyInApp(event.serverVerificationData!, event.price!);
+      } catch (error) {
+        print(error);
+      } finally {
+        _fetchCourse(event.courseId);
+      }
     }
 
     if (event is PaymentSelectedEvent) {
@@ -49,64 +64,31 @@ class CourseBloc extends Bloc<CourseEvent, CourseState> {
     }
 
     if (event is UsePlan) {
-      yield InitialCourseState();
+      emit(InitialCourseState());
       await _purchaseRepository.usePlan(event.courseId, selectedPaymetId);
 
-      yield* _fetchCourse(event.courseId);
+      _fetchCourse(event.courseId);
     }
 
     if (event is AddToCart) {
       var response = await _purchaseRepository.addToCart(event.courseId);
-      yield OpenPurchaseState(response.cart_url);
-      //yield* _fetchCourse(event.courseId);
+      emit(OpenPurchaseState(response.cart_url));
     }
   }
 
-  Stream<CourseState> _fetchCourse(courseId) async* {
-    if (courseDetailResponse == null || state is ErrorCourseState) yield InitialCourseState();
+  Future<CourseState> _fetchCourse(courseId) async {
+    if (courseDetailResponse == null || state is ErrorCourseState) emit(InitialCourseState());
     try {
       courseDetailResponse = await _coursesRepository.getCourse(courseId);
       var reviews = await _reviewRepository.getReviews(courseId);
-      var plans = await _purchaseRepository.getUserPlans();
+      // var plans = await _purchaseRepository.getUserPlans();
       availablePlans = await _purchaseRepository.getPlans();
-      yield LoadedCourseState(courseDetailResponse!, reviews, plans);
+      emit(LoadedCourseState(courseDetailResponse!, reviews, []/*plans*/));
     } catch (e, s) {
       print(e);
       print(s);
-      yield ErrorCourseState();
+      emit(ErrorCourseState());
     }
-  }
-
-  Stream<CourseState> _mapFetchToState(FetchEvent event) async* {
-    yield* _fetchCourse(event.courseId);
-  }
-
-  Stream<CourseState> _mapVerifyInAppToState(VerifyInAppPurchase event) async* {
-    yield InitialCourseState();
-    try {
-      await _coursesRepository.verifyInApp(event.serverVerificationData!, event.price!);
-    } catch (error) {
-      print(error);
-    } finally {
-      yield* _fetchCourse(event.courseId);
-    }
-  }
-
-  Stream<CourseState> _mapAddFavToState(event) async* {
-    try {
-      await _coursesRepository.addFavoriteCourse(event.courseId);
-      yield* _fetchCourse(event.courseId);
-    } catch (error) {
-      print(error);
-    }
-  }
-
-  Stream<CourseState> _mapDeleteFavToState(event) async* {
-    try {
-      await _coursesRepository.deleteFavoriteCourse(event.courseId);
-      yield* _fetchCourse(event.courseId);
-    } catch (error) {
-      print(error);
-    }
+    return ErrorCourseState();
   }
 }

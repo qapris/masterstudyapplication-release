@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:masterstudy_app/data/cache/cache_manager.dart';
@@ -15,7 +16,8 @@ class AppInterceptors extends Interceptor {
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
       var header = prefs.get("apiToken");
-      options.headers.addAll({"token": "$header"});
+      // options.headers.addAll({"token": "$header"});
+      options.headers.addAll({"token": "105419|c30c4463a0acdac3a45fce72e764bcec"});
 
       return options;
     }

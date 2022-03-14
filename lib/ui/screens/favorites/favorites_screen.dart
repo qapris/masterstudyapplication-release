@@ -25,8 +25,8 @@ class _FavoritesScreenWidget extends StatefulWidget {
 }
 
 class _FavoritesScreenWidgetState extends State<_FavoritesScreenWidget> {
-  late int? selectedId;
-  late FavoritesBloc _bloc;
+  int? selectedId;
+  FavoritesBloc? _bloc;
 
   @override
   void initState() {
@@ -81,7 +81,7 @@ class _FavoritesScreenWidgetState extends State<_FavoritesScreenWidget> {
             if (state is ErrorFavoritesState)
               return Center(
                 child: LoadingErrorWidget(() {
-                  _bloc.add(FetchFavorites());
+                  _bloc?.add(FetchFavorites());
                 }),
               );
             if (state is LoadedFavoritesState) {
@@ -125,7 +125,7 @@ class _FavoritesScreenWidgetState extends State<_FavoritesScreenWidget> {
                           setState(() {
                             selectedId = null;
                           });
-                          _bloc.add(DeleteEvent(itemId));
+                          _bloc?.add(DeleteEvent(itemId));
                         },
                         onSelected: () {
                           setState(() {

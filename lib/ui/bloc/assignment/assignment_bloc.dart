@@ -13,21 +13,23 @@ class AssignmentBloc extends Bloc<AssignmentEvent, AssignmentState> {
   final AssignmentRepository _assignmentRepository;
   final CacheManager cacheManager;
 
-  AssignmentBloc(this._assignmentRepository, this.cacheManager): super(InitialAssignmentState());
-
-  @override
   AssignmentState get initialState => InitialAssignmentState();
 
-  @override
-  Stream<AssignmentState> mapEventToState(AssignmentEvent event) async* {
+  AssignmentBloc(this._assignmentRepository, this.cacheManager) : super(InitialAssignmentState()) {
+    on<AssignmentEvent>((event, emit) async {
+      await _assignment(event, emit);
+    });
+  }
+
+  Future<void> _assignment(AssignmentEvent event, Emitter<AssignmentState> emit) async {
     if (event is FetchEvent) {
       try {
         AssignmentResponse assignment = await _assignmentRepository.getAssignmentInfo(event.courseId, event.assignmentId);
 
-        yield LoadedAssignmentState(assignment);
+        emit(LoadedAssignmentState(assignment));
       } catch (error) {
         if (await cacheManager.isCached(event.courseId)) {
-          yield CacheWarningAssignmentState();
+          // emit(CacheWarningAssignmentState());
         }
         print(error);
       }
@@ -38,7 +40,7 @@ class AssignmentBloc extends Bloc<AssignmentEvent, AssignmentState> {
         var assignmentStart = await _assignmentRepository.startAssignment(event.courseId, event.assignmentId);
         AssignmentResponse assignment = await _assignmentRepository.getAssignmentInfo(event.courseId, event.assignmentId);
 
-        yield LoadedAssignmentState(assignment);
+        emit(LoadedAssignmentState(assignment));
       } catch (error) {
         print(error);
       }
@@ -59,7 +61,7 @@ class AssignmentBloc extends Bloc<AssignmentEvent, AssignmentState> {
 
         AssignmentResponse assignment = await _assignmentRepository.getAssignmentInfo(event.courseId, event.assignmentId);
 
-        yield LoadedAssignmentState(assignment);
+        emit(LoadedAssignmentState(assignment));
       } catch (error) {
         print(error);
       }

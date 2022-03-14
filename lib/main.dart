@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 import 'package:device_info/device_info.dart';
+import 'package:dio/adapter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
@@ -73,6 +74,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'data/push/push_manager.dart';
+import 'data/utils.dart';
 import 'di/app_injector.dart';
 import 'ui/screens/orders/orders.dart';
 import 'ui/screens/user_course/user_course.dart';
@@ -146,7 +148,6 @@ void main() async {
     statusBarColor: Colors.grey.withOpacity(0.4), //top bar color
     statusBarIconBrightness: Brightness.light, //top bar icons
   ));
-
   WidgetsFlutterBinding.ensureInitialized();
   //Firebase
   await Firebase.initializeApp();

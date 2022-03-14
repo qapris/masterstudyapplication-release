@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -41,16 +42,7 @@ class CourseScreenArgs {
   StatusBean? status;
   List<Category?> categories_object;
 
-  CourseScreenArgs(
-      this.id,
-      this.title,
-      this.images,
-      this.categories,
-      this.price,
-      this.rating,
-      this.featured,
-      this.status,
-      this.categories_object);
+  CourseScreenArgs(this.id, this.title, this.images, this.categories, this.price, this.rating, this.featured, this.status, this.categories_object);
 
   CourseScreenArgs.fromCourseBean(CoursesBean coursesBean)
       : id = coursesBean.id,
@@ -66,8 +58,7 @@ class CourseScreenArgs {
   CourseScreenArgs.fromOrderListBean(Cart_itemsBean cart_itemsBean)
       : id = cart_itemsBean.cart_item_id,
         title = cart_itemsBean.title,
-        images = ImagesBean(
-            full: cart_itemsBean.image_url, small: cart_itemsBean.image_url),
+        images = ImagesBean(full: cart_itemsBean.image_url, small: cart_itemsBean.image_url),
         categories = [],
         price = null,
         rating = null,
@@ -85,8 +76,7 @@ class CourseScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final CourseScreenArgs args = ModalRoute.of(context)?.settings.arguments as CourseScreenArgs;
-    return BlocProvider<CourseBloc>(
-        create: (c) => _bloc, child: _CourseScreenWidget(args));
+    return BlocProvider<CourseBloc>(create: (c) => _bloc, child: _CourseScreenWidget(args));
   }
 }
 
@@ -96,24 +86,20 @@ class _CourseScreenWidget extends StatefulWidget {
   const _CourseScreenWidget(this.coursesBean);
 
   @override
-  State<StatefulWidget> createState() {
-    return _CourseScreenWidgetState();
-  }
+  State<StatefulWidget> createState() => _CourseScreenWidgetState();
 }
 
-class _CourseScreenWidgetState extends State<_CourseScreenWidget>
-    with TickerProviderStateMixin {
+class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerProviderStateMixin {
   late ScrollController _scrollController;
-  String title = "";
-  var _favIcoColor = Colors.white;
   late AnimationController animation;
   late Animation<double> _fadeInFadeOut;
   late CourseBloc _bloc;
+  var _favIcoColor = Colors.white;
+  var screenHeight;
+  String title = "";
   bool hasTrial = true;
   bool _isFav = false;
   num kef = 2;
-
-  var screenHeight;
 
   @override
   void initState() {
@@ -123,8 +109,11 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget>
       duration: Duration(milliseconds: 700),
     );
     _fadeInFadeOut = Tween<double>(begin: 0.0, end: 1.0).animate(
-        CurvedAnimation(
-            parent: animation, curve: Interval(0.25, 1, curve: Curves.easeIn)));
+      CurvedAnimation(
+        parent: animation,
+        curve: Interval(0.25, 1, curve: Curves.easeIn),
+      ),
+    );
     animation.forward();
 
     _scrollController = ScrollController()
@@ -134,16 +123,13 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget>
             title = "";
           });
         } else {
-          //if (_bloc.account != null) {
           setState(() {
             title = "${widget.coursesBean.title}";
           });
-          //}
         }
       });
 
-    _bloc = BlocProvider.of<CourseBloc>(context)
-      ..add(FetchEvent(widget.coursesBean.id!));
+    _bloc = BlocProvider.of<CourseBloc>(context)..add(FetchEvent(widget.coursesBean.id!));
 
     _initInApp();
   }
@@ -161,9 +147,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget>
         if (state is LoadedCourseState) {
           setState(() {
             _isFav = state.courseDetailResponse.is_favorite!;
-            _favIcoColor = (state.courseDetailResponse.is_favorite!)
-                ? Colors.red
-                : Colors.white;
+            _favIcoColor = (state.courseDetailResponse.is_favorite!) ? Colors.red : Colors.white;
           });
         }
 
@@ -181,34 +165,29 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget>
       child: BlocBuilder<CourseBloc, CourseState>(
         builder: (context, state) {
           var tabLength = 2;
+
           if (state is LoadedCourseState) {
-            if (state.courseDetailResponse.faq != null &&
-                state.courseDetailResponse.faq.isNotEmpty) tabLength = 3;
+            if (state.courseDetailResponse.faq != null && state.courseDetailResponse.faq.isNotEmpty) tabLength = 3;
           }
+
           return DefaultTabController(
             length: tabLength,
             child: Scaffold(
               body: NestedScrollView(
                 controller: _scrollController,
-                headerSliverBuilder:
-                    (BuildContext context, bool innerBoxIsScrolled) {
+                headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
                   String? categories = "";
                   double? ratingAverage = 0.0;
-                  double? ratingTotal = 0.0;
+                  dynamic ratingTotal = 0.0;
 
                   if (state is LoadedCourseState) {
-                    if (state.courseDetailResponse.categories_object != null &&
-                        state.courseDetailResponse.categories_object.isNotEmpty)
-                      categories =
-                          state.courseDetailResponse.categories_object[0]?.name;
-                    ratingAverage =
-                        state.courseDetailResponse.rating?.average!.toDouble();
+                    if (state.courseDetailResponse.categories_object != null && state.courseDetailResponse.categories_object.isNotEmpty)
+                      categories = state.courseDetailResponse.categories_object[0]?.name;
+                    ratingAverage = state.courseDetailResponse.rating?.average!.toDouble();
                     ratingTotal = state.courseDetailResponse.rating!.total;
                   } else {
-                    if (widget.coursesBean.categories_object != null &&
-                        widget.coursesBean.categories_object.isNotEmpty) {
-                      categories =
-                          widget.coursesBean.categories_object.first!.name;
+                    if (widget.coursesBean.categories_object != null && widget.coursesBean.categories_object.isNotEmpty) {
+                      categories = widget.coursesBean.categories_object.first!.name;
                     }
 
                     if (widget.coursesBean.rating == null) {
@@ -231,8 +210,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget>
                         IconButton(
                           icon: Icon(Icons.share),
                           onPressed: () {
-                            if (state is LoadedCourseState)
-                              Share.share(state.courseDetailResponse.url);
+                            if (state is LoadedCourseState) Share.share(state.courseDetailResponse.url);
                           },
                         ),
                         IconButton(
@@ -240,15 +218,13 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget>
                           color: _favIcoColor,
                           onPressed: () {
                             setState(() {
-                              _favIcoColor =
-                                  (_isFav) ? Colors.white : Colors.red;
+                              _favIcoColor = (_isFav) ? Colors.white : Colors.red;
                               _isFav = (_isFav) ? false : true;
                             });
 
                             if (state is LoadedCourseState) {
                               if (state.courseDetailResponse.is_favorite!) {
-                                _bloc.add(
-                                    DeleteFromFavorite(widget.coursesBean.id!));
+                                _bloc.add(DeleteFromFavorite(widget.coursesBean.id!));
                               } else {
                                 _bloc.add(AddToFavorite(widget.coursesBean.id!));
                               }
@@ -258,32 +234,24 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget>
                         IconButton(
                           icon: Icon(Icons.search),
                           onPressed: () {
-                            Navigator.of(context).pushNamed(
-                                SearchDetailScreen.routeName,
-                                arguments: SearchDetailScreenArgs(""));
+                            Navigator.of(context).pushNamed(SearchDetailScreen.routeName, arguments: SearchDetailScreenArgs(""));
                           },
                         ),
                       ],
                       bottom: ColoredTabBar(
-                          Colors.white,
-                          TabBar(
-                            indicatorColor: mainColorA,
-                            tabs: [
-                              Tab(
-                                text: localizations
-                                    .getLocalization("course_overview_tab"),
-                              ),
-                              Tab(
-                                  text: localizations.getLocalization(
-                                      "course_curriculum_tab")),
-                              if (state is LoadedCourseState)
-                                if (state.courseDetailResponse.faq != null &&
-                                    state.courseDetailResponse.faq.isNotEmpty)
-                                  Tab(
-                                      text: localizations
-                                          .getLocalization("course_faq_tab")),
-                            ],
-                          )),
+                        Colors.white,
+                        TabBar(
+                          indicatorColor: mainColorA,
+                          tabs: [
+                            Tab(
+                              text: localizations.getLocalization("course_overview_tab"),
+                            ),
+                            Tab(text: localizations.getLocalization("course_curriculum_tab")),
+                            if (state is LoadedCourseState)
+                              if (state.courseDetailResponse.faq != null && state.courseDetailResponse.faq.isNotEmpty) Tab(text: localizations.getLocalization("course_faq_tab")),
+                          ],
+                        ),
+                      ),
                       flexibleSpace: FlexibleSpaceBar(
                         collapseMode: CollapseMode.parallax,
                         background: Container(
@@ -294,11 +262,10 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget>
                                 Hero(
                                   tag: widget.coursesBean.images?.small as Object,
                                   child: FadeInImage.memoryNetwork(
-                                    image: "${widget.coursesBean.images?.small}",
+                                    image: widget.coursesBean.images!.small!,
                                     fit: BoxFit.cover,
                                     width: MediaQuery.of(context).size.width,
-                                    height: MediaQuery.of(context).size.height /
-                                        kef,
+                                    height: MediaQuery.of(context).size.height / kef,
                                     placeholder: kTransparentImage,
                                   ),
                                 ),
@@ -307,58 +274,43 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget>
                             FadeTransition(
                               opacity: _fadeInFadeOut,
                               child: Container(
-                                decoration: BoxDecoration(
-                                    color: mainColor?.withOpacity(0.5)),
+                                decoration: BoxDecoration(color: mainColor?.withOpacity(0.5)),
                               ),
                             ),
                             FadeTransition(
                               opacity: _fadeInFadeOut,
                               child: Container(
                                 child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 20, right: 20),
+                                  padding: const EdgeInsets.only(left: 20, right: 20),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: <Widget>[
                                       Padding(
-                                        padding:
-                                            const EdgeInsets.only(top: 0.0),
+                                        padding: const EdgeInsets.only(top: 0.0),
                                         child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: <Widget>[
                                             Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
                                               children: <Widget>[
                                                 GestureDetector(
                                                   onTap: () {
                                                     Navigator.pushNamed(
                                                       context,
-                                                      CategoryDetailScreen
-                                                          .routeName,
-                                                      arguments:
-                                                          CategoryDetailScreenArgs(
-                                                              widget.coursesBean
-                                                                  .categories_object[0]),
+                                                      CategoryDetailScreen.routeName,
+                                                      arguments: CategoryDetailScreenArgs(widget.coursesBean.categories_object[0]),
                                                     );
                                                   },
                                                   child: Text(
-                                                    unescape
-                                                        .convert(categories),
+                                                    unescape.convert(categories),
                                                     textScaleFactor: 1.0,
-                                                    style: TextStyle(
-                                                        color: Colors.white
-                                                            .withOpacity(0.5),
-                                                        fontSize: 16),
+                                                    style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 16),
                                                   ),
                                                 ),
                                                 Icon(
                                                   Icons.keyboard_arrow_right,
-                                                  color: Colors.white
-                                                      .withOpacity(0.5),
+                                                  color: Colors.white.withOpacity(0.5),
                                                 )
                                               ],
                                             ),
@@ -367,40 +319,33 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget>
                                                 showDialog(
                                                   context: context,
                                                   barrierDismissible: false,
-                                                  builder: (BuildContext
-                                                          context) =>
-                                                      DialogAuthorWidget(state),
+                                                  builder: (BuildContext context) => DialogAuthorWidget(state),
                                                 );
                                               },
                                               child: CircleAvatar(
-                                                  backgroundImage: NetworkImage(
-                                                (state is LoadedCourseState)
-                                                    ? state.courseDetailResponse
-                                                        .author?.avatar_url
-                                                    : "",
-                                              )),
+                                                backgroundImage: NetworkImage(
+                                                  (state is LoadedCourseState)
+                                                      ? state.courseDetailResponse.author?.avatar_url
+                                                      : 'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png',
+                                                ),
+                                              ),
                                             )
                                           ],
                                         ),
                                       ),
                                       Padding(
-                                        padding:
-                                            const EdgeInsets.only(top: 8.0),
+                                        padding: const EdgeInsets.only(top: 8.0),
                                         child: Container(
                                           height: 140,
                                           child: Text(
-                                            unescape.convert(
-                                                widget.coursesBean.title),
+                                            unescape.convert(widget.coursesBean.title),
                                             textScaleFactor: 1.0,
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 40),
+                                            style: TextStyle(color: Colors.white, fontSize: 40),
                                           ),
                                         ),
                                       ),
                                       Padding(
-                                        padding: const EdgeInsets.only(
-                                            top: 32.0, right: 16.0),
+                                        padding: const EdgeInsets.only(top: 32.0, right: 16.0),
                                         child: Row(
                                           children: <Widget>[
                                             RatingBar(
@@ -420,15 +365,11 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget>
                                               onRatingUpdate: (rating) {},
                                             ),
                                             Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 8.0),
+                                              padding: const EdgeInsets.only(left: 8.0),
                                               child: Text(
                                                 "${ratingAverage?.toDouble()} (${ratingTotal} review)",
                                                 textScaleFactor: 1.0,
-                                                style: TextStyle(
-                                                    fontSize: 16,
-                                                    color: Colors.white
-                                                        .withOpacity(0.5)),
+                                                style: TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.5)),
                                               ),
                                             ),
                                           ],
@@ -445,9 +386,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget>
                     )
                   ];
                 },
-                body: AnimatedSwitcher(
-                    duration: Duration(milliseconds: 150),
-                    child: _buildBody(state)),
+                body: AnimatedSwitcher(duration: Duration(milliseconds: 150), child: _buildBody(state)),
               ),
               bottomNavigationBar: _buildBottom(state),
             ),
@@ -467,13 +406,10 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget>
       return TabBarView(
         children: <Widget>[
           OverviewWidget(state.courseDetailResponse, state.reviewResponse, () {
-            _scrollController
-                .jumpTo(screenHeight / kef - (kToolbarHeight * kef));
+            _scrollController.jumpTo(screenHeight / kef - (kToolbarHeight * kef));
           }),
           CurriculumWidget(state.courseDetailResponse),
-          if (state.courseDetailResponse.faq != null &&
-              state.courseDetailResponse.faq.isNotEmpty)
-            FaqWidget(state.courseDetailResponse),
+          if (state.courseDetailResponse.faq != null && state.courseDetailResponse.faq.isNotEmpty) FaqWidget(state.courseDetailResponse),
         ],
       );
     if (state is ErrorCourseState) {
@@ -488,11 +424,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget>
 
   bool get _isAppBarExpanded {
     if (screenHeight == null) screenHeight = MediaQuery.of(context).size.height;
-    if (_scrollController.offset >
-        (screenHeight / kef - (kToolbarHeight * kef)))
-      return _scrollController.hasClients &&
-          _scrollController.offset >
-              (screenHeight / kef - (kToolbarHeight * kef));
+    if (_scrollController.offset > (screenHeight / kef - (kToolbarHeight * kef))) return _scrollController.hasClients && _scrollController.offset > (screenHeight / kef - (kToolbarHeight * kef));
 
     return false;
   }
@@ -503,9 +435,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget>
           decoration: BoxDecoration(
             color: HexColor.fromHex("#F6F6F6"),
           ),
-          child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: _buildStartButton(state)));
+          child: Padding(padding: const EdgeInsets.all(20.0), child: _buildStartButton(state)));
     }
 
     return Container(
@@ -525,12 +455,9 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget>
                 if (state is LoadedCourseState) {
                   if (Platform.isIOS) {
                     if (_products.isNotEmpty) {
-                      PurchaseParam purchaseParam =
-                          PurchaseParam(productDetails: _products[0]);
-                      print(
-                          '${_products[0].title}: ${_products[0].description} (cost is ${_products[0].price})');
-                      _connection.buyNonConsumable(
-                          purchaseParam: purchaseParam);
+                      PurchaseParam purchaseParam = PurchaseParam(productDetails: _products[0]);
+                      print('${_products[0].title}: ${_products[0].description} (cost is ${_products[0].price})');
+                      _connection.buyNonConsumable(purchaseParam: purchaseParam);
                     } else {
                       _showInAppNotFound();
                     }
@@ -558,9 +485,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget>
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text(localizations.getLocalization("error_dialog_title"),
-                textScaleFactor: 1.0,
-                style: TextStyle(color: Colors.black, fontSize: 20.0)),
+            title: Text(localizations.getLocalization("error_dialog_title"), textScaleFactor: 1.0, style: TextStyle(color: Colors.black, fontSize: 20.0)),
             content: Text(localizations.getLocalization("in_app_not_found")),
             actions: <Widget>[
               FlatButton(
@@ -593,18 +518,13 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget>
           );
         } else {
           String? selectedPlan;
-          if (_bloc.selectedPaymetId == -1)
-            selectedPlan =
-                "${localizations.getLocalization("course_regular_price")} ${state.courseDetailResponse.price?.price}";
+          if (_bloc.selectedPaymetId == -1) selectedPlan = "${localizations.getLocalization("course_regular_price")} ${state.courseDetailResponse.price?.price}";
           if (state.userPlans.isNotEmpty) {
             state.userPlans.forEach((value) {
-              if (int.parse(value.subscription_id) == _bloc.selectedPaymetId)
-                selectedPlan = value.name;
+              if (int.parse(value.subscription_id) == _bloc.selectedPaymetId) selectedPlan = value.name;
             });
           }
-          if (_products.isNotEmpty)
-            selectedPlan =
-                "${localizations.getLocalization("course_regular_price")} ${_products[0].price}";
+          if (_products.isNotEmpty) selectedPlan = "${localizations.getLocalization("course_regular_price")} ${_products[0].price}";
           return GestureDetector(
             onTap: () async {
               if (!Platform.isIOS) {
@@ -709,7 +629,6 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget>
   }
 
   //InApp
-
   final InAppPurchase _connection = InAppPurchase.instance;
   late StreamSubscription<List<PurchaseDetails>> _subscription;
   List<String> _notFoundIds = [];
@@ -722,9 +641,8 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget>
   String? _queryProductError;
 
   _initInApp() {
-    Stream purchaseUpdated =
-        InAppPurchase.instance.purchaseStream;
-    _subscription =  InAppPurchase.instance.purchaseStream.listen((purchaseDetailsList) {
+    Stream purchaseUpdated = InAppPurchase.instance.purchaseStream;
+    _subscription = InAppPurchase.instance.purchaseStream.listen((purchaseDetailsList) {
       _listenToPurchaseUpdated(purchaseDetailsList);
     }, onDone: () {
       _subscription.cancel();
@@ -750,8 +668,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget>
     }
 
     var courseId = widget.coursesBean.id.toString();
-    ProductDetailsResponse productDetailResponse =
-        await _connection.queryProductDetails({courseId});
+    ProductDetailsResponse productDetailResponse = await _connection.queryProductDetails({courseId});
 
     if (productDetailResponse.error != null) {
       setState(() {
@@ -812,18 +729,14 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget>
           _verifyPurchase(purchaseDetails!);
         }
         if (purchaseDetails?.pendingCompletePurchase ?? false) {
-          await InAppPurchase.instance
-              .completePurchase(purchaseDetails!);
+          await InAppPurchase.instance.completePurchase(purchaseDetails!);
         }
       }
     });
   }
 
   Future<bool> _verifyPurchase(PurchaseDetails? purchaseDetails) async {
-    _bloc.add(VerifyInAppPurchase(
-        purchaseDetails!.verificationData.serverVerificationData,
-        _products[0].price,
-        widget.coursesBean.id));
+    _bloc.add(VerifyInAppPurchase(purchaseDetails!.verificationData.serverVerificationData, _products[0].price, widget.coursesBean.id));
     return Future<bool>.value(true);
   }
 

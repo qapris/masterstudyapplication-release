@@ -9,33 +9,32 @@ import './bloc.dart';
 
 @provide
 class LessonVideoBloc extends Bloc<LessonVideoEvent, LessonVideoState> {
-    final LessonRepository _lessonRepository;
+  final LessonRepository _lessonRepository;
 
-    LessonVideoBloc(this._lessonRepository) : super(InitialLessonVideoState());
+  LessonVideoState get initialState => InitialLessonVideoState();
 
-    @override
-    LessonVideoState get initialState => InitialLessonVideoState();
+  LessonVideoBloc(this._lessonRepository) : super(InitialLessonVideoState()) {
+    on<LessonVideoEvent>((event, emit) async {
+      await _lessonVideo(event, emit);
+    });
+  }
 
-    @override
-    Stream<LessonVideoState> mapEventToState(
-        LessonVideoEvent event,
-        ) async* {
-        if (event is FetchEvent) {
-            try {
+  Future<void> _lessonVideo(LessonVideoEvent event, Emitter<LessonVideoState> emit) async {
+    if (event is FetchEvent) {
+      try {
+        LessonResponse response = await _lessonRepository.getLesson(event.courseId, event.lessonId);
 
-                LessonResponse response = await _lessonRepository.getLesson(event.courseId, event.lessonId);
-
-                yield LoadedLessonVideoState(response);
-            } catch(error) {
-                print(error);
-            }
-        }else if (event is CompleteLessonEvent){
-            try{
-                var response = await _lessonRepository.completeLesson(event.courseId, event.lessonId);
-            }catch(e,s){
-                print(e);
-                print(s);
-            }
-        }
+        emit(LoadedLessonVideoState(response));
+      } catch (error) {
+        print(error);
+      }
+    } else if (event is CompleteLessonEvent) {
+      try {
+        var response = await _lessonRepository.completeLesson(event.courseId, event.lessonId);
+      } catch (e, s) {
+        print(e);
+        print(s);
+      }
     }
+  }
 }

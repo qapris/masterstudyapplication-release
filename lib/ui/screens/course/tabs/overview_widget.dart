@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -21,8 +22,7 @@ class OverviewWidget extends StatefulWidget {
   final ReviewResponse reviewResponse;
   final VoidCallback scrollCallback;
 
-  const OverviewWidget(this.response, this.reviewResponse, this.scrollCallback)
-      : super();
+  const OverviewWidget(this.response, this.reviewResponse, this.scrollCallback) : super();
 
   @override
   State<StatefulWidget> createState() {
@@ -30,8 +30,7 @@ class OverviewWidget extends StatefulWidget {
   }
 }
 
-class _OverviewWidgetState extends State<OverviewWidget>
-    with AutomaticKeepAliveClientMixin {
+class _OverviewWidgetState extends State<OverviewWidget> with AutomaticKeepAliveClientMixin {
   bool descTextShowFlag = false;
   bool reviewTextShowFlag = false;
   bool annoncementTextShowFlag = false;
@@ -99,8 +98,7 @@ class _OverviewWidgetState extends State<OverviewWidget>
                 onPressed: () {
                   Navigator.of(context).pushNamed(
                     ReviewWriteScreen.routeName,
-                    arguments: ReviewWriteScreenArgs(
-                        widget.response.id, widget.response.title),
+                    arguments: ReviewWriteScreenArgs(widget.response.id, widget.response.title),
                   );
                 },
                 child: Text(
@@ -117,35 +115,30 @@ class _OverviewWidgetState extends State<OverviewWidget>
     );
   }
 
-  late WebViewController _descriptionWebViewController;
-  late double descriptionHeight;
+  late WebViewController? _descriptionWebViewController;
+  dynamic descriptionHeight;
 
   _buildDescription() {
-    if(Platform.isAndroid && (androidInfo?.version.sdkInt == 28))
-      return _buildHtmlDesctription();
+    if (Platform.isAndroid && (androidInfo?.version.sdkInt == 28)) return _buildHtmlDesctription();
 
-    double webContainerHeight;
+    dynamic webContainerHeight;
     if (descriptionHeight != null && descTextShowFlag) {
       webContainerHeight = descriptionHeight;
     } else {
       webContainerHeight = 160;
     }
 
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <
-        Widget>[
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
         ConstrainedBox(
-          constraints: BoxConstraints(maxHeight: webContainerHeight),
+          constraints: BoxConstraints(maxHeight: double.parse(webContainerHeight.toString())),
           child: WebView(
             javascriptMode: JavascriptMode.unrestricted,
-            initialUrl:
-                'data:text/html;base64,${base64Encode(const Utf8Encoder().convert(widget.response.description!))}',
+            initialUrl: 'data:text/html;base64,${base64Encode(const Utf8Encoder().convert(widget.response.description!))}',
             onPageFinished: (some) async {
-              double height = double.parse(
-                  await _descriptionWebViewController.evaluateJavascript(
-                      "document.documentElement.scrollHeight;"));
+              dynamic height = await _descriptionWebViewController!.evaluateJavascript("document.documentElement.scrollHeight;");
               setState(() {
-                descriptionHeight = height;
+                descriptionHeight = height!;
               });
             },
             onWebViewCreated: (controller) async {
@@ -175,8 +168,7 @@ class _OverviewWidgetState extends State<OverviewWidget>
                       textScaleFactor: 1.0,
                       style: TextStyle(color: mainColor),
                     )
-                  : Text(localizations.getLocalization("show_more_button"),
-                      textScaleFactor: 1.0, style: TextStyle(color: mainColor))
+                  : Text(localizations.getLocalization("show_more_button"), textScaleFactor: 1.0, style: TextStyle(color: mainColor))
             ],
           ),
         ),
@@ -192,30 +184,25 @@ class _OverviewWidgetState extends State<OverviewWidget>
       children: <Widget>[
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
           Container(
-              constraints: BoxConstraints.loose(Size(
-                  MediaQuery.of(context).size.width,
-                  annoncementTextShowFlag ? htmlDesctriptionHeight : 300)),
-              child: Stack(
-                  alignment: Alignment.topCenter,
-                  overflow: Overflow.clip,
-                  children: [
-                    Positioned(
-                        top: -130.0,
-                        child: MeasureSize(
-                          child: SizedBox(
-                              width: MediaQuery.of(context).size.width - 34,
-                              child: Html(
-                                data: widget.response.description,
-                                useRichText: true,
-                                shrinkToFit: false,
-                              )),
-                          onChange: (size) {
-                            setState(() {
-                              htmlDesctriptionHeight = size.height - 130;
-                            });
-                          },
-                        ))
-                  ])),
+              constraints: BoxConstraints.loose(Size(MediaQuery.of(context).size.width, annoncementTextShowFlag ? htmlDesctriptionHeight : 300)),
+              child: Stack(alignment: Alignment.topCenter, overflow: Overflow.clip, children: [
+                Positioned(
+                    top: -130.0,
+                    child: MeasureSize(
+                      child: SizedBox(
+                          width: MediaQuery.of(context).size.width - 34,
+                          child: Html(
+                            data: widget.response.description,
+                            useRichText: true,
+                            shrinkToFit: false,
+                          )),
+                      onChange: (size) {
+                        setState(() {
+                          htmlDesctriptionHeight = size.height - 130;
+                        });
+                      },
+                    ))
+              ])),
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: InkWell(
@@ -236,9 +223,7 @@ class _OverviewWidgetState extends State<OverviewWidget>
                           textScaleFactor: 1.0,
                           style: TextStyle(color: mainColor),
                         )
-                      : Text(localizations.getLocalization("show_more_button"),
-                          textScaleFactor: 1.0,
-                          style: TextStyle(color: mainColor))
+                      : Text(localizations.getLocalization("show_more_button"), textScaleFactor: 1.0, style: TextStyle(color: mainColor))
                 ],
               ),
             ),
@@ -249,12 +234,12 @@ class _OverviewWidgetState extends State<OverviewWidget>
   }
 
   late WebViewController _annoncementWebViewController;
-  late double annoncementHeight;
+  dynamic annoncementHeight;
 
-  _buildAnnoncement(String? announcement) {
+  _buildAnnoncement(dynamic announcement) {
     if (announcement == null || announcement.isEmpty) return Center();
 
-    double webContainerHeight;
+    dynamic webContainerHeight;
     if (annoncementHeight != null && annoncementTextShowFlag) {
       webContainerHeight = annoncementHeight;
     } else {
@@ -268,23 +253,18 @@ class _OverviewWidgetState extends State<OverviewWidget>
             Padding(
               padding: const EdgeInsets.only(top: 20.0, bottom: 20.0),
               child: Text(localizations.getLocalization("annoncement_title"),
-                  textScaleFactor: 1.0,
-                  style: Theme.of(context)
-                      .primaryTextTheme.headline6?.copyWith(color: dark, fontStyle: FontStyle.normal)),
+                  textScaleFactor: 1.0, style: Theme.of(context).primaryTextTheme.headline6?.copyWith(color: dark, fontStyle: FontStyle.normal)),
             )
           ],
         ),
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
           ConstrainedBox(
-            constraints: BoxConstraints(maxHeight: webContainerHeight),
+            constraints: BoxConstraints(maxHeight: double.parse(webContainerHeight.toString())),
             child: WebView(
               javascriptMode: JavascriptMode.unrestricted,
-              initialUrl:
-                  'data:text/html;base64,${base64Encode(const Utf8Encoder().convert(announcement))}',
+              initialUrl: 'data:text/html;base64,${base64Encode(const Utf8Encoder().convert(announcement))}',
               onPageFinished: (some) async {
-                double height = double.parse(
-                    await _annoncementWebViewController.evaluateJavascript(
-                        "document.documentElement.scrollHeight;"));
+                dynamic height = await _annoncementWebViewController.evaluateJavascript("document.documentElement.scrollHeight;");
                 setState(() {
                   annoncementHeight = height;
                 });
@@ -312,9 +292,7 @@ class _OverviewWidgetState extends State<OverviewWidget>
                           textScaleFactor: 1.0,
                           style: TextStyle(color: mainColor),
                         )
-                      : Text(localizations.getLocalization("show_more_button"),
-                          textScaleFactor: 1.0,
-                          style: TextStyle(color: mainColor))
+                      : Text(localizations.getLocalization("show_more_button"), textScaleFactor: 1.0, style: TextStyle(color: mainColor))
                 ],
               ),
             ),
@@ -335,12 +313,8 @@ class _OverviewWidgetState extends State<OverviewWidget>
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.only(top: 20.0, bottom: 20.0),
-              child: Text(localizations.getLocalization("reviews_title"),
-                  textScaleFactor: 1.0,
-                  style: Theme.of(context)
-                      .primaryTextTheme
-                      .headline6
-                      ?.copyWith(color: dark, fontStyle: FontStyle.normal)),
+              child:
+                  Text(localizations.getLocalization("reviews_title"), textScaleFactor: 1.0, style: Theme.of(context).primaryTextTheme.headline6?.copyWith(color: dark, fontStyle: FontStyle.normal)),
             )
           ],
         ),
@@ -350,16 +324,11 @@ class _OverviewWidgetState extends State<OverviewWidget>
           children: <Widget>[
             Column(
               children: <Widget>[
-                _buildStatRow(
-                    "5", rating.details!.five / onePercent, rating.details?.five),
-                _buildStatRow(
-                    "4", rating.details!.four / onePercent, rating.details!.four),
-                _buildStatRow("3", rating.details!.three / onePercent,
-                    rating.details!.three),
-                _buildStatRow(
-                    "2", rating.details!.two / onePercent, rating.details!.two),
-                _buildStatRow(
-                    "1", rating.details!.one / onePercent, rating.details!.one),
+                _buildStatRow("5", rating.details!.five / onePercent, rating.details?.five),
+                _buildStatRow("4", rating.details!.four / onePercent, rating.details!.four),
+                _buildStatRow("3", rating.details!.three / onePercent, rating.details!.three),
+                _buildStatRow("2", rating.details!.two / onePercent, rating.details!.two),
+                _buildStatRow("1", rating.details!.one / onePercent, rating.details!.one),
               ],
             ),
             Column(
@@ -368,9 +337,7 @@ class _OverviewWidgetState extends State<OverviewWidget>
                 Container(
                     height: 140,
                     width: 130,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                        color: HexColor.fromHex("#EEF1F7")),
+                    decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(20)), color: HexColor.fromHex("#EEF1F7")),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -401,8 +368,7 @@ class _OverviewWidgetState extends State<OverviewWidget>
                           child: Text(
                             "(${rating.total} ${localizations.getLocalization("reviews_count")})",
                             textScaleFactor: 1.0,
-                            style:
-                                TextStyle(color: HexColor.fromHex("#AAAAAA")),
+                            style: TextStyle(color: HexColor.fromHex("#AAAAAA")),
                           ),
                         ),
                       ],
@@ -423,10 +389,7 @@ class _OverviewWidgetState extends State<OverviewWidget>
           Text(
             "$stars ${localizations.getLocalization("stars_count")}",
             textScaleFactor: 1.0,
-            style: TextStyle(
-                color: HexColor.fromHex("#777777"),
-                fontWeight: FontWeight.bold,
-                fontSize: 14),
+            style: TextStyle(color: HexColor.fromHex("#777777"), fontWeight: FontWeight.bold, fontSize: 14),
           ),
           Padding(
             padding: const EdgeInsets.only(left: 8.0, right: 8.0),
@@ -438,8 +401,7 @@ class _OverviewWidgetState extends State<OverviewWidget>
                 child: LinearProgressIndicator(
                   value: (!progress.isNaN) ? progress / 100 : 0,
                   backgroundColor: HexColor.fromHex("#F3F5F9"),
-                  valueColor: new AlwaysStoppedAnimation(
-                      HexColor.fromHex("#ECA824")),
+                  valueColor: new AlwaysStoppedAnimation(HexColor.fromHex("#ECA824")),
                 ),
               ),
             ),
@@ -447,10 +409,7 @@ class _OverviewWidgetState extends State<OverviewWidget>
           Text(
             "$count",
             textScaleFactor: 1.0,
-            style: TextStyle(
-                color: HexColor.fromHex("#777777"),
-                fontWeight: FontWeight.bold,
-                fontSize: 14),
+            style: TextStyle(color: HexColor.fromHex("#777777"), fontWeight: FontWeight.bold, fontSize: 14),
           )
         ],
       ),
@@ -475,9 +434,7 @@ class _OverviewWidgetState extends State<OverviewWidget>
             ? InkWell(
                 onTap: () {
                   setState(() {
-                    reviewsListShowItems == 1
-                        ? reviewsListShowItems = reviews.length
-                        : reviewsListShowItems = 1;
+                    reviewsListShowItems == 1 ? reviewsListShowItems = reviews.length : reviewsListShowItems = 1;
                   });
                 },
                 child: Padding(
@@ -491,10 +448,7 @@ class _OverviewWidgetState extends State<OverviewWidget>
                               textScaleFactor: 1.0,
                               style: TextStyle(color: mainColor),
                             )
-                          : Text(
-                              localizations.getLocalization("show_more_button"),
-                              textScaleFactor: 1.0,
-                              style: TextStyle(color: mainColor))
+                          : Text(localizations.getLocalization("show_more_button"), textScaleFactor: 1.0, style: TextStyle(color: mainColor))
                     ],
                   ),
                 ),
@@ -508,12 +462,9 @@ class _OverviewWidgetState extends State<OverviewWidget>
     return Padding(
       padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
       child: Container(
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(20)),
-              color: HexColor.fromHex("#EEF1F7")),
+          decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(20)), color: HexColor.fromHex("#EEF1F7")),
           child: Padding(
-              padding: EdgeInsets.only(
-                  top: 15.0, right: 20.0, bottom: 15.0, left: 20.0),
+              padding: EdgeInsets.only(top: 15.0, right: 20.0, bottom: 15.0, left: 20.0),
               child: Column(
                 children: <Widget>[
                   Row(
@@ -533,10 +484,7 @@ class _OverviewWidgetState extends State<OverviewWidget>
                               child: Text(
                                 review.user,
                                 textScaleFactor: 1.0,
-                                style: TextStyle(
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.w600,
-                                    color: HexColor.fromHex("#273044")),
+                                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600, color: HexColor.fromHex("#273044")),
                               ),
                             ),
                             Padding(
@@ -544,9 +492,7 @@ class _OverviewWidgetState extends State<OverviewWidget>
                               child: Text(
                                 review.time,
                                 textScaleFactor: 1.0,
-                                style: TextStyle(
-                                    fontSize: 14.0,
-                                    color: HexColor.fromHex("#AAAAAA")),
+                                style: TextStyle(fontSize: 14.0, color: HexColor.fromHex("#AAAAAA")),
                               ),
                             ),
                           ],

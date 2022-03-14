@@ -12,38 +12,37 @@ import './bloc.dart';
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final AccountRepository _accountRepository;
   final AuthRepository _authRepository;
-
   late Account account;
 
-  ProfileBloc(this._accountRepository, this._authRepository) : super(InitialProfileState());
-
-  @override
   ProfileState get initialState => InitialProfileState();
 
-  @override
-  Stream<ProfileState> mapEventToState(
-    ProfileEvent event,
-  ) async* {
+  ProfileBloc(this._accountRepository, this._authRepository) : super(InitialProfileState()) {
+    on<ProfileEvent>((event, emit) async => await _profile(event, emit));
+  }
+
+  Future<void> _profile(ProfileEvent event, Emitter<ProfileState> emit) async {
     if (event is FetchProfileEvent) {
-      yield* _mapFetchToState(event);
+      try {
+        Account account = await _accountRepository.getUserAccount();
+        emit(LoadedProfileState(account));
+      } catch (excaption, stacktrace) {
+        print(excaption);
+        print(stacktrace);
+      }
     }
     if (event is UpdateProfileEvent) {
-      yield InitialProfileState();
-      yield* _mapFetchToState(event);
+      emit(InitialProfileState());
+      try {
+        Account account = await _accountRepository.getUserAccount();
+        emit(LoadedProfileState(account));
+      } catch (excaption, stacktrace) {
+        print(excaption);
+        print(stacktrace);
+      }
     }
     if (event is LogoutProfileEvent) {
       await _authRepository.logout();
-      yield LogoutProfileState();
-    }
-  }
-
-  Stream<ProfileState> _mapFetchToState(event) async* {
-    try {
-      Account account = await _accountRepository.getUserAccount();
-      yield LoadedProfileState(account);
-    } catch (excaption, stacktrace) {
-      print(excaption);
-      print(stacktrace);
+      emit(LogoutProfileState());
     }
   }
 }

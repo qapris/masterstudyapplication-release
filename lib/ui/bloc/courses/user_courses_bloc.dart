@@ -10,50 +10,48 @@ import './bloc.dart';
 
 @provide
 class UserCoursesBloc extends Bloc<UserCoursesEvent, UserCoursesState> {
-  UserCoursesBloc(this._userCourseRepository, this._cacheManager) : super(InitialUserCoursesState());
-
-  UserCoursesState get initialState => InitialUserCoursesState();
-
   final UserCourseRepository _userCourseRepository;
   final CacheManager _cacheManager;
 
-  Stream<UserCoursesState> mapEventToState(
-    UserCoursesEvent event,
-  ) async* {
-    if (event is FetchEvent) {
-      yield* _mapFetchToState();
-    }
+  UserCoursesState get initialState => InitialUserCoursesState();
+
+  UserCoursesBloc(this._userCourseRepository, this._cacheManager) : super(InitialUserCoursesState()) {
+    on<UserCoursesEvent>((event, emit) async {
+      await _userCourses(event, emit);
+    });
   }
 
-  Stream<UserCoursesState> _mapFetchToState() async* {
-    if (state is ErrorUserCoursesState) yield InitialUserCoursesState();
-    try {
-      UserCourseResponse response = await _userCourseRepository.getUserCourses();
-      if (response.posts.isEmpty) {
-        yield EmptyCoursesState();
-      } else {
-        yield InitialUserCoursesState();
-        // yield LoadedCoursesState(response.posts.map((e) => e.fromCache = false).toList());
-        print(response.posts.length);
-      }
-    } catch (e, s) {
-      print(e);
-      print(s);
-      var cache = await _cacheManager.getFromCache();
-      if (cache != null) {
-        try {
-          List<PostsBean> list = [];
-          cache.courses.forEach((element) {
-            // list.add(element.postsBean.fromCache = true);
-          });
-          yield LoadedCoursesState(list);
-        } catch (e, s) {
-          print(e);
-          print(s);
-          yield ErrorUserCoursesState();
+  Future<void> _userCourses(UserCoursesEvent event, Emitter<UserCoursesState> emit) async {
+    if (event is FetchEvent) {
+      if (state is ErrorUserCoursesState) emit(InitialUserCoursesState());
+      try {
+        UserCourseResponse response = await _userCourseRepository.getUserCourses();
+        if (response.posts.isEmpty) {
+          emit(EmptyCoursesState());
+        } else {
+          emit(InitialUserCoursesState());
+          // yield LoadedCoursesState(response.posts.map((e) => e.fromCache = false).toList());
+          print(response.posts.length);
         }
-      } else {
-        yield ErrorUserCoursesState();
+      } catch (e, s) {
+        print(e);
+        print(s);
+        var cache = await _cacheManager.getFromCache();
+        if (cache != null) {
+          try {
+            List<PostsBean> list = [];
+            cache.courses.forEach((element) {
+              // list.add(element.postsBean.fromCache = true);
+            });
+            emit(LoadedCoursesState(list));
+          } catch (e, s) {
+            print(e);
+            print(s);
+            emit(ErrorUserCoursesState());
+          }
+        } else {
+          emit(ErrorUserCoursesState());
+        }
       }
     }
   }

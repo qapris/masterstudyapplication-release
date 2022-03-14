@@ -12,42 +12,27 @@ import './bloc.dart';
 class SearchDetailBloc extends Bloc<SearchDetailEvent, SearchDetailState> {
   final CoursesRepository _coursesRepository;
 
-  SearchDetailBloc(this._coursesRepository) : super(InitialSearchDetailState());
-
-  @override
   SearchDetailState get initialState => InitialSearchDetailState();
 
-  /*Stream<SearchDetailState> transformEvents(
-    Stream<SearchDetailEvent> events,
-    Stream<SearchDetailState> Function(SearchDetailEvent event) next,
-  ) {
-    return super.transformEvents(
-      events.debounceTime(
-        Duration(milliseconds: 500),
-      ),
-      next,
-    );
-  }*/
+  SearchDetailBloc(this._coursesRepository) : super(InitialSearchDetailState()) {
+    on<SearchDetailEvent>((event, emit) async {
+      await _search(event, emit);
+    });
+  }
 
-  @override
-  // ignore: must_call_super
-  void onTransition(Transition<SearchDetailEvent, SearchDetailState> transition) {}
-
-  Stream<SearchDetailState> mapEventToState(
-    SearchDetailEvent event,
-  ) async* {
+  Future<void> _search(SearchDetailEvent event, Emitter<SearchDetailState> emit) async {
     if (event is FetchEvent) {
       if (event.query.isNotEmpty) {
         try {
-          yield LoadingSearchDetailState();
+          emit(LoadingSearchDetailState());
 
           CourcesResponse response = await _coursesRepository.getCourses(searchQuery: event.query);
 
-          yield LoadedSearchDetailState(response.courses);
+          emit(LoadedSearchDetailState(response.courses));
         } catch (error, stacktrace) {
           print(error);
           print(stacktrace);
-          yield NotingFoundSearchDetailState();
+          emit(NotingFoundSearchDetailState());
         }
       }
     }

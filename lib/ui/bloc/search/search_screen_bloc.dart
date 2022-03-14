@@ -9,35 +9,29 @@ import './bloc.dart';
 
 @provide
 class SearchScreenBloc extends Bloc<SearchScreenEvent, SearchScreenState> {
-  SearchScreenBloc(this._coursesRepository) : super(InitialSearchScreenState());
-
-  @override
-  SearchScreenState get initialState => InitialSearchScreenState();
-
   final CoursesRepository _coursesRepository;
   late List<String> _popularSearches;
   late List<CoursesBean> _newCourses;
 
-  @override
-  Stream<SearchScreenState> mapEventToState(
-    SearchScreenEvent event,
-  ) async* {
-    if (event is FetchEvent) {
-      yield* _mapFetchToState();
-    }
+  SearchScreenState get initialState => InitialSearchScreenState();
+
+  SearchScreenBloc(this._coursesRepository) : super(InitialSearchScreenState()) {
+    on<SearchScreenEvent>((event, emit) async => await _searchBloc(event, emit));
   }
 
-  Stream<SearchScreenState> _mapFetchToState() async* {
-    if (state is ErrorSearchScreenState) yield InitialSearchScreenState();
-    if (_popularSearches == null || _newCourses == null) {
-      yield InitialSearchScreenState();
-      try {
-        // _newCourses = (await _coursesRepository.getCourses(sort: Sort.date_low)).courses;
+  Future<void> _searchBloc(SearchScreenEvent event, Emitter<SearchScreenState> emit) async {
+    if (event is FetchEvent) {
+      if (state is ErrorSearchScreenState) emit(InitialSearchScreenState());
+      if (_popularSearches == null || _newCourses == null) {
+        emit(InitialSearchScreenState());
+        try {
+          // _newCourses = (await _coursesRepository.getCourses(sort: Sort.date_low)).courses;
 
-        _popularSearches = (await _coursesRepository.getPopularSearches()).searches;
-        yield LoadedSearchScreenState(_newCourses, _popularSearches);
-      } catch (_) {
-        yield ErrorSearchScreenState();
+          _popularSearches = (await _coursesRepository.getPopularSearches()).searches;
+          emit(LoadedSearchScreenState(_newCourses, _popularSearches));
+        } catch (_) {
+          emit(ErrorSearchScreenState());
+        }
       }
     }
   }

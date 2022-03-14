@@ -7,14 +7,11 @@ import './bloc.dart';
 
 @provide
 class ProfileAssignmentBloc extends Bloc<ProfileAssignmentEvent, ProfileAssignmentState> {
+  ProfileAssignmentState get initialState => InitialProfileAssignmentState();
 
-    ProfileAssignmentBloc() : super(InitialProfileAssignmentState());
+  ProfileAssignmentBloc() : super(InitialProfileAssignmentState()) {
+    on<ProfileAssignmentEvent>((event, emit) async => await _profileAssignment(event, emit));
+  }
 
-    @override
-    ProfileAssignmentState get initialState => InitialProfileAssignmentState();
-
-    @override
-    Stream<ProfileAssignmentState> mapEventToState (
-        ProfileAssignmentEvent event,
-    ) async* { }
+  Future<void> _profileAssignment(ProfileAssignmentEvent event, Emitter<ProfileAssignmentState> emit) async {}
 }

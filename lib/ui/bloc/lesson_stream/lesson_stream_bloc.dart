@@ -9,31 +9,30 @@ import './bloc.dart';
 
 @provide
 class LessonStreamBloc extends Bloc<LessonStreamEvent, LessonStreamState> {
-    final LessonRepository repository;
-    final CacheManager cacheManager;
+  final LessonRepository repository;
+  final CacheManager cacheManager;
 
-    LessonStreamBloc(this.repository, this.cacheManager) : super(InitialLessonStreamState());
+  LessonStreamState get initialState => InitialLessonStreamState();
 
-    @override
-    LessonStreamState get initialState => InitialLessonStreamState();
+  LessonStreamBloc(this.repository, this.cacheManager) : super(InitialLessonStreamState()) {
+    on<LessonStreamEvent>((event, emit) async {
+      await _lessonStream(event, emit);
+    });
+  }
 
-    @override
-    Stream<LessonStreamState> mapEventToState(
-        LessonStreamEvent event,
-        ) async* {
-        if (event is FetchEvent) {
-            try{
-                var response = await repository.getLesson(event.courseId, event.lessonId);
-                print(response);
-                yield LoadedLessonStreamState(response);
-            }catch(e,s){
-
-                if(await cacheManager.isCached(event.courseId)){
-                    yield CacheWarningLessonStreamState();
-                }
-                print(e);
-                print(s);
-            }
+  Future<void> _lessonStream(LessonStreamEvent event, Emitter<LessonStreamState> emit) async {
+    if (event is FetchEvent) {
+      try {
+        var response = await repository.getLesson(event.courseId, event.lessonId);
+        print(response);
+        emit(LoadedLessonStreamState(response));
+      } catch (e, s) {
+        if (await cacheManager.isCached(event.courseId)) {
+          emit(CacheWarningLessonStreamState());
         }
+        print(e);
+        print(s);
+      }
     }
+  }
 }

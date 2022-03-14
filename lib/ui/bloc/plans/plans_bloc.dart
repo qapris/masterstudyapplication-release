@@ -6,21 +6,18 @@ import './bloc.dart';
 
 @provide
 class PlansBloc extends Bloc<PlansEvent, PlansState> {
-
   final PurchaseRepository _repository;
 
-  PlansBloc(this._repository) : super(InitialPlansState());
-
-  @override
   PlansState get initialState => InitialPlansState();
 
-  @override
-  Stream<PlansState> mapEventToState(
-    PlansEvent event,
-  ) async* {
-    if(event is FetchEvent){
-     var response = await  _repository.getPlans();
-     yield LoadedPlansState(response);
+  PlansBloc(this._repository) : super(InitialPlansState()) {
+    on<PlansEvent>((event, emit) async => await _plans(event, emit));
+  }
+
+  Future<void> _plans(PlansEvent event, Emitter<PlansState> emit) async {
+    if (event is FetchEvent) {
+      var response = await _repository.getPlans();
+      emit(LoadedPlansState(response));
     }
   }
 }

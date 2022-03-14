@@ -12,28 +12,25 @@ class CategoriesWidget extends StatelessWidget {
   final String? title;
 
   CategoriesWidget(
-      this.title,
+    this.title,
     this.categories, {
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return (categories.length != 0) ? Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-            padding: const EdgeInsets.only(top: 30.0, left: 30.0),
-            child: Text(title!,
-                textScaleFactor: 1.0,
-                style: Theme.of(context)
-                    .primaryTextTheme
-                    .headline6
-                    ?.copyWith(color: dark, fontStyle: FontStyle.normal))),
-        _buildList(context)
-      ],
-    ) : Center();
+    return (categories.length != 0)
+        ? Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                  padding: const EdgeInsets.only(top: 30.0, left: 30.0),
+                  child: Text(title!, textScaleFactor: 1.0, style: Theme.of(context).primaryTextTheme.headline6?.copyWith(color: dark, fontStyle: FontStyle.normal))),
+              _buildList(context)
+            ],
+          )
+        : Center();
   }
 
   _buildList(context) {
@@ -46,11 +43,10 @@ class CategoriesWidget extends StatelessWidget {
           itemBuilder: (context, index) {
             var item = categories[index];
             var padding = (index == 0) ? 20.0 : 0.0;
-            var color =
-                (item?.color != null) ? HexColor.fromHex(item?.color) : dark;
+            var color = (item?.color != null) ? HexColor.fromHex(item?.color) : dark;
 
             return GestureDetector(
-              onTap: (){
+              onTap: () {
                 Navigator.pushNamed(
                   context,
                   CategoryDetailScreen.routeName,
@@ -71,48 +67,46 @@ class CategoriesWidget extends StatelessWidget {
   }
 
   _buildRow(String imgUrl, color, title) {
-
     var unescape = new HtmlUnescape();
+
     var imgFormat = (imgUrl != null && imgUrl != "") ? imgUrl.split(".") : null;
 
     return Card(
-        color: color,
-        child: new Container(
-          width: 140,
-          height: 140,
-          child: Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                (imgFormat != null)
-                  ?
-                  SizedBox(
+      color: color,
+      child: new Container(
+        width: 140,
+        height: 140,
+        child: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              (imgFormat != null)
+                  ? SizedBox(
                       width: 50,
                       height: 50,
-                      child: (imgFormat.last == 'svg') ? SvgPicture.asset(
-                          imgUrl,
-                          color: HexColor.fromHex("#FFFFFF")
-                      ) : Image.network(
-                        imgUrl,
-                        width: double.infinity,
-                        height: 50,
-                        fit: BoxFit.cover,
-                      )
-                  )
-                : Center(),
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0, left: 16, right: 16),
-                  child: Text(
-                    unescape.convert(title),
-                    textScaleFactor: 1.0,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white),
-                  ),
-                )
-              ],
-            ),
+                      child: (imgFormat.last == 'svg')
+                          ? SvgPicture.asset(imgUrl, color: HexColor.fromHex("#FFFFFF"))
+                          : Image.network(
+                              imgUrl,
+                              width: double.infinity,
+                              height: 50,
+                              fit: BoxFit.cover,
+                            ))
+                  : SizedBox(),
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0, left: 16, right: 16),
+                child: Text(
+                  unescape.convert(title),
+                  textScaleFactor: 1.0,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white),
+                ),
+              )
+            ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 }

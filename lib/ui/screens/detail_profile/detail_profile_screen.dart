@@ -17,8 +17,8 @@ import 'package:transparent_image/transparent_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DetailProfileScreenArgs {
-  late Account account;
-  late int teacherId;
+  Account? account;
+  int? teacherId;
 
   DetailProfileScreenArgs(this.account);
 
@@ -35,9 +35,9 @@ class DetailProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final DetailProfileScreenArgs args = ModalRoute.of(context)?.settings.arguments as DetailProfileScreenArgs;
     if (args.teacherId != null) {
-      _bloc.setTeacherId(args.teacherId);
+      _bloc.setTeacherId(args.teacherId!);
     } else {
-      _bloc.setAccount(args.account);
+      _bloc.setAccount(args.account!);
     }
     return BlocProvider<DetailProfileBloc>(create: (context) => _bloc, child: DetailProfileWidget());
   }
@@ -68,7 +68,7 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
         } else {
           if (_bloc.account != null) {
             setState(() {
-              title = "${_bloc.account.meta?.first_name} ${_bloc.account.meta?.last_name}";
+              title = "${_bloc.account!.meta!.first_name} ${_bloc.account!.meta!.last_name}";
             });
           }
         }
@@ -103,7 +103,7 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
                       var avatar = ClipRRect(
                         borderRadius: BorderRadius.circular(60.0),
                         child: Image.network(
-                          (_bloc.account.avatar_url == null) ? "" : _bloc.account.avatar_url,
+                          (_bloc.account!.avatar_url == null) ? "" : _bloc.account!.avatar_url,
                           fit: BoxFit.cover,
                           height: 100.0,
                           width: 100.0,
@@ -111,7 +111,7 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
                       );
 
                       var name =
-                          (_bloc.account.meta?.first_name != '' && _bloc.account.meta?.last_name != '') ? "${_bloc.account.meta?.first_name} ${_bloc.account.meta?.last_name}" : _bloc.account.login;
+                          (_bloc.account!.meta?.first_name != '' && _bloc.account!.meta?.last_name != '') ? "${_bloc.account!.meta?.first_name} ${_bloc.account!.meta?.last_name}" : _bloc.account!.login;
                       return <Widget>[
                         SliverAppBar(
                           title: Text(
@@ -177,7 +177,7 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
                                         Visibility(
                                           visible: isTeacher,
                                           child: Text(
-                                            isTeacher ? _bloc.account.meta!.position! : "",
+                                            isTeacher ? _bloc.account!.meta!.position! : "",
                                             textScaleFactor: 1.0,
                                             style: TextStyle(color: Colors.white.withOpacity(0.5)),
                                           ),
@@ -190,7 +190,7 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
                                               mainAxisAlignment: MainAxisAlignment.center,
                                               children: <Widget>[
                                                 RatingBar(
-                                                  initialRating: _bloc.account.rating?.average.toDouble(),
+                                                  initialRating: _bloc.account!.rating?.average.toDouble(),
                                                   minRating: 0,
                                                   direction: Axis.horizontal,
                                                   allowHalfRating: true,
@@ -205,7 +205,7 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
                                                 Padding(
                                                   padding: const EdgeInsets.only(left: 8.0),
                                                   child: Text(
-                                                    "${_bloc.account.rating?.average.toDouble()} (${_bloc.account.rating?.total_marks})",
+                                                    "${_bloc.account!.rating?.average.toDouble()} (${_bloc.account!.rating?.total_marks})",
                                                     textScaleFactor: 1.0,
                                                     style: TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.5)),
                                                   ),
@@ -221,13 +221,13 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
                                             child: Row(
                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: <Widget>[
-                                                if (_bloc.account.meta?.facebook != "")
+                                                if (_bloc.account!.meta?.facebook != "")
                                                   Padding(
                                                     padding: EdgeInsets.only(left: 5.0, right: 5.0),
                                                     child: GestureDetector(
                                                       onTap: () async {
                                                         try {
-                                                          await launch(_bloc.account.meta!.facebook!);
+                                                          await launch(_bloc.account!.meta!.facebook!);
                                                         } catch (e) {
                                                           await launch("https://www.facebook.com/");
                                                         }
@@ -235,13 +235,13 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
                                                       child: SizedBox(width: 20, height: 20, child: SvgPicture.asset("assets/icons/ico_fb.svg", color: Colors.white)),
                                                     ),
                                                   ),
-                                                if (_bloc.account.meta!.twitter != "")
+                                                if (_bloc.account!.meta!.twitter != "")
                                                   Padding(
                                                     padding: EdgeInsets.only(left: 5.0, right: 5.0),
                                                     child: GestureDetector(
                                                       onTap: () async {
                                                         try {
-                                                          await launch(_bloc.account.meta!.twitter);
+                                                          await launch(_bloc.account!.meta!.twitter);
                                                         } catch (e) {
                                                           await launch("https://twitter.com/");
                                                         }
@@ -249,13 +249,13 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
                                                       child: SizedBox(width: 20, height: 20, child: SvgPicture.asset("assets/icons/ico_twit.svg", color: Colors.white)),
                                                     ),
                                                   ),
-                                                if (_bloc.account.meta!.instagram != "")
+                                                if (_bloc.account!.meta!.instagram != "")
                                                   Padding(
                                                     padding: EdgeInsets.only(left: 5.0, right: 5.0),
                                                     child: GestureDetector(
                                                       onTap: () async {
                                                         try {
-                                                          await launch(_bloc.account.meta!.instagram);
+                                                          await launch(_bloc.account!.meta!.instagram);
                                                         } catch (e) {
                                                           await launch("https://www.instagram.com/");
                                                         }
@@ -293,14 +293,14 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
             Padding(
               padding: const EdgeInsets.all(32.0),
               child: Text(
-                _bloc.account.meta!.description,
+                _bloc.account!.meta!.description,
                 textScaleFactor: 1.0,
               ),
             ),
             ListView.builder(
-              itemCount: state.courses.length,
+              itemCount: state.courses!.length,
               itemBuilder: (BuildContext context, int index) {
-                var item = state.courses[index];
+                var item = state.courses![index];
                 var padding = (index == 0) ? 20.0 : 0.0;
 
                 double? rating = 0.0;
@@ -328,11 +328,11 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
           ],
         );
       } else {
-        if (_bloc.account.meta?.description != null && _bloc.account.meta!.description.isNotEmpty) {
+        if (_bloc.account!.meta?.description != null && _bloc.account!.meta!.description.isNotEmpty) {
           return Padding(
             padding: const EdgeInsets.all(32.0),
             child: Text(
-              _bloc.account.meta!.description,
+              _bloc.account!.meta!.description,
               textScaleFactor: 1.0,
             ),
           );

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -23,8 +25,13 @@ class TopInstructorsWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Padding(
-                  padding: const EdgeInsets.only(top: 30.0, left: 30.0, bottom: 20),
-                  child: Text(title!, textScaleFactor: 1.0, style: Theme.of(context).primaryTextTheme.headline6?.copyWith(color: dark, fontStyle: FontStyle.normal))),
+                padding: const EdgeInsets.only(top: 30.0, left: 30.0, bottom: 20),
+                child: Text(
+                  title!,
+                  textScaleFactor: 1.0,
+                  style: Theme.of(context).primaryTextTheme.headline6?.copyWith(color: dark, fontStyle: FontStyle.normal),
+                ),
+              ),
               _buildList(context)
             ],
           )
@@ -42,6 +49,7 @@ class TopInstructorsWidget extends StatelessWidget {
             itemCount: list.length,
             itemBuilder: (context, index) {
               var item = list[index];
+              print(item?.id.toString());
               return Padding(
                 padding: EdgeInsets.only(left: 15),
                 child: _buildCard(

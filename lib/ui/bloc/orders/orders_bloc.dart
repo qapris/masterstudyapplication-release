@@ -10,21 +10,20 @@ import './bloc.dart';
 class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
   final PurchaseRepository _repository;
 
-  OrdersBloc(this._repository) : super(InitialOrdersState());
-
-  @override
   OrdersState get initialState => InitialOrdersState();
 
-  @override
-  Stream<OrdersState> mapEventToState(
-    OrdersEvent event,
-  ) async* {
+  OrdersBloc(this._repository) : super(InitialOrdersState()) {
+    on<OrdersEvent>((event, emit) async => await _ordersBloc(event, emit));
+  }
+
+  Future<void> _ordersBloc(OrdersEvent event, Emitter<OrdersState> emit) async {
     if (event is FetchEvent) {
       try {
         var orders = await _repository.getOrders();
-        if(orders!=null && orders.isNotEmpty) {
-          yield LoadedOrdersState(orders);
-        }else yield EmptyOrdersState();
+        if (orders != null && orders.isNotEmpty) {
+          emit(LoadedOrdersState(orders));
+        } else
+          emit(EmptyOrdersState());
       } catch (e, s) {
         print(e);
         print(s);

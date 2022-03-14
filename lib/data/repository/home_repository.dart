@@ -22,11 +22,13 @@ class HomeRepositoryImpl implements HomeRepository {
 
   HomeRepositoryImpl(this.apiProvider, this._sharedPreferences);
 
+  //Get categories
   @override
   Future<List<Category>> getCategories() {
     return apiProvider.getCategories();
   }
 
+  //Get app settings
   @override
   Future<AppSettings> getAppSettings() async {
     AppSettings appSettings = await apiProvider.getAppSettings();
@@ -44,6 +46,7 @@ class HomeRepositoryImpl implements HomeRepository {
       _sharedPreferences.setInt('second_color_b', appSettings.options?.secondary_color?.b.toInt());
       _sharedPreferences.setDouble('second_color_a', appSettings.options?.secondary_color?.a.toDouble());
     }
+    
     _sharedPreferences.setBool('app_view', appSettings.options?.app_view);
 
     return appSettings;

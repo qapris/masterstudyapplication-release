@@ -10,32 +10,32 @@ import './bloc.dart';
 
 @provide
 class FinalBloc extends Bloc<FinalEvent, FinalState> {
-    final FinalRepository _finalRepository;
-    final CacheManager cacheManager;
+  final FinalRepository _finalRepository;
+  final CacheManager cacheManager;
 
-    FinalBloc(this._finalRepository, this.cacheManager) : super(InitialFinalState());
+  FinalState get initialState => InitialFinalState();
 
-    @override
-    FinalState get initialState => InitialFinalState();
+  FinalBloc(this._finalRepository, this.cacheManager) : super(InitialFinalState()) {
+    on<FinalEvent>((event, emit) async {
+      await _finalBloc(event, emit);
+    });
+  }
 
-    @override
-    Stream<FinalState> mapEventToState (
-        FinalEvent event
-        ) async* {
-        if (event is FetchEvent) {
-            try {
-                FinalResponse response = await _finalRepository.getCourseResults(event.courseId);
+  Future<void> _finalBloc(FinalEvent event, Emitter<FinalState> emit) async {
+    if (event is FetchEvent) {
+      try {
+        FinalResponse response = await _finalRepository.getCourseResults(event.courseId);
 
-                print(response);
+        print(response);
 
-                yield LoadedFinalState(response);
-            } catch(error) {
-                if(await cacheManager.isCached(event.courseId)){
-                    yield CacheWarningState();
-                }
-                print('Final Page Error');
-                print(error);
-            }
+        emit(LoadedFinalState(response));
+      } catch (error) {
+        if (await cacheManager.isCached(event.courseId)) {
+          emit(CacheWarningState());
         }
+        print('Final Page Error');
+        print(error);
+      }
     }
+  }
 }

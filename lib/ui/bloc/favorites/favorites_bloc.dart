@@ -10,44 +10,36 @@ import './bloc.dart';
 class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
   final CoursesRepository coursesRepository;
 
-  FavoritesBloc(this.coursesRepository) : super(InitialFavoritesState());
-
-  @override
   FavoritesState get initialState => InitialFavoritesState();
 
+  FavoritesBloc(this.coursesRepository) : super(InitialFavoritesState()) {
+    on<FavoritesEvent>((event, emit) async {
+      await _favourites(event, emit);
+    });
+  }
+
   @override
-  Stream<FavoritesState> mapEventToState(
-    FavoritesEvent event,
-  ) async* {
+  Future<void> _favourites(FavoritesEvent event, Emitter<FavoritesState> emit) async {
     if (event is FetchFavorites) {
-      yield* _mapFetchToState();
+      if (state is ErrorFavoritesState) emit(InitialFavoritesState());
+      try {
+        var courses = await coursesRepository.getFavoriteCourses();
+        if (courses.courses.isNotEmpty) {
+          emit(LoadedFavoritesState(courses.courses));
+        } else {
+          emit(EmptyFavoritesState());
+        }
+      } catch (_) {
+        emit(ErrorFavoritesState());
+      }
     }
     if (event is DeleteEvent) {
-      yield* _mapDeleteToState(event);
+      try {
+        var courses = (state as LoadedFavoritesState).favoriteCourses;
+        courses.removeWhere((item) => item?.id == event.courseId);
+        await coursesRepository.deleteFavoriteCourse(event.courseId);
+        emit(LoadedFavoritesState(courses));
+      } catch (_) {}
     }
-  }
-
-  Stream<FavoritesState> _mapFetchToState() async* {
-    if(state is ErrorFavoritesState) yield InitialFavoritesState();
-    try {
-
-      var courses = await coursesRepository.getFavoriteCourses();
-      if (courses.courses.isNotEmpty) {
-        yield LoadedFavoritesState(courses.courses);
-      } else {
-        yield EmptyFavoritesState();
-      }
-    } catch (_) {
-      yield ErrorFavoritesState();
-    }
-  }
-
-  Stream<FavoritesState> _mapDeleteToState(event) async* {
-    try {
-      var courses = (state as LoadedFavoritesState).favoriteCourses;
-      courses.removeWhere((item) => item?.id == event.courseId);
-      await coursesRepository.deleteFavoriteCourse(event.courseId);
-      yield LoadedFavoritesState(courses);
-    } catch (_) {}
   }
 }

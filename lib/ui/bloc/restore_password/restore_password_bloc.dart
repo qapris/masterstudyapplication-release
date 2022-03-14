@@ -4,23 +4,21 @@ import 'package:masterstudy_app/data/repository/auth_repository.dart';
 import 'package:masterstudy_app/ui/bloc/restore_password/bloc.dart';
 
 @provide
-class RestorePasswordBloc
-    extends Bloc<RestorePasswordEvent, RestorePasswordState> {
+class RestorePasswordBloc extends Bloc<RestorePasswordEvent, RestorePasswordState> {
   final AuthRepository _authRepository;
 
-  RestorePasswordBloc(this._authRepository): super(InitialRestorePasswordState());
-
-  @override
   RestorePasswordState get initialState => InitialRestorePasswordState();
 
-  @override
-  Stream<RestorePasswordState> mapEventToState(
-      RestorePasswordEvent event) async* {
+  RestorePasswordBloc(this._authRepository) : super(InitialRestorePasswordState()) {
+    on<RestorePasswordEvent>((event, emit) async => await _restorePassword(event, emit));
+  }
+
+  Future<void> _restorePassword(RestorePasswordEvent event, Emitter<RestorePasswordState> emit) async {
     if (event is SendRestorePasswordEvent) {
       try {
-        yield LoadingRestorePasswordState();
+        emit(LoadingRestorePasswordState());
         await _authRepository.restorePassword(event.email);
-        yield SuccessRestorePasswordState();
+        emit(SuccessRestorePasswordState());
       } catch (e, s) {
         print(e);
         print(s);
