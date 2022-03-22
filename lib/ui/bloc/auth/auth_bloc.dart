@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/repository/auth_repository.dart';
 
@@ -25,9 +28,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         await _repository.register(event.login, event.email, event.password);
         emit(SuccessAuthState());
-      } catch (error, stacktrace) {
-        var errorData = json.decode(error.toString());
-        emit(_errorToState(errorData['message']));
+      } on DioError catch (e) {
+        // print(e.response?.data);
+        emit(_errorToState(e.response?.data['message']));
       }
     }
 
@@ -36,10 +39,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         await _repository.authUser(event.login, event.password);
         emit(SuccessAuthState());
-      } catch (error, stacktrace) {
-        var errorData = json.decode(error.toString());
-
-        emit(_errorToState(errorData['message']));
+      } on DioError catch (e) {
+        emit(_errorToState(e.response?.data['message']));
       }
     }
 
@@ -59,8 +60,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  _errorToState(message) async* {
+  _errorToState(message) async {
     emit(ErrorAuthState(message));
-    //yield InitialAuthState();
   }
 }

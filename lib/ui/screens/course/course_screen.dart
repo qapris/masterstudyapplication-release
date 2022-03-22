@@ -13,6 +13,7 @@ import 'package:masterstudy_app/data/models/OrdersResponse.dart';
 import 'package:masterstudy_app/data/models/category.dart';
 import 'package:masterstudy_app/data/models/course/CourcesResponse.dart';
 import 'package:masterstudy_app/data/network/api_provider.dart';
+import 'package:masterstudy_app/data/utils.dart';
 import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/bloc/course/bloc.dart';
 import 'package:masterstudy_app/ui/screens/category_detail/category_detail_screen.dart';
@@ -98,7 +99,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
   var screenHeight;
   String title = "";
   bool hasTrial = true;
-  bool _isFav = false;
+  late bool _isFav;
   num kef = 2;
 
   @override
@@ -144,6 +145,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
     return BlocListener<CourseBloc, CourseState>(
       bloc: _bloc,
       listener: (context, state) {
+        ///Favorite Course or not
         if (state is LoadedCourseState) {
           setState(() {
             _isFav = state.courseDetailResponse.is_favorite!;
@@ -151,6 +153,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
           });
         }
 
+        ///Purchase
         if (state is OpenPurchaseState) {
           var future = Navigator.pushNamed(
             context,
@@ -167,7 +170,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
           var tabLength = 2;
 
           if (state is LoadedCourseState) {
-            if (state.courseDetailResponse.faq != null && state.courseDetailResponse.faq.isNotEmpty) tabLength = 3;
+            if (state.courseDetailResponse.faq != null && state.courseDetailResponse.faq!.isNotEmpty) tabLength = 3;
           }
 
           return DefaultTabController(
@@ -207,18 +210,20 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
                       pinned: true,
                       snap: false,
                       actions: <Widget>[
+                        //Icon share
                         IconButton(
                           icon: Icon(Icons.share),
                           onPressed: () {
                             if (state is LoadedCourseState) Share.share(state.courseDetailResponse.url);
                           },
                         ),
+                        //Icon fav
                         IconButton(
                           icon: Icon(Icons.favorite),
                           color: _favIcoColor,
                           onPressed: () {
                             setState(() {
-                              _favIcoColor = (_isFav) ? Colors.white : Colors.red;
+                              _favIcoColor = _isFav ? Colors.white : Colors.red;
                               _isFav = (_isFav) ? false : true;
                             });
 
@@ -231,6 +236,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
                             }
                           },
                         ),
+                        //Icon search
                         IconButton(
                           icon: Icon(Icons.search),
                           onPressed: () {
@@ -248,7 +254,10 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
                             ),
                             Tab(text: localizations.getLocalization("course_curriculum_tab")),
                             if (state is LoadedCourseState)
-                              if (state.courseDetailResponse.faq != null && state.courseDetailResponse.faq.isNotEmpty) Tab(text: localizations.getLocalization("course_faq_tab")),
+                              if (state.courseDetailResponse.faq != null && state.courseDetailResponse.faq!.isNotEmpty)
+                                Tab(
+                                  text: localizations.getLocalization("course_faq_tab"),
+                                ),
                           ],
                         ),
                       ),
@@ -395,6 +404,12 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
       ),
     );
   }
+  bool get _isAppBarExpanded {
+    if (screenHeight == null) screenHeight = MediaQuery.of(context).size.height;
+    if (_scrollController.offset > (screenHeight / kef - (kToolbarHeight * kef))) return _scrollController.hasClients && _scrollController.offset > (screenHeight / kef - (kToolbarHeight * kef));
+
+    return false;
+  }
 
   _buildBody(state) {
     if (state is InitialCourseState)
@@ -409,7 +424,11 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
             _scrollController.jumpTo(screenHeight / kef - (kToolbarHeight * kef));
           }),
           CurriculumWidget(state.courseDetailResponse),
-          if (state.courseDetailResponse.faq != null && state.courseDetailResponse.faq.isNotEmpty) FaqWidget(state.courseDetailResponse),
+          if (state.courseDetailResponse.faq != null && state.courseDetailResponse.faq!.isNotEmpty)
+            FaqWidget(
+              state.courseDetailResponse,
+            ),
+
         ],
       );
     if (state is ErrorCourseState) {
@@ -420,13 +439,6 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
     return Center(
       child: CircularProgressIndicator(),
     );
-  }
-
-  bool get _isAppBarExpanded {
-    if (screenHeight == null) screenHeight = MediaQuery.of(context).size.height;
-    if (_scrollController.offset > (screenHeight / kef - (kToolbarHeight * kef))) return _scrollController.hasClients && _scrollController.offset > (screenHeight / kef - (kToolbarHeight * kef));
-
-    return false;
   }
 
   _buildBottom(CourseState state) {
@@ -447,7 +459,9 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
+            //Price Course
             _buildPrice(state),
+            //Button "Get Now"
             MaterialButton(
               height: 40,
               color: mainColor,
@@ -464,8 +478,10 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
                   } else {
                     if (!state.courseDetailResponse.has_access) {
                       if (_bloc.selectedPaymetId == -1) {
+                        print('1');
                         _bloc.add(AddToCart(state.courseDetailResponse.id));
                       } else {
+                        print('2');
                         _bloc.add(UsePlan(state.courseDetailResponse.id));
                       }
                     }
@@ -478,28 +494,6 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
         ),
       ),
     );
-  }
-
-  _showInAppNotFound() {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text(localizations.getLocalization("error_dialog_title"), textScaleFactor: 1.0, style: TextStyle(color: Colors.black, fontSize: 20.0)),
-            content: Text(localizations.getLocalization("in_app_not_found")),
-            actions: <Widget>[
-              FlatButton(
-                child: Text(
-                  localizations.getLocalization("ok_dialog_button"),
-                  textScaleFactor: 1.0,
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        });
   }
 
   _buildPrice(CourseState state) {
@@ -568,6 +562,28 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
       }
     }
     return Text("");
+  }
+
+  _showInAppNotFound() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(localizations.getLocalization("error_dialog_title"), textScaleFactor: 1.0, style: TextStyle(color: Colors.black, fontSize: 20.0)),
+            content: Text(localizations.getLocalization("in_app_not_found")),
+            actions: <Widget>[
+              FlatButton(
+                child: Text(
+                  localizations.getLocalization("ok_dialog_button"),
+                  textScaleFactor: 1.0,
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
   }
 
   Widget setUpButtonChild(CourseState state) {
@@ -745,7 +761,6 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
   }
 
   void handleError(IAPError? error) {
-    print(error!.details.toString());
     setState(() {
       //_purchasePending = false;
     });

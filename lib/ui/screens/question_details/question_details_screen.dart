@@ -27,9 +27,7 @@ class QuestionDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     QuestionDetailsScreenArgs args = ModalRoute.of(context)?.settings.arguments as QuestionDetailsScreenArgs;
-    return BlocProvider<QuestionDetailsBloc>(
-        create: (context) => bloc,
-        child: QuestionDetailsWidget(args.lessonId, args.questionBean));
+    return BlocProvider<QuestionDetailsBloc>(create: (context) => bloc, child: QuestionDetailsWidget(args.lessonId, args.questionBean));
   }
 }
 
@@ -40,15 +38,14 @@ class QuestionDetailsWidget extends StatefulWidget {
   const QuestionDetailsWidget(this.lessonId, this.questionBean) : super();
 
   @override
-  State<StatefulWidget> createState() {
-    return QuestionDetailsWidgetState();
-  }
+  State<StatefulWidget> createState() => QuestionDetailsWidgetState();
 }
 
 class QuestionDetailsWidgetState extends State<QuestionDetailsWidget> {
   late QuestionDetailsBloc _bloc;
   bool completed = false;
   TextEditingController _reply = TextEditingController();
+
   // ignore: deprecated_member_use
   List<QuestionAddBean> newReply = [];
   late List<ReplyBean?> aList;
@@ -71,8 +68,7 @@ class QuestionDetailsWidgetState extends State<QuestionDetailsWidget> {
           });
         }
       },
-      child: BlocBuilder<QuestionDetailsBloc, QuestionDetailsState>(
-          builder: (context, state) {
+      child: BlocBuilder<QuestionDetailsBloc, QuestionDetailsState>(builder: (context, state) {
         return Scaffold(
             appBar: AppBar(
               backgroundColor: HexColor.fromHex("#273044"),
@@ -84,20 +80,12 @@ class QuestionDetailsWidgetState extends State<QuestionDetailsWidget> {
             ),
             body: SingleChildScrollView(
                 child: Padding(
-                    padding:
-                        EdgeInsets.only(top: 30.0, left: 20.0, right: 20.0),
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          _buildBodyHead(state),
-                          _buildAddedReply(),
-                          Padding(
-                              padding: EdgeInsets.only(top: 0),
-                              child: (widget.questionBean.replies.length != 0)
-                                  ? _buildList(aList)
-                                  : Center()),
-                        ]))));
+                    padding: EdgeInsets.only(top: 30.0, left: 20.0, right: 20.0),
+                    child: Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+                      _buildBodyHead(state),
+                      _buildAddedReply(),
+                      Padding(padding: EdgeInsets.only(top: 0), child: (widget.questionBean.replies.length != 0) ? _buildList(aList) : Center()),
+                    ]))));
       }),
     );
   }
@@ -117,12 +105,13 @@ class QuestionDetailsWidgetState extends State<QuestionDetailsWidget> {
         children: <Widget>[
           Padding(
             padding: EdgeInsets.only(bottom: 10.0),
-            child: Html(
-                data: widget.questionBean.content,
-                defaultTextStyle: TextStyle(
-                    fontSize: 17.0,
-                    fontWeight: FontWeight.w700,
-                    color: HexColor.fromHex("#273044"))),
+            child: Html(data: widget.questionBean.content, style: {
+              'body': Style(
+                fontSize: FontSize(17.0),
+                fontWeight: FontWeight.w700,
+                color: HexColor.fromHex("#273044"),
+              )
+            }),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -142,9 +131,7 @@ class QuestionDetailsWidgetState extends State<QuestionDetailsWidget> {
                       color: HexColor.fromHex("#E2E5EB"),
                     )),
               ),
-              Text(widget.questionBean.datetime,
-                  textScaleFactor: 1.0,
-                  style: TextStyle(color: HexColor.fromHex("#AAAAAA"))),
+              Text(widget.questionBean.datetime, textScaleFactor: 1.0, style: TextStyle(color: HexColor.fromHex("#AAAAAA"))),
               Padding(
                 padding: EdgeInsets.only(left: 20.0, right: 20.0),
                 child: Container(
@@ -192,8 +179,7 @@ class QuestionDetailsWidgetState extends State<QuestionDetailsWidget> {
   }
 
   addReply() {
-    _bloc.add(QuestionAddEvent(widget.lessonId, _reply.text,
-        int.tryParse(widget.questionBean.comment_ID)!));
+    _bloc.add(QuestionAddEvent(widget.lessonId, _reply.text, int.tryParse(widget.questionBean.comment_ID)!));
     _reply.clear();
   }
 
@@ -279,9 +265,7 @@ class QuestionDetailsWidgetState extends State<QuestionDetailsWidget> {
                       color: HexColor.fromHex("#E2E5EB"),
                     )),
               ),
-              Text(reply.datetime,
-                  textScaleFactor: 1.0,
-                  style: TextStyle(color: HexColor.fromHex("#AAAAAA"))),
+              Text(reply.datetime, textScaleFactor: 1.0, style: TextStyle(color: HexColor.fromHex("#AAAAAA"))),
               Padding(
                 padding: EdgeInsets.only(left: 20.0, right: 20.0),
                 child: Container(
@@ -302,10 +286,7 @@ class QuestionDetailsWidgetState extends State<QuestionDetailsWidget> {
           ),
           Padding(
             padding: EdgeInsets.only(top: 10.0),
-            child: Html(
-                data: reply.content,
-                defaultTextStyle: TextStyle(
-                    fontSize: 14.0, color: HexColor.fromHex("#273044"))),
+            child: Html(data: reply.content, style: {'body': Style(fontSize: FontSize(14.0), color: HexColor.fromHex("#273044"))}),
           ),
         ],
       ),
@@ -353,9 +334,7 @@ class QuestionDetailsWidgetState extends State<QuestionDetailsWidget> {
                       color: HexColor.fromHex("#E2E5EB"),
                     )),
               ),
-              Text(reply.datetime,
-                  textScaleFactor: 1.0,
-                  style: TextStyle(color: HexColor.fromHex("#AAAAAA"))),
+              Text(reply.datetime, textScaleFactor: 1.0, style: TextStyle(color: HexColor.fromHex("#AAAAAA"))),
               Padding(
                 padding: EdgeInsets.only(left: 20.0, right: 20.0),
                 child: Container(
@@ -376,10 +355,7 @@ class QuestionDetailsWidgetState extends State<QuestionDetailsWidget> {
           ),
           Padding(
             padding: EdgeInsets.only(top: 10.0),
-            child: Html(
-                data: reply.content,
-                defaultTextStyle: TextStyle(
-                    fontSize: 14.0, color: HexColor.fromHex("#273044"))),
+            child: Html(data: reply.content, style: {'body': Style(fontSize: FontSize(14.0), color: HexColor.fromHex("#273044"))}),
           ),
         ],
       ),

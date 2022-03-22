@@ -35,6 +35,7 @@ class _CurriculumWidgetState extends State<CurriculumWidget> with AutomaticKeepA
         });
   }
 
+  ///Section of Lessons
   _buildSection(CurriculumBean curriculumBean) {
     return Padding(
       padding: const EdgeInsets.all(20.0),
@@ -62,54 +63,72 @@ class _CurriculumWidgetState extends State<CurriculumWidget> with AutomaticKeepA
 
   _buildLesson(BuildContext context, CurriculumBean curriculumBean) {
     Widget icon = Center();
-    if (curriculumBean.view == "video")
-      icon = SizedBox(
-          width: 24,
-          height: 24,
-          child: SvgPicture.asset(
-              "assets/icons/ico_play.svg",
-              color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)
-          ));
-    if (curriculumBean.view == "assignment")
-      icon = SizedBox(
-          width: 24,
-          height: 24,
-          child: SvgPicture.asset(
-              "assets/icons/assignment_icon.svg",
-              color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)
-          ));
-    if (curriculumBean.view == "slide")
-      icon = SizedBox(
-          width: 24,
-          height: 24,
-          child: SvgPicture.asset(
-              "assets/icons/slides_icon.svg",
-              color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)
-          ));
-    if (curriculumBean.view == "stream")
-      icon = SizedBox(
-          width: 24,
-          height: 24,
-          child: SvgPicture.asset(
-              "assets/icons/video-camera.svg",
-              color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)
-          ));
-    if (curriculumBean.view == "quiz")
-      icon = SizedBox(
-          width: 24,
-          height: 24,
-          child: SvgPicture.asset(
-              "assets/icons/ico_question.svg",
-              color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)
-          ));
-    if (curriculumBean.view == "text" || curriculumBean.view == "")
-      icon = SizedBox(
-          width: 24,
-          height: 24,
-          child: SvgPicture.asset(
-              "assets/icons/ico_text.svg",
-              color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)
-          ));
+
+    switch (curriculumBean.view){
+      case 'video':
+        icon = SizedBox(
+            width: 24,
+            height: 24,
+            child: SvgPicture.asset(
+                "assets/icons/ico_play.svg",
+                color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)
+            ));
+        break;
+      case 'assignment':
+        icon = SizedBox(
+            width: 24,
+            height: 24,
+            child: SvgPicture.asset(
+                "assets/icons/assignment_icon.svg",
+                color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)
+            ));
+        break;
+      case 'slide':
+        icon = SizedBox(
+            width: 24,
+            height: 24,
+            child: SvgPicture.asset(
+                "assets/icons/slides_icon.svg",
+                color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)
+            ));
+        break;
+      case 'stream':
+        icon = SizedBox(
+            width: 24,
+            height: 24,
+            child: SvgPicture.asset(
+                "assets/icons/video-camera.svg",
+                color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)
+            ));
+        break;
+      case 'quiz':
+        icon = SizedBox(
+            width: 24,
+            height: 24,
+            child: SvgPicture.asset(
+                "assets/icons/ico_question.svg",
+                color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)
+            ));
+        break;
+      case 'text':
+        icon = SizedBox(
+            width: 24,
+            height: 24,
+            child: SvgPicture.asset(
+                "assets/icons/ico_text.svg",
+                color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)
+            ));
+        break;
+      case '':
+        icon = SizedBox(
+            width: 24,
+            height: 24,
+            child: SvgPicture.asset(
+                "assets/icons/ico_text.svg",
+                color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)
+            ));
+        break;
+    }
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 2.0),
@@ -123,6 +142,7 @@ class _CurriculumWidgetState extends State<CurriculumWidget> with AutomaticKeepA
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               icon,
+              ///Title Lesson
               Expanded(
                 flex: 6,
                 child: Padding(
@@ -174,7 +194,6 @@ class _CurriculumWidgetState extends State<CurriculumWidget> with AutomaticKeepA
                       style: TextStyle(
                         color: Colors.white,
                         letterSpacing: 0.4,
-
                       )
                   ),
                 ),

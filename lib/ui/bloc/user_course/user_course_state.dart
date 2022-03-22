@@ -9,7 +9,7 @@ class InitialUserCourseState extends UserCourseState {}
 class ErrorUserCourseState extends UserCourseState {}
 
 class LoadedUserCourseState extends UserCourseState {
-  final dynamic sections;
+  final List<SectionItem?> sections;
   final String? progress;
   final String? current_lesson_id;
   final String? lesson_type;

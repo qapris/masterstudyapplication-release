@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:masterstudy_app/data/models/QuizResponse.dart';
 import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/bloc/quiz_screen/bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import 'timer_widget.dart';
@@ -38,24 +40,18 @@ class QuizScreen extends StatelessWidget {
 
 class QuizScreenWidget extends StatefulWidget {
   final LessonResponse quizResponse;
-
   int lessonId;
-
   int courseId;
 
   QuizScreenWidget(this.quizResponse, this.lessonId, this.courseId) : super();
 
   @override
-  State<StatefulWidget> createState() {
-    return QuizScreenWidgetState();
-  }
+  State<StatefulWidget> createState() => QuizScreenWidgetState();
 }
 
 class QuizScreenWidgetState extends State<QuizScreenWidget> {
   late QuizScreenBloc _bloc;
-
   late WebViewController _webViewController;
-
 
   int? courseId;
   int? lessonId;
@@ -69,9 +65,10 @@ class QuizScreenWidgetState extends State<QuizScreenWidget> {
     _bloc.add(FetchEvent(courseId!, lessonId!, widget.quizResponse));
   }
 
+  // TODO: QUIZ DATA DELETE
   bool isCoursePassed(QuizResponse response) {
     bool passed = false;
-    if (response.quiz_data.isNotEmpty) {
+     if (response.quiz_data.isNotEmpty) {
       widget.quizResponse.quiz_data.forEach((value) {
         if (value?.status == "passed") passed = true;
       });
@@ -118,45 +115,35 @@ class QuizScreenWidgetState extends State<QuizScreenWidget> {
     return _buildWebView();
   }
 
-
-
-
   _buildWebView() {
-    if(widget.quizResponse.view_link !=null && widget.quizResponse.view_link.isNotEmpty)
-    return Stack(
-      children: <Widget>[ 
-        WebView(
-          initialUrl: widget.quizResponse.view_link,
-          javascriptMode: JavascriptMode.unrestricted,
-          onPageFinished: (some) async {
+    log(widget.quizResponse.view_link.toString());
+    if (widget.quizResponse.view_link != null && widget.quizResponse.view_link.isNotEmpty)
+      return Stack(
+        children: <Widget>[
+          WebView(
+            initialUrl: widget.quizResponse.view_link,
+            javascriptMode: JavascriptMode.unrestricted,
+            onPageFinished: (some) async {},
+            onPageStarted: (some) {},
+            onWebViewCreated: (controller) async {
+             /* SharedPreferences prefs = await SharedPreferences.getInstance();
+              String header = prefs.get("apiToken");
 
-
-          },
-          onPageStarted: (some) {
-
-          },
-          onWebViewCreated: (controller) async {
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            String header = prefs.get("apiToken");
-
-            controller.clearCache();
-            this._webViewController = controller;
-            controller.loadUrl(widget.quizResponse.view_link,
-                headers: {"token": header});
-          },
-          javascriptChannels: Set.from([
-            JavascriptChannel(
-                name: "lmsEvent",
-                onMessageReceived: (JavascriptMessage result) {
-                  if (jsonDecode(result.message)["event_type"] ==
-                      "close_quiz"){
-                    Navigator.pop(context);
-
-                  }
-                }),
-          ]),
-        )
-      ],
-    );
+              controller.clearCache();
+              this._webViewController = controller;
+              controller.loadUrl(widget.quizResponse.view_link, headers: {"token": header});*/
+            },
+            javascriptChannels: Set.from([
+              JavascriptChannel(
+                  name: "lmsEvent",
+                  onMessageReceived: (JavascriptMessage result) {
+                    if (jsonDecode(result.message)["event_type"] == "close_quiz") {
+                      Navigator.pop(context);
+                    }
+                  }),
+            ]),
+          )
+        ],
+      );
   }
 }

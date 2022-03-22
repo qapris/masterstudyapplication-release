@@ -1,19 +1,9 @@
-import 'dart:developer';
-
-import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/ui/bloc/home/bloc.dart';
 import 'package:masterstudy_app/ui/widgets/loading_error_widget.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../../data/utils.dart';
-import 'items/categories_item.dart';
-import 'items/new_courses_item.dart';
-import 'items/top_instructors.dart';
-import 'items/trending_item.dart';
+import 'items/items.dart';
 
 @provide
 class HomeScreen extends StatefulWidget {
@@ -25,6 +15,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late HomeBloc _bloc;
+
   @override
   void initState() {
     super.initState();
@@ -40,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: SafeArea(
         child: BlocBuilder<HomeBloc, HomeState>(
-          builder: (context, state)  {
+          builder: (context, state) {
             return _buildBody(context, state);
           },
         ),

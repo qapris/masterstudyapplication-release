@@ -10,11 +10,11 @@ class FaqWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (response.faq == null || response.faq.isEmpty) return Center();
+    if (response.faq == null || response.faq!.isEmpty) return Center();
     return ListView.builder(
-        itemCount: response.faq.length,
+        itemCount: response.faq!.length,
         itemBuilder: (context, index) {
-          var item = response.faq[index];
+          var item = response.faq![index];
           return ExpansionTile(
             title: Text(
               item?.question ?? '',

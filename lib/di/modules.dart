@@ -25,9 +25,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AppModule {
   @singleton
   @provide
-  AuthRepository userRepository(UserApiProvider apiProvider,
-      SharedPreferences sharedPreferences) =>
-      new AuthRepositoryImpl(apiProvider, sharedPreferences);
+  AuthRepository userRepository(UserApiProvider apiProvider) =>
+      new AuthRepositoryImpl(apiProvider);
 
   @singleton
   @provide

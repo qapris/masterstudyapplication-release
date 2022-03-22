@@ -1,3 +1,7 @@
+import 'package:masterstudy_app/data/models/LessonResponse.dart';
+import 'package:meta/meta.dart';
+
+
 import 'dart:async';
 import 'dart:developer';
 
@@ -10,23 +14,23 @@ import 'package:masterstudy_app/data/repository/lesson_repository.dart';
 import './bloc.dart';
 
 @provide
-class LessonVideoBloc extends Bloc<LessonVideoEvent, LessonVideoState> {
+class LessonZoomBloc extends Bloc<LessonZoomEvent, LessonZoomState> {
   final LessonRepository _lessonRepository;
 
-  LessonVideoState get initialState => InitialLessonVideoState();
+  LessonZoomState get initialState => InitialLessonZoomState();
 
-  LessonVideoBloc(this._lessonRepository) : super(InitialLessonVideoState()) {
-    on<LessonVideoEvent>((event, emit) async {
-      await _lessonVideo(event, emit);
+  LessonZoomBloc(this._lessonRepository) : super(InitialLessonZoomState()) {
+    on<LessonZoomEvent>((event, emit) async {
+      await _lessonZoom(event, emit);
     });
   }
 
-  Future<void> _lessonVideo(LessonVideoEvent event, Emitter<LessonVideoState> emit) async {
+  Future<void> _lessonZoom(LessonZoomEvent event, Emitter<LessonZoomState> emit) async {
     if (event is FetchEvent) {
       try {
         LessonResponse response = await _lessonRepository.getLesson(event.courseId, event.lessonId);
 
-        emit(LoadedLessonVideoState(response));
+        emit(LoadedLessonZoomState(response));
       } on DioError catch(e) {
       }
     } else if (event is CompleteLessonEvent) {
@@ -39,3 +43,9 @@ class LessonVideoBloc extends Bloc<LessonVideoEvent, LessonVideoState> {
     }
   }
 }
+
+
+
+
+
+

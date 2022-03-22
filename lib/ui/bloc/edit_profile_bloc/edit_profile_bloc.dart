@@ -20,11 +20,35 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
     });
   }
 
-  Future<void> _editProfile(EditProfileEvent event, Emitter<EditProfileState> emit) async {
+  Future<void> _editProfile(EditProfileEvent? event, Emitter<EditProfileState> emit) async {
     if (event is SaveEvent) {
       try {
         emit(LoadingEditProfileState());
-        await _repository.editProfile(event.firstName, event.lastName, event.password, event.description, event.position, event.facebook, event.twitter, event.instagram, photo: event.photo);
+        if(event.photo != null) {
+          await _repository.editProfile(
+            event.firstName,
+            event.lastName,
+            event.password,
+            event.description,
+            event.position,
+            event.facebook,
+            event.twitter,
+            event.instagram,
+            event.photo!,
+          );
+        }else {
+          await _repository.editProfile(
+            event.firstName,
+            event.lastName,
+            event.password,
+            event.description,
+            event.position,
+            event.facebook,
+            event.twitter,
+            event.instagram,
+          );
+        }
+
         await Future.delayed(Duration(milliseconds: 1000));
         emit(CloseEditProfileState());
       } catch (e, s) {

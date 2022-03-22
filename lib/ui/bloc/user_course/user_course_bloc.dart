@@ -24,11 +24,22 @@ class UserCourseBloc extends Bloc<UserCourseEvent, UserCourseState> {
       int courseId = int.parse(event.userCourseScreenArgs.course_id!);
 
       var isCached = await cacheManager.isCached(courseId);
+
       if (state is ErrorUserCourseState) emit(InitialUserCourseState());
+
       try {
         var response = await _repository.getCourseCurriculum(courseId);
 
-        emit(LoadedUserCourseState(response.sections, response.progress_percent, response.current_lesson_id, response.lesson_type, response = response, await cacheManager.isCached(courseId), false));
+        emit(LoadedUserCourseState(
+          response.sections,
+          response.progress_percent,
+          response.current_lesson_id,
+          response.lesson_type,
+          response = response,
+          await cacheManager.isCached(courseId),
+          false,
+        ));
+
         if (isCached) {
           print(event.userCourseScreenArgs.postsBean?.hash);
           var currentHash = (await cacheManager.getFromCache())?.courses.firstWhere((element) => courseId == element?.id)?.hash;
@@ -45,10 +56,10 @@ class UserCourseBloc extends Bloc<UserCourseEvent, UserCourseState> {
             var response = cache?.courses.firstWhere((element) => courseId == element?.id)?.curriculumResponse;
 
             emit(LoadedUserCourseState(
-              response?.sections,
-              response?.progress_percent,
-              response?.current_lesson_id,
-              response?.lesson_type,
+              response!.sections,
+              response.progress_percent,
+              response.current_lesson_id,
+              response.lesson_type,
               response = response,
               true,
               false,

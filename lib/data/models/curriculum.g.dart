@@ -8,7 +8,7 @@ part of 'curriculum.dart';
 
 CurriculumResponse _$CurriculumResponseFromJson(Map<String, dynamic> json) {
   return CurriculumResponse(
-    (json['sections']),
+    (json['sections'] as List).map((e) => e == null ? null : SectionItem.fromJson(e as Map<String, dynamic>)).toList(),
     json['progress_percent'] as String,
     json['current_lesson_id'] as String,
     json['lesson_type'] as String,

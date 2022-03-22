@@ -9,6 +9,8 @@ import 'package:masterstudy_app/main.dart';
 import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/bloc/plans/bloc.dart';
 import 'package:masterstudy_app/ui/screens/web_checkout/web_checkout_screen.dart';
+import 'package:webview_flutter/platform_interface.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class PlansScreen extends StatelessWidget {

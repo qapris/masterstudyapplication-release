@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:masterstudy_app/main.dart';
 import 'package:masterstudy_app/theme/theme.dart';
@@ -16,6 +18,7 @@ import 'package:masterstudy_app/ui/screens/questions/questions_screen.dart';
 import 'package:masterstudy_app/ui/screens/quiz_screen/quiz_screen.dart';
 import 'package:masterstudy_app/ui/screens/text_lesson/text_lesson_screen.dart';
 import 'package:masterstudy_app/ui/widgets/warning_lessong_dialog.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class QuizLessonScreenArgs {
@@ -49,9 +52,7 @@ class QuizLessonWidget extends StatefulWidget {
   const QuizLessonWidget(this.courseId, this.lessonId, this.authorAva, this.authorName) : super();
 
   @override
-  State<StatefulWidget> createState() {
-    return QuizLessonWidgetState();
-  }
+  State<StatefulWidget> createState() => QuizLessonWidgetState();
 }
 
 class QuizLessonWidgetState extends State<QuizLessonWidget> {
@@ -161,7 +162,8 @@ class QuizLessonWidgetState extends State<QuizLessonWidget> {
   bool showLoadingWebview = true;
 
   _buildWebView(LoadedQuizLessonState state) {
-    print(state.quizResponse.content);
+
+
     return Stack(
       children: <Widget>[
         Visibility(
@@ -200,6 +202,7 @@ class QuizLessonWidgetState extends State<QuizLessonWidget> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
+              //Button back
               SizedBox(
                   width: 35,
                   height: 35,
@@ -246,6 +249,7 @@ class QuizLessonWidgetState extends State<QuizLessonWidget> {
                           child: Icon(Icons.chevron_left),
                         )
                       : Center()),
+              //Button "Start Quiz"
               Expanded(
                 child: Padding(
                   padding: EdgeInsets.only(left: 20, right: 20),
@@ -253,11 +257,19 @@ class QuizLessonWidgetState extends State<QuizLessonWidget> {
                       height: 50,
                       color: mainColor,
                       onPressed: () {
-                        if (state is LoadedQuizLessonState) Navigator.of(context).pushNamed(QuizScreen.routeName, arguments: QuizScreenArgs(state.quizResponse, widget.lessonId, widget.courseId));
+                        if (state is LoadedQuizLessonState) {
+                          Navigator.of(context).pushNamed(QuizScreen.routeName,
+                              arguments: QuizScreenArgs(
+                                state.quizResponse,
+                                widget.lessonId,
+                                widget.courseId,
+                              ));
+                        }
                       },
                       child: _buildButtonChild(state)),
                 ),
               ),
+              //Button next
               SizedBox(
                 width: 35,
                 height: 35,

@@ -27,6 +27,10 @@ class DetailProfileBloc extends Bloc<DetailProfileEvent, DetailProfileState> {
     this.account = account;
   }
 
+  void setTeacherId(int teacherId) {
+    _teacherId = teacherId;
+  }
+
   Future<void> _detailProfile(DetailProfileEvent event, Emitter<DetailProfileState> emit) async {
     if (event is LoadDetailProfile) {
       if (account == null) {
@@ -44,7 +48,5 @@ class DetailProfileBloc extends Bloc<DetailProfileEvent, DetailProfileState> {
     }
   }
 
-  void setTeacherId(int teacherId) {
-    _teacherId = teacherId;
-  }
+
 }

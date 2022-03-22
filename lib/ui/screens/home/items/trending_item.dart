@@ -14,17 +14,10 @@ class TrendingWidget extends StatefulWidget {
   final String? title;
   final List<CoursesBean?> courses;
 
-  TrendingWidget(
-    this.darkMode,
-    this.title,
-    this.courses, {
-    Key? key,
-  }) : super(key: key);
+  TrendingWidget(this.darkMode, this.title, this.courses, {Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() {
-    return _TrendingWidget();
-  }
+  State<StatefulWidget> createState() => _TrendingWidget();
 }
 
 class _TrendingWidget extends State<TrendingWidget> {
@@ -72,7 +65,6 @@ class _TrendingWidget extends State<TrendingWidget> {
             if (item?.rating?.total != null) {
               reviews = item?.rating?.total;
             }
-            print(item.toString());
             return GestureDetector(
               onTap: () {
                 Navigator.pushNamed(

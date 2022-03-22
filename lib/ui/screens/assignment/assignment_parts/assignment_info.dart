@@ -37,11 +37,11 @@ class _AssignmentInfoWidgetState extends State<AssignmentInfoWidget> {
                     padding: EdgeInsets.only(top: 20.0, right: 7.0, bottom: 20.0, left: 7.0),
                     child: Html(
                         data: widget.assignmentResponse.title,
-                        defaultTextStyle: TextStyle(
-                            fontSize: 34.0,
+                        style: {'body':  Style(
+                            fontSize: FontSize(34.0),
                             fontWeight: FontWeight.w700,
                             color: HexColor.fromHex("#273044")
-                        ),
+                        )},
                     ),
                 ),
                 Padding(

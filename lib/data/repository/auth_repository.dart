@@ -1,8 +1,13 @@
+import 'dart:developer';
+
+import 'package:dio/dio.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/cache/cache_manager.dart';
 import 'package:masterstudy_app/data/models/auth.dart';
 import 'package:masterstudy_app/data/network/api_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../utils.dart';
 
 abstract class AuthRepository {
   Future authUser(String login, String password);
@@ -24,52 +29,48 @@ abstract class AuthRepository {
 @singleton
 class AuthRepositoryImpl extends AuthRepository {
   final UserApiProvider provider;
-  final SharedPreferences _sharedPreferences;
   static const tokenKey = "apiToken";
 
-  AuthRepositoryImpl(this.provider, this._sharedPreferences);
+  AuthRepositoryImpl(this.provider);
 
-  @override
   Future authUser(String login, String password) async {
     AuthResponse response = await provider.authUser(login, password);
+
     _saveToken(response.token);
   }
 
-  @override
   Future register(String login, String email, String password) async {
     AuthResponse response = await provider.signUpUser(login, email, password);
     _saveToken(response.token);
   }
 
-  @override
   Future<String> getToken() {
-    return Future.value(_sharedPreferences.getString(tokenKey));
+    return Future.value(preferences.getString(tokenKey));
   }
 
   void _saveToken(String token) {
-    _sharedPreferences.setString(tokenKey, token);
+    preferences.setString(tokenKey, token);
+    dio.options.headers.addAll({"token": "$token"});
   }
 
-  @override
   Future<bool> isSigned() {
-    var token = _sharedPreferences.getString(tokenKey);
+    var token = preferences.getString(tokenKey);
+    dio.options.headers.addAll({"token": "$token"});
     if (token != null && token.isNotEmpty) return Future.value(true);
     return Future.value(false);
   }
 
-  @override
   Future logout() async {
-    _sharedPreferences.setString("apiToken", "");
+    preferences.setString("apiToken", "");
     await CacheManager().cleanCache();
   }
 
-  @override
   Future demoAuth() async {
     var token = await provider.demoAuth();
+    dio.options.headers.addAll({"token": "$token"});
     _saveToken(token);
   }
 
-  @override
   Future restorePassword(String email) async {
     await provider.restorePassword(email);
   }

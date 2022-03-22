@@ -14,6 +14,8 @@ import 'package:masterstudy_app/ui/screens/questions/questions_screen.dart';
 import 'package:masterstudy_app/ui/screens/quiz_lesson/quiz_lesson_screen.dart';
 import 'package:masterstudy_app/ui/screens/user_course_locked/user_course_locked_screen.dart';
 import 'package:masterstudy_app/ui/widgets/warning_lessong_dialog.dart';
+import 'package:webview_flutter/platform_interface.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../../main.dart';

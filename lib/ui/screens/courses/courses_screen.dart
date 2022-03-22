@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -5,13 +7,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:masterstudy_app/data/models/user_course.dart';
+import 'package:masterstudy_app/data/utils.dart';
 import 'package:masterstudy_app/main.dart';
 import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/bloc/courses/bloc.dart';
 import 'package:masterstudy_app/ui/screens/category_detail/category_detail_screen.dart';
 import 'package:masterstudy_app/ui/screens/user_course/user_course.dart';
 import 'package:masterstudy_app/ui/widgets/loading_error_widget.dart';
-import 'package:transparent_image/transparent_image.dart';
 
 class CoursesScreen extends StatelessWidget {
   final Function addCoursesCallback;
@@ -19,9 +21,7 @@ class CoursesScreen extends StatelessWidget {
   const CoursesScreen(this.addCoursesCallback) : super();
 
   @override
-  Widget build(BuildContext context) {
-    return _CoursesWidget(addCoursesCallback);
-  }
+  Widget build(BuildContext context) => _CoursesWidget(addCoursesCallback);
 }
 
 class _CoursesWidget extends StatefulWidget {
@@ -30,9 +30,7 @@ class _CoursesWidget extends StatefulWidget {
   const _CoursesWidget(this.addCoursesCallback) : super();
 
   @override
-  State<StatefulWidget> createState() {
-    return _CoursesWidgetState();
-  }
+  State<StatefulWidget> createState() => _CoursesWidgetState();
 }
 
 class _CoursesWidgetState extends State<_CoursesWidget> {
@@ -49,25 +47,31 @@ class _CoursesWidgetState extends State<_CoursesWidget> {
     return Scaffold(
         backgroundColor: HexColor.fromHex("#F3F5F9"),
         appBar: AppBar(
-            backgroundColor: HexColor.fromHex("#273044"),
-            centerTitle: true,
-            title: Text(
-              localizations.getLocalization("user_courses_screen_title"),
-              textScaleFactor: 1.0,
-              style: TextStyle(fontSize: 16.0, color: Colors.white),
-            )),
+          centerTitle: true,
+          title: Text(
+            localizations.getLocalization("user_courses_screen_title"),
+            textScaleFactor: 1.0,
+            style: TextStyle(color: Colors.white, fontSize: 18),
+          ),
+        ),
         body: BlocBuilder<UserCoursesBloc, UserCoursesState>(
           bloc: _bloc,
           // ignore: missing_return
           builder: (context, state) {
             if (state is LoadedCoursesState) return _buildList(state.courses);
+
             if (state is ErrorUserCoursesState)
               return Center(
                 child: LoadingErrorWidget(() {
                   _bloc.add(FetchEvent());
                 }),
               );
-            if (state is InitialUserCoursesState) return _buildLoading();
+
+            if (state is InitialUserCoursesState)
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+
             if (state is EmptyCoursesState) return _buildEmptyList();
 
             return Text('Ошибка');
@@ -75,12 +79,7 @@ class _CoursesWidgetState extends State<_CoursesWidget> {
         ));
   }
 
-  _buildLoading() {
-    return Center(
-      child: CircularProgressIndicator(),
-    );
-  }
-
+  ///Empty List
   _buildEmptyList() {
     return Center(
       child: Column(
@@ -121,14 +120,14 @@ class _CoursesWidgetState extends State<_CoursesWidget> {
     );
   }
 
-  _buildList(List<PostsBean> courses) {
+  ///List with courses
+  _buildList(List<PostsBean?> courses) {
     return ListView.builder(
-        itemCount: courses.length,
-        itemBuilder: (context, index) {
-          return _CourseWidget(
-            courses[index],
-          );
-        });
+      itemCount: courses.length,
+      itemBuilder: (context, index) {
+        return _CourseWidget(courses[index]!);
+      },
+    );
   }
 }
 
@@ -150,10 +149,14 @@ class _CourseWidget extends StatelessWidget {
     var unescape = new HtmlUnescape();
     double imgHeight = (MediaQuery.of(context).size.width > 450) ? 370.0 : 160.0;
 
+    ///Function for set category
     String category = "";
     if (postsBean.categories_object != null && postsBean.categories_object.isNotEmpty) {
-      if (postsBean.categories_object.first?.name != null) category = postsBean.categories_object.first!.name;
+      if (postsBean.categories_object.first?.name != null) {
+        category = postsBean.categories_object.first!.name;
+      }
     }
+
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: SizedBox(
@@ -189,7 +192,7 @@ class _CourseWidget extends StatelessWidget {
                   ),
                 ),
                 Visibility(
-                  visible: !postsBean.fromCache,
+                  visible: postsBean.fromCache ?? true,
                   child: Padding(
                       padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
                       child: GestureDetector(
@@ -225,7 +228,7 @@ class _CourseWidget extends StatelessWidget {
                   ),
                 ),
                 Visibility(
-                  visible: !postsBean.fromCache,
+                  visible: postsBean.fromCache ?? true,
                   child: Padding(
                     padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 8),
                     child: ClipRRect(
@@ -242,17 +245,19 @@ class _CourseWidget extends StatelessWidget {
                   ),
                 ),
                 Visibility(
-                  visible: !postsBean.fromCache,
+                  visible: postsBean.fromCache ?? true,
                   child: Padding(
                     padding: const EdgeInsets.only(left: 16.0, right: 16, top: 10),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
+                        //Time Course
                         Text(
                           postsBean.duration ?? "",
                           textScaleFactor: 1.0,
                           style: TextStyle(color: HexColor.fromHex("#2a3045").withOpacity(0.5)),
                         ),
+                        //Percent course complete
                         Text(
                           postsBean.progress_label ?? "",
                           textScaleFactor: 1.0,
@@ -262,6 +267,7 @@ class _CourseWidget extends StatelessWidget {
                     ),
                   ),
                 ),
+                //Button 'CONTINUE'
                 Padding(
                   padding: const EdgeInsets.only(top: 10.0, left: 16, right: 16, bottom: 16),
                   child: SizedBox(

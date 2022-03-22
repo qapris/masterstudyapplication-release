@@ -20,7 +20,7 @@ class CourseDetailResponse {
   String? announcement;
   String? purchase_label;
   List<CurriculumBean?>? curriculum;
-  List<FaqBean?> faq;
+  List<FaqBean?>? faq;
   bool? is_favorite;
   dynamic trial;
   dynamic first_lesson;
@@ -44,7 +44,7 @@ class CourseDetailResponse {
     required this.announcement,
     required this.purchase_label,
     required this.curriculum,
-    required this.faq,
+    this.faq,
     required this.is_favorite,
     required this.trial,
     required this.first_lesson,

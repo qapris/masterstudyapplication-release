@@ -143,10 +143,10 @@ class _LessonStreamScreenState extends State<_LessonStreamScreenWidget> {
 
   loadPlayer(state) {
     if (state is LoadedLessonStreamState) {
-      String videoId = YoutubePlayer.convertUrlToId(state.lessonResponse.video);
+      String? videoId = YoutubePlayer.convertUrlToId(state.lessonResponse.video);
       if (videoId != "") {
         _youtubePlayerController = YoutubePlayerController(
-          initialVideoId: videoId,
+          initialVideoId: videoId!,
           flags: YoutubePlayerFlags(
             autoPlay: true,
             isLive: true,

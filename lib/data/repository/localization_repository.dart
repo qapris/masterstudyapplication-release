@@ -4,8 +4,8 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
 abstract class LocalizationRepository {
-  late Map<String, dynamic> localization;
-  late Map<String, dynamic> customLocalization;
+  Map<String, dynamic> localization = {};
+  Map<String, dynamic> customLocalization = {};
 
   String getLocalization(String key) {
     if (customLocalization.containsKey(key)) return customLocalization[key];

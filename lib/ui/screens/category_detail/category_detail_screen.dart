@@ -37,22 +37,18 @@ class _CategoryDetailScreenWidget extends StatefulWidget {
   const _CategoryDetailScreenWidget(this.category);
 
   @override
-  State<StatefulWidget> createState() {
-    return _CategoryDetailScreenWidgetState();
-  }
+  State<StatefulWidget> createState() => _CategoryDetailScreenWidgetState();
 }
 
 class _CategoryDetailScreenWidgetState extends State<_CategoryDetailScreenWidget> {
   late CategoryDetailBloc _bloc;
-  var unescape = new HtmlUnescape();
   late Category selCat;
+  var unescape = new HtmlUnescape();
 
   @override
   void initState() {
     super.initState();
-
     _bloc = BlocProvider.of<CategoryDetailBloc>(context)..add(FetchEvent(widget.category.id!));
-
     selCat = widget.category;
   }
 
@@ -126,6 +122,7 @@ class _CategoryDetailScreenWidgetState extends State<_CategoryDetailScreenWidget
         }),
       );
     if (state is InitialCategoryDetailState) return _buildLoading();
+
     if (state is LoadedCategoryDetailState) {
       return Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.max, children: <Widget>[
         Padding(

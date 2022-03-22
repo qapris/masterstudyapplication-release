@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:html_unescape/html_unescape.dart';
@@ -14,11 +13,7 @@ class NewCoursesWidget extends StatelessWidget {
   final String? title;
   final List<CoursesBean?> courses;
 
-  NewCoursesWidget(
-    this.title,
-    this.courses, {
-    Key? key,
-  }) : super(key: key);
+  NewCoursesWidget(this.title, this.courses, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -153,9 +148,7 @@ class NewCoursesWidget extends StatelessWidget {
                         Icons.star,
                         color: Colors.amber,
                       ),
-                      onRatingUpdate: (rating) {
-                        print(rating);
-                      },
+                      onRatingUpdate: (rating) {},
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 8.0),

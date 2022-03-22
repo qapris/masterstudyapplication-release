@@ -1,9 +1,5 @@
-import 'dart:developer';
 import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -13,8 +9,9 @@ import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/screens/course/meta_icon.dart';
 import 'package:masterstudy_app/ui/screens/review_write/review_write_screen.dart';
 import 'package:masterstudy_app/ui/widgets/MeasureSizeWidget.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-
+import '../../../../data/utils.dart';
 import '../../../../main.dart';
 
 class OverviewWidget extends StatefulWidget {
@@ -25,9 +22,7 @@ class OverviewWidget extends StatefulWidget {
   const OverviewWidget(this.response, this.reviewResponse, this.scrollCallback) : super();
 
   @override
-  State<StatefulWidget> createState() {
-    return _OverviewWidgetState();
-  }
+  State<StatefulWidget> createState() => _OverviewWidgetState();
 }
 
 class _OverviewWidgetState extends State<OverviewWidget> with AutomaticKeepAliveClientMixin {
@@ -88,7 +83,9 @@ class _OverviewWidgetState extends State<OverviewWidget> with AutomaticKeepAlive
                 );
               }).toList(),
             ),
+            //Annoncement
             _buildAnnoncement(widget.response.announcement),
+            //ReviewsStat
             _buildReviewsStat(widget.response.rating!),
             Padding(
               padding: const EdgeInsets.only(top: 20.0),
@@ -193,8 +190,6 @@ class _OverviewWidgetState extends State<OverviewWidget> with AutomaticKeepAlive
                           width: MediaQuery.of(context).size.width - 34,
                           child: Html(
                             data: widget.response.description,
-                            useRichText: true,
-                            shrinkToFit: false,
                           )),
                       onChange: (size) {
                         setState(() {

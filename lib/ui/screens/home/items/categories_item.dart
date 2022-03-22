@@ -4,18 +4,12 @@ import 'package:html_unescape/html_unescape.dart';
 import 'package:masterstudy_app/data/models/category.dart';
 import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/screens/category_detail/category_detail_screen.dart';
-import 'package:masterstudy_app/ui/screens/final/final_screen.dart';
-import 'package:masterstudy_app/ui/screens/user_course_locked/user_course_locked_screen.dart';
 
 class CategoriesWidget extends StatelessWidget {
   final List<Category?> categories;
   final String? title;
 
-  CategoriesWidget(
-    this.title,
-    this.categories, {
-    Key? key,
-  }) : super(key: key);
+  CategoriesWidget(this.title, this.categories, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,8 +19,13 @@ class CategoriesWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Padding(
-                  padding: const EdgeInsets.only(top: 30.0, left: 30.0),
-                  child: Text(title!, textScaleFactor: 1.0, style: Theme.of(context).primaryTextTheme.headline6?.copyWith(color: dark, fontStyle: FontStyle.normal))),
+                padding: const EdgeInsets.only(top: 30.0, left: 30.0),
+                child: Text(
+                  title!,
+                  textScaleFactor: 1.0,
+                  style: Theme.of(context).primaryTextTheme.headline6?.copyWith(color: dark, fontStyle: FontStyle.normal),
+                ),
+              ),
               _buildList(context)
             ],
           )
@@ -40,6 +39,8 @@ class CategoriesWidget extends StatelessWidget {
         constraints: new BoxConstraints(minHeight: 120, maxHeight: 160),
         child: new ListView.builder(
           itemCount: categories.length,
+          padding: const EdgeInsets.all(8.0),
+          scrollDirection: Axis.horizontal,
           itemBuilder: (context, index) {
             var item = categories[index];
             var padding = (index == 0) ? 20.0 : 0.0;
@@ -59,8 +60,6 @@ class CategoriesWidget extends StatelessWidget {
               ),
             );
           },
-          padding: const EdgeInsets.all(8.0),
-          scrollDirection: Axis.horizontal,
         ),
       ),
     );
@@ -92,7 +91,8 @@ class CategoriesWidget extends StatelessWidget {
                               width: double.infinity,
                               height: 50,
                               fit: BoxFit.cover,
-                            ))
+                            ),
+                    )
                   : SizedBox(),
               Padding(
                 padding: const EdgeInsets.only(top: 8.0, left: 16, right: 16),

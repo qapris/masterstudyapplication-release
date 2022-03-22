@@ -11,11 +11,7 @@ class TopInstructorsWidget extends StatelessWidget {
   final List<InstructorBean?> list;
   final String? title;
 
-  TopInstructorsWidget(
-    this.title,
-    this.list, {
-    Key? key,
-  }) : super(key: key);
+  TopInstructorsWidget(this.title, this.list, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

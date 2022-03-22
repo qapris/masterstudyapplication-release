@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -14,13 +15,15 @@ import 'package:masterstudy_app/ui/bloc/profile/profile_event.dart';
 
 class ProfileEditScreenArgs {
   final Account? account;
+  final dynamic avatar_url;
 
-  ProfileEditScreenArgs(this.account);
+  ProfileEditScreenArgs(this.account, this.avatar_url);
 }
 
 class ProfileEditScreen extends StatelessWidget {
   static const routeName = "profileEditScreen";
   ProfileEditScreenArgs? args;
+  ProfileEditScreenArgs? avatar_url;
   final EditProfileBloc bloc;
 
   ProfileEditScreen(this.bloc) : super();
@@ -28,22 +31,26 @@ class ProfileEditScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     args = ModalRoute.of(context)?.settings.arguments as ProfileEditScreenArgs;
+    avatar_url = ModalRoute.of(context)?.settings.arguments as ProfileEditScreenArgs;
     return BlocProvider(
       create: (context) => bloc..account = args!.account!,
-      child: _ProfileEditWidget(),
+      child: _ProfileEditWidget(avatar_url: avatar_url),
     );
   }
 }
 
 class _ProfileEditWidget extends StatefulWidget {
+  final dynamic avatar_url;
+
+  const _ProfileEditWidget({Key? key, this.avatar_url}) : super(key: key);
+
   @override
-  State<StatefulWidget> createState() {
-    return _ProfileEditWidgetState();
-  }
+  State<StatefulWidget> createState() => _ProfileEditWidgetState();
 }
 
 class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
   final _formKey = GlobalKey<FormState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   TextEditingController _firstNameController = TextEditingController();
   TextEditingController _lastNameController = TextEditingController();
@@ -56,9 +63,7 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
   TextEditingController _instagramController = TextEditingController();
 
   var enableInputs = true;
-
   var passwordVisible = false;
-
   late EditProfileBloc _bloc;
 
   @override
@@ -76,21 +81,6 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
     super.initState();
   }
 
-  _saveForm() {
-    if (_formKey.currentState!.validate()) {
-      _bloc.add(SaveEvent(
-          _firstNameController.text,
-          _lastNameController.text,
-          _passwordController.text,
-          _bioController.text,
-          _occupationController.text,
-          _facebookController.text,
-          _twitterController.text,
-          _instagramController.text,
-          _image));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,53 +96,54 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
           bloc: _bloc,
           listener: (context, state) {
             if (state is CloseEditProfileState) {
+              //SnackBar after edit profile
               BlocProvider.of<ProfileBloc>(context)..add(FetchProfileEvent());
-
-              Scaffold.of(context)
-                  .showSnackBar(SnackBar(
-                    content: Text(
-                      localizations.getLocalization("profile_updated_message"),
-                      textScaleFactor: 1.0,
-                    ),
-                    duration: Duration(seconds: 2),
-                  ))
-                  .closed
-                  .then((reason) {
-                Navigator.of(context).pop(true);
-              });
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(
+                  localizations.getLocalization("profile_updated_message"),
+                  textScaleFactor: 1.0,
+                ),
+                duration: const Duration(seconds: 2),
+                action: SnackBarAction(
+                  label: 'Назад',
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                ),
+              ));
             }
           },
           child: BlocBuilder(
             bloc: _bloc,
             builder: (context, state) {
-              return _buildBody(state);
+              return _buildBody(state, widget.avatar_url);
             },
           ),
         ));
   }
 
-  late File _image;
+  File? _image;
 
-  Future getImage() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
-
-    setState(() {
-      _image = image;
-    });
-  }
-
-  _buildBody(state) {
+  _buildBody(state, avatar_url) {
     enableInputs = !(state is LoadingEditProfileState);
-
+    Widget image;
+    String userRole = _bloc.account.roles[0];
     final Widget svg = SvgPicture.asset(
       "assets/icons/file_icon.svg",
       color: Colors.white,
     );
-    Widget image;
 
-    if (_image != null) {
+    ///Check avatar
+    if (_image == null && avatar_url != null) {
+      image = Image.network(
+        avatar_url.avatar_url.toString(),
+        fit: BoxFit.cover,
+        height: 100.0,
+        width: 100.0,
+      );
+    } else if (_image != null) {
       image = Image.file(
-        _image,
+        _image!,
         width: 70,
         height: 70,
         fit: BoxFit.cover,
@@ -171,6 +162,7 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
       key: _formKey,
       child: ListView(
         children: <Widget>[
+          //Image
           Padding(
             padding: const EdgeInsets.only(top: 16.0, bottom: 8),
             child: Center(
@@ -184,15 +176,26 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
               ),
             ),
           ),
+          //Button "Change Photo"
           Center(
-            child: FlatButton(
-              shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(32.0),
-                  side: BorderSide(color: secondColor!)),
-              color: secondColor,
-              textColor: Colors.white,
-              padding: EdgeInsets.all(8.0),
-              onPressed: getImage,
+            child: ElevatedButton(
+              style: ButtonStyle(
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(32.0),
+                    side: BorderSide(color: secondColor!),
+                  ),
+                ),
+                backgroundColor: MaterialStateProperty.all(secondColor),
+                padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(8)),
+              ),
+              onPressed: () async {
+                var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+
+                setState(() {
+                  _image = image;
+                });
+              },
               child: Padding(
                   padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                   child: Row(
@@ -214,49 +217,46 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
                   )),
             ),
           ),
+          //FirstName
           Padding(
             padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
             child: TextFormField(
               controller: _firstNameController,
               enabled: enableInputs,
-              decoration: InputDecoration(
-                  labelText: localizations.getLocalization("first_name"),
-                  filled: true),
+              decoration: InputDecoration(labelText: localizations.getLocalization("first_name"), filled: true),
             ),
           ),
+          //LastName
           Padding(
             padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
             child: TextFormField(
               controller: _lastNameController,
               enabled: enableInputs,
-              decoration: InputDecoration(
-                  labelText: localizations.getLocalization("last_name"),
-                  filled: true),
+              decoration: InputDecoration(labelText: localizations.getLocalization("last_name"), filled: true),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
-            child: TextFormField(
-              controller: _occupationController,
-              enabled: enableInputs,
-              decoration: InputDecoration(
-                  labelText: localizations.getLocalization("occupation"),
-                  filled: true),
-            ),
-          ),
+          //Occupation
+          userRole != 'subscriber'
+              ? Padding(
+                  padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
+                  child: TextFormField(
+                    controller: _occupationController,
+                    enabled: enableInputs,
+                    decoration: InputDecoration(labelText: localizations.getLocalization("occupation"), filled: true),
+                  ),
+                )
+              : const SizedBox(),
+          //Email
           Padding(
             padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
             child: TextFormField(
               controller: _emailController,
               enabled: enableInputs,
               validator: _validateEmail,
-              decoration: InputDecoration(
-                  labelText: localizations.getLocalization("email_label_text"),
-                  helperText:
-                      localizations.getLocalization("email_helper_text"),
-                  filled: true),
+              decoration: InputDecoration(labelText: localizations.getLocalization("email_label_text"), helperText: localizations.getLocalization("email_helper_text"), filled: true),
             ),
           ),
+          //Password
           Padding(
             padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
             child: TextFormField(
@@ -264,10 +264,8 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
               enabled: enableInputs,
               obscureText: passwordVisible,
               decoration: InputDecoration(
-                  labelText:
-                      localizations.getLocalization("password_label_text"),
-                  helperText: localizations
-                      .getLocalization("password_registration_helper_text"),
+                  labelText: localizations.getLocalization("password_label_text"),
+                  helperText: localizations.getLocalization("password_registration_helper_text"),
                   filled: true,
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -285,8 +283,7 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
                   return null;
                 } else {
                   if (value.length < 8) {
-                    return localizations.getLocalization(
-                        "password_register_characters_count_error_text");
+                    return localizations.getLocalization("password_register_characters_count_error_text");
                   }
                 }
 
@@ -294,63 +291,84 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
               },
             ),
           ),
+          //Bio
           Padding(
             padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
             child: TextFormField(
               controller: _bioController,
               enabled: enableInputs,
               maxLines: 5,
-              decoration: InputDecoration(
-                  labelText: localizations.getLocalization("bio"),
-                  helperText: localizations.getLocalization("bio_helper"),
-                  filled: true),
+              decoration: InputDecoration(labelText: localizations.getLocalization("bio"), helperText: localizations.getLocalization("bio_helper"), filled: true),
             ),
           ),
+          //Facebook
           Padding(
             padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
             child: TextFormField(
               controller: _facebookController,
               enabled: enableInputs,
-              decoration: InputDecoration(
-                  labelText: 'Facebook',
-                  hintText: localizations.getLocalization("enter_url"),
-                  filled: true),
+              decoration: InputDecoration(labelText: 'Facebook', hintText: localizations.getLocalization("enter_url"), filled: true),
             ),
           ),
+          //Twitter
           Padding(
             padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
             child: TextFormField(
               controller: _twitterController,
               enabled: enableInputs,
-              decoration: InputDecoration(
-                  labelText: 'Twitter',
-                  hintText: localizations.getLocalization("enter_url"),
-                  filled: true),
+              decoration: InputDecoration(labelText: 'Twitter', hintText: localizations.getLocalization("enter_url"), filled: true),
             ),
           ),
+          //Instagram
           Padding(
             padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
             child: TextFormField(
               controller: _instagramController,
               enabled: enableInputs,
-              decoration: InputDecoration(
-                  labelText: 'Instagram',
-                  hintText: localizations.getLocalization("enter_url"),
-                  filled: true),
+              decoration: InputDecoration(labelText: 'Instagram', hintText: localizations.getLocalization("enter_url"), filled: true),
             ),
           ),
+          //Button Save
           Padding(
             padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
             child: new MaterialButton(
               minWidth: double.infinity,
               color: mainColor,
               onPressed: () {
-                _saveForm();
+                if (_formKey.currentState!.validate()) {
+                  if (_image == null) {
+                    _bloc.add(
+                      SaveEvent(
+                        _firstNameController.text,
+                        _lastNameController.text,
+                        _passwordController.text,
+                        _bioController.text,
+                        _occupationController.text,
+                        _facebookController.text,
+                        _twitterController.text,
+                        _instagramController.text,
+                      ),
+                    );
+                  } else {
+                    _bloc.add(SaveEvent(
+                      _firstNameController.text,
+                      _lastNameController.text,
+                      _passwordController.text,
+                      _bioController.text,
+                      _occupationController.text,
+                      _facebookController.text,
+                      _twitterController.text,
+                      _instagramController.text,
+                      _image,
+                    ));
+                  }
+                }
               },
               child: setUpButtonChild(enableInputs),
               textColor: Colors.white,
             ),
           ),
+          //Cancel
           Padding(
             padding: const EdgeInsets.only(
               left: 18.0,
@@ -378,13 +396,7 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
       return localizations.getLocalization("email_empty_error_text");
     }
     // This is just a regular expression for email addresses
-    String p = "[a-zA-Z0-9\+\.\_\%\-\+]{1,256}" +
-        "\\@" +
-        "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" +
-        "(" +
-        "\\." +
-        "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
-        ")+";
+    String p = "[a-zA-Z0-9\+\.\_\%\-\+]{1,256}" + "\\@" + "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" + "(" + "\\." + "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" + ")+";
     RegExp regExp = new RegExp(p);
 
     if (regExp.hasMatch(value)) {
