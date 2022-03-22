@@ -15,17 +15,14 @@ class RestorePasswordScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: BlocProvider<RestorePasswordBloc>(
-          create: (context) => bloc, child: _RestorePasswordWidget()),
+      body: BlocProvider<RestorePasswordBloc>(create: (context) => bloc, child: _RestorePasswordWidget()),
     );
   }
 }
 
 class _RestorePasswordWidget extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() {
-    return _RestorePasswordWidgetState();
-  }
+  State<StatefulWidget> createState() => _RestorePasswordWidgetState();
 }
 
 class _RestorePasswordWidgetState extends State<_RestorePasswordWidget> {
@@ -41,9 +38,13 @@ class _RestorePasswordWidgetState extends State<_RestorePasswordWidget> {
   Widget build(BuildContext context) {
     return BlocListener(
       bloc: _bloc,
-      listener: (context,state){
-        if(state is SuccessRestorePasswordState)
-          Scaffold.of(context).showSnackBar(SnackBar(content: Text(localizations.getLocalization("restore_password_sent_text")),backgroundColor: Colors.green,));
+      listener: (context, state) {
+        if (state is SuccessRestorePasswordState)
+          Scaffold.of(context).showSnackBar(SnackBar(
+            // content: Text(localizations.getLocalization("restore_password_sent_text")),
+            content: Text("Restore password, check email"),
+            backgroundColor: Colors.green,
+          ));
       },
       child: BlocBuilder<RestorePasswordBloc, RestorePasswordState>(
         bloc: _bloc,
@@ -68,11 +69,7 @@ class _RestorePasswordWidgetState extends State<_RestorePasswordWidget> {
             child: TextFormField(
               controller: _emailController,
               enabled: enableInputs,
-              decoration: InputDecoration(
-                  labelText: localizations.getLocalization("email_label_text"),
-                  helperText:
-                      localizations.getLocalization("email_helper_text"),
-                  filled: true),
+              decoration: InputDecoration(labelText: localizations.getLocalization("email_label_text"), helperText: localizations.getLocalization("email_helper_text"), filled: true),
               validator: _validateEmail,
             ),
           ),
@@ -81,7 +78,11 @@ class _RestorePasswordWidgetState extends State<_RestorePasswordWidget> {
             child: new MaterialButton(
               minWidth: double.infinity,
               color: mainColor,
-              onPressed: register,
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  _bloc.add(SendRestorePasswordEvent(_emailController.text));
+                }
+              },
               child: setUpButtonChild(enableInputs),
               textColor: Colors.white,
             ),
@@ -91,16 +92,11 @@ class _RestorePasswordWidgetState extends State<_RestorePasswordWidget> {
     );
   }
 
-  void register() {
-    if (_formKey.currentState!.validate()) {
-      _bloc.add(SendRestorePasswordEvent(_emailController.text));
-    }
-  }
-
   Widget setUpButtonChild(enable) {
     if (enable == true) {
       return new Text(
-        localizations.getLocalization("restore_password_button"),
+        // localizations.getLocalization("restore_password_button"),
+        'Restore password',
         textScaleFactor: 1.0,
       );
     } else {
@@ -120,13 +116,7 @@ class _RestorePasswordWidgetState extends State<_RestorePasswordWidget> {
       return localizations.getLocalization("email_empty_error_text");
     }
     // This is just a regular expression for email addresses
-    String p = "[a-zA-Z0-9\+\.\_\%\-\+]{1,256}" +
-        "\\@" +
-        "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" +
-        "(" +
-        "\\." +
-        "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
-        ")+";
+    String p = "[a-zA-Z0-9\+\.\_\%\-\+]{1,256}" + "\\@" + "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" + "(" + "\\." + "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" + ")+";
     RegExp regExp = new RegExp(p);
 
     if (regExp.hasMatch(value)) {

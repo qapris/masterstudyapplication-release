@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:masterstudy_app/main.dart';
 import 'package:masterstudy_app/ui/screens/orders/orders.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class WebCheckoutScreenArgs {
@@ -24,7 +25,7 @@ class WebCheckoutScreen extends StatelessWidget {
         title: Text(
           localizations.getLocalization("checkout_title"),
           textScaleFactor: 1.0,
-          style: TextStyle(color: Colors.white, fontSize: 20),
+          style: TextStyle(color: Colors.white, fontSize: 18),
         ),
       ),
       body: WebCheckoutWidget(url: args.url),
@@ -38,31 +39,15 @@ class WebCheckoutWidget extends StatefulWidget {
   const WebCheckoutWidget({Key? key, this.url});
 
   @override
-  State<StatefulWidget> createState() {
-    return WebCheckoutWidgetState();
-  }
+  State<StatefulWidget> createState() => WebCheckoutWidgetState();
 }
 
 class WebCheckoutWidgetState extends State<WebCheckoutWidget> {
   late WebViewController _webViewController;
+  bool showLoading = true;
 
   @override
-  Widget build(BuildContext context) {
-    return _buildWebView();
-  }
-
-  _closeScreen() {
-    Navigator.of(context).pop();
-  }
-
-  _openOrders() {
-    var future = Navigator.pushNamed(context, OrdersScreen.routeName);
-    future.then((value) {
-      Navigator.pop(context);
-    });
-  }
-
-  bool showLoading = true;
+  Widget build(BuildContext context) => _buildWebView();
 
   _buildWebView() {
     return Stack(
@@ -116,6 +101,17 @@ class WebCheckoutWidgetState extends State<WebCheckoutWidget> {
         ),
       ],
     );
+  }
+
+  _closeScreen() {
+    Navigator.of(context).pop();
+  }
+
+  _openOrders() {
+    var future = Navigator.pushNamed(context, OrdersScreen.routeName);
+    future.then((value) {
+      Navigator.pop(context);
+    });
   }
 
   void openPaypalPayment(url) {

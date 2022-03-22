@@ -19,9 +19,7 @@ class SearchScreen extends StatelessWidget {
 
 class SearchScreenWidget extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() {
-    return SearchScreenWidgetState();
-  }
+  State<StatefulWidget> createState() => SearchScreenWidgetState();
 }
 
 class SearchScreenWidgetState extends State<SearchScreenWidget> {
@@ -41,7 +39,7 @@ class SearchScreenWidgetState extends State<SearchScreenWidget> {
           title: Text(
             localizations.getLocalization("search_title"),
             textScaleFactor: 1.0,
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: Colors.white, fontSize: 18),
           ),
           bottom: PreferredSize(
               preferredSize: const Size.fromHeight(kToolbarHeight + 16),
@@ -49,9 +47,7 @@ class SearchScreenWidgetState extends State<SearchScreenWidget> {
                 padding: const EdgeInsets.only(bottom: 16.0, left: 2, right: 2),
                 child: InkWell(
                   onTap: () {
-                    Navigator.of(context).pushNamed(
-                        SearchDetailScreen.routeName,
-                        arguments: SearchDetailScreenArgs(""));
+                    Navigator.of(context).pushNamed(SearchDetailScreen.routeName, arguments: SearchDetailScreenArgs(""));
                   },
                   child: new Card(
                     shape: RoundedRectangleBorder(
@@ -69,11 +65,9 @@ class SearchScreenWidgetState extends State<SearchScreenWidget> {
                               children: <Widget>[
                                 new Expanded(
                                     child: new Text(
-                                  localizations
-                                      .getLocalization("search_bar_title"),
+                                  localizations.getLocalization("search_bar_title"),
                                   textScaleFactor: 1.0,
-                                  style: TextStyle(
-                                      color: Colors.black.withOpacity(0.5)),
+                                  style: TextStyle(color: Colors.black.withOpacity(0.5)),
                                 )),
                                 Icon(
                                   Icons.search,
@@ -98,6 +92,7 @@ class SearchScreenWidgetState extends State<SearchScreenWidget> {
               });
             }
             if (state is InitialSearchScreenState) return _buildLoading();
+
             if (state is LoadedSearchScreenState) {
               return _buildBody(state);
             }
@@ -107,6 +102,7 @@ class SearchScreenWidgetState extends State<SearchScreenWidget> {
         ));
   }
 
+  //loading widget
   _buildLoading() {
     return Center(
       child: CircularProgressIndicator(),
@@ -124,21 +120,12 @@ class SearchScreenWidgetState extends State<SearchScreenWidget> {
             child: Padding(
                 padding: const EdgeInsets.only(top: 30.0, left: 30.0),
                 child: Text(localizations.getLocalization("popular_searchs"),
-                    textScaleFactor: 1.0,
-                    style: Theme.of(context)
-                        .primaryTextTheme
-                        .headline5
-                        ?.copyWith(color: dark, fontStyle: FontStyle.normal))),
+                    textScaleFactor: 1.0, style: Theme.of(context).primaryTextTheme.headline5?.copyWith(color: dark, fontStyle: FontStyle.normal))),
           ),
           _buildChips(state),
           Padding(
               padding: const EdgeInsets.only(top: 30.0, left: 30.0),
-              child: Text(localizations.getLocalization("new_courses"),
-                  textScaleFactor: 1.0,
-                  style: Theme.of(context)
-                      .primaryTextTheme
-                      .headline5
-                      ?.copyWith(color: dark, fontStyle: FontStyle.normal))),
+              child: Text(localizations.getLocalization("new_courses"), textScaleFactor: 1.0, style: Theme.of(context).primaryTextTheme.headline5?.copyWith(color: dark, fontStyle: FontStyle.normal))),
           _buildCourses(state)
         ],
       ),
@@ -176,12 +163,7 @@ class SearchScreenWidgetState extends State<SearchScreenWidget> {
     var unescape = new HtmlUnescape();
     return Padding(
       padding: const EdgeInsets.only(left: 22.0, right: 22.0, top: 16),
-      child: Wrap(
-          spacing: 6.0,
-          runSpacing: 6.0,
-          children: state.popularSearch
-              .map((value) => chip(unescape.convert(value)))
-              .toList()),
+      child: Wrap(spacing: 6.0, runSpacing: 6.0, children: state.popularSearch.map((value) => chip(unescape.convert(value))).toList()),
     );
   }
 

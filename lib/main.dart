@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
-import 'package:device_info/device_info.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/adapter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -24,6 +24,7 @@ import 'package:masterstudy_app/ui/bloc/home/bloc.dart';
 import 'package:masterstudy_app/ui/bloc/home_simple/bloc.dart';
 import 'package:masterstudy_app/ui/bloc/lesson_stream/bloc.dart';
 import 'package:masterstudy_app/ui/bloc/lesson_video/bloc.dart';
+import 'package:masterstudy_app/ui/bloc/lesson_zoom/bloc.dart';
 import 'package:masterstudy_app/ui/bloc/orders/orders_bloc.dart';
 import 'package:masterstudy_app/ui/bloc/plans/plans_bloc.dart';
 import 'package:masterstudy_app/ui/bloc/profile/bloc.dart';
@@ -67,6 +68,7 @@ import 'package:masterstudy_app/ui/screens/user_course/user_course.dart';
 import 'package:masterstudy_app/ui/screens/user_course_locked/user_course_locked_screen.dart';
 import 'package:masterstudy_app/ui/screens/video_screen/video_screen.dart';
 import 'package:masterstudy_app/ui/screens/web_checkout/web_checkout_screen.dart';
+import 'package:masterstudy_app/ui/screens/zoom/zoom.dart';
 import 'package:masterstudy_app/ui/widgets/message_notification.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:page_transition/page_transition.dart';
@@ -92,11 +94,6 @@ Stream pushStream = pushStreamController.stream.asBroadcastStream();
 bool dripContentEnabled = false;
 bool demoEnabled = false;
 bool appView = false;
-
-AndroidDeviceInfo? androidInfo;
-IosDeviceInfo? iosDeviceInfo;
-String? appLogoUrl;
-Directory? appDocDir;
 
 Future<bool> setColors() async {
   final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -142,30 +139,47 @@ Future<dynamic>? myBackgroundMessageHandler(Map<String, dynamic> message) {
 }
 
 void main() async {
-  //System style
+  //System style AppBar
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarBrightness: Brightness.light,
     statusBarColor: Colors.grey.withOpacity(0.4), //top bar color
     statusBarIconBrightness: Brightness.light, //top bar icons
   ));
   WidgetsFlutterBinding.ensureInitialized();
+
+  await setColors();
+  DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  // androidInfo = await deviceInfo.androidInfo;
+  // iosDeviceInfo = await deviceInfo.iosInfo;
+
+  //SharedPreferences
+  preferences = await SharedPreferences.getInstance();
+
   //Firebase
   await Firebase.initializeApp();
   FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
-  localizations = LocalizationRepositoryImpl(await getDefaultLocalization());
-  final SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
-  appView = _sharedPreferences.getBool("app_view") ?? false;
-  await setColors();
-  if (Platform.isAndroid) androidInfo = await DeviceInfoPlugin().androidInfo;
-  if (Platform.isIOS) iosDeviceInfo = await DeviceInfoPlugin().iosInfo;
   PushNotificationsManager().init();
+  //Firebase
+
+  //Localizations
+  localizations = LocalizationRepositoryImpl(await getDefaultLocalization());
+
   appDocDir = await getApplicationDocumentsDirectory();
+  appView = preferences.getBool("app_view") ?? false;
+
+  if (Platform.isAndroid) androidInfo = await deviceInfo.androidInfo;
+  if (Platform.isIOS) iosDeviceInfo = await deviceInfo.iosInfo;
+
+  (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (HttpClient client) {
+    client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+    return client;
+  };
+
+  //runApp
   runZoned(() async {
     var container = await AppInjector.create();
-
     runApp(container.app);
-    // ignore: deprecated_member_use
   }, onError: FirebaseCrashlytics.instance.recordError);
 }
 
@@ -202,6 +216,7 @@ class MyApp extends StatefulWidget {
   final Provider<PlansBloc> plansBloc;
   final Provider<OrdersBloc> ordersBloc;
   final Provider<RestorePasswordBloc> restorePasswordBloc;
+  final Provider<LessonZoomBloc> lessonZoomBloc;
 
   const MyApp(
     this.authScreen,
@@ -235,6 +250,7 @@ class MyApp extends StatefulWidget {
     this.plansBloc,
     this.ordersBloc,
     this.restorePasswordBloc,
+    this.lessonZoomBloc,
   ) : super();
 
   _getProvidedMainScreen() {
@@ -250,10 +266,10 @@ class MyApp extends StatefulWidget {
     );
   }
 
+  ///Theme for App
   ThemeData _buildShrineTheme() {
     final ThemeData base = ThemeData.light();
     return base.copyWith(
-      accentColor: mainColor,
       primaryColor: mainColor,
       buttonTheme: buttonThemeData,
       buttonBarTheme: base.buttonBarTheme.copyWith(
@@ -273,16 +289,15 @@ class MyApp extends StatefulWidget {
         bodyColor: mainColor,
         displayColor: mainColor,
       ),
-      accentTextTheme: textTheme,
-      textSelectionColor: mainColor?.withOpacity(0.4),
+      // accentTextTheme: textTheme,
+      // textSelectionColor: mainColor?.withOpacity(0.4),
       errorColor: Colors.red[400],
+      colorScheme: ColorScheme.fromSwatch().copyWith(secondary: mainColor),
     );
   }
 
   @override
-  State<StatefulWidget> createState() {
-    return MyAppState();
-  }
+  State<StatefulWidget> createState() => MyAppState();
 }
 
 class MyAppState extends State<MyApp> {
@@ -399,7 +414,6 @@ class MyAppState extends State<MyApp> {
           theme: widget._buildShrineTheme(),
           initialRoute: SplashScreen.routeName,
           debugShowCheckedModeBanner: false,
-          // ignore: missing_return
           navigatorKey: navigatorKey,
           onGenerateRoute: (routeSettings) {
             switch (routeSettings.name) {
@@ -457,6 +471,9 @@ class MyAppState extends State<MyApp> {
                 return MaterialPageRoute(builder: (context) => UserCourseLockedScreen(widget.courseBloc()), settings: routeSettings);
               case RestorePasswordScreen.routeName:
                 return MaterialPageRoute(builder: (context) => RestorePasswordScreen(widget.restorePasswordBloc()), settings: routeSettings);
+              case LessonZoomScreen.routeName:
+                return MaterialPageRoute(builder: (context) => LessonZoomScreen(widget.lessonZoomBloc()), settings: routeSettings);
+
               default:
                 return MaterialPageRoute(builder: (context) => widget.splashScreen());
             }

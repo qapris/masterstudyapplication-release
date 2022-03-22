@@ -83,11 +83,11 @@ class CourseBloc extends Bloc<CourseEvent, CourseState> {
       var reviews = await _reviewRepository.getReviews(courseId);
       // var plans = await _purchaseRepository.getUserPlans();
       availablePlans = await _purchaseRepository.getPlans();
-      emit(LoadedCourseState(courseDetailResponse!, reviews, []/*plans*/));
+      emit(LoadedCourseState(courseDetailResponse!, reviews, [] /*plans*/));
     } catch (e, s) {
       print(e);
       print(s);
-      emit(ErrorCourseState());
+      // emit(ErrorCourseState());
     }
     return ErrorCourseState();
   }

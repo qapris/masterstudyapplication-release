@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -45,9 +47,7 @@ class DetailProfileScreen extends StatelessWidget {
 
 class DetailProfileWidget extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() {
-    return _DetailProfileWidgetState();
-  }
+  State<StatefulWidget> createState() => _DetailProfileWidgetState();
 }
 
 class _DetailProfileWidgetState extends State<DetailProfileWidget> {
@@ -100,6 +100,7 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
                 ? NestedScrollView(
                     controller: _scrollController,
                     headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+                      log(_bloc.account.toString());
                       var avatar = ClipRRect(
                         borderRadius: BorderRadius.circular(60.0),
                         child: Image.network(
@@ -110,8 +111,9 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
                         ),
                       );
 
-                      var name =
-                          (_bloc.account!.meta?.first_name != '' && _bloc.account!.meta?.last_name != '') ? "${_bloc.account!.meta?.first_name} ${_bloc.account!.meta?.last_name}" : _bloc.account!.login;
+                      var name = (_bloc.account!.meta?.first_name != '' && _bloc.account!.meta?.last_name != '')
+                          ? "${_bloc.account!.meta?.first_name} ${_bloc.account!.meta?.last_name}"
+                          : _bloc.account!.login;
                       return <Widget>[
                         SliverAppBar(
                           title: Text(
@@ -134,7 +136,7 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
                               ),
                             ),
                             Visibility(
-                              visible: false,
+                              visible: isTeacher,
                               child: IconButton(
                                 icon: Icon(Icons.favorite),
                                 onPressed: () {},
@@ -355,7 +357,7 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
                       Navigator.pushReplacementNamed(
                         context,
                         ProfileEditScreen.routeName,
-                        arguments: ProfileEditScreenArgs(_bloc.account),
+                        arguments: ProfileEditScreenArgs(_bloc.account, ''),
                       );
                     },
                     child: Text(

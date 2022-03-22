@@ -142,10 +142,12 @@ class OrderWidgetState extends State<OrderWidget> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Text(
-            "${widget.orderBean.date_formatted}  id:${widget.orderBean.id}",
-            textScaleFactor: 1.0,
-            style: TextStyle(fontSize: 20),
+          Expanded(
+            child: Text(
+              "${widget.orderBean.date_formatted}  id:${widget.orderBean.id}",
+              textScaleFactor: 1.0,
+              style: TextStyle(fontSize: 20),
+            ),
           ),
           IconButton(
             onPressed: () {

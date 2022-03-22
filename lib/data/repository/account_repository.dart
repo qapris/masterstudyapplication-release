@@ -10,7 +10,7 @@ abstract class AccountRepository {
 
   Future<Account> getAccountById(int userId);
 
-  Future editProfile(String firstName, String lastName, String password, String description, String position, String facebook, String twitter, String instagram, {File photo});
+  Future editProfile(String firstName, String lastName, String password, String description, String position, String facebook, String twitter, String instagram, [File photo]);
 }
 
 @provide
@@ -30,7 +30,7 @@ class AccountRepositoryImpl implements AccountRepository {
   }
 
   @override
-  Future editProfile(String firstName, String lastName, String password, String description, String position, String facebook, String twitter, String instagram, {File? photo}) async {
+  Future editProfile(String firstName, String lastName, String password, String description, String position, String facebook, String twitter, String instagram, [File? photo]) async {
     await _apiProvider.editProfile(firstName, lastName, password, description, position, facebook, instagram, twitter);
     if (photo != null) await _apiProvider.uploadProfilePhoto(photo);
   }

@@ -17,6 +17,7 @@ Account _$AccountFromJson(Map<String, dynamic> json) {
     meta: json['meta'] == null ? null : MetaBean.fromJson(json['meta'] as Map<String, dynamic>),
     rating: json['rating'] == null ? null : RatingBean.fromJson(json['rating'] as Map<String, dynamic>),
     profile_url: json['profile_url'] as String,
+    roles: (json['roles'] as List).map((e) => e as String).toList(),
   );
 }
 
@@ -30,6 +31,7 @@ Map<String, dynamic> _$AccountToJson(Account instance) => <String, dynamic>{
       'meta': instance.meta,
       'rating': instance.rating,
       'profile_url': instance.profile_url,
+      'roles': instance.roles,
     };
 
 RatingBean _$RatingBeanFromJson(Map<String, dynamic> json) {

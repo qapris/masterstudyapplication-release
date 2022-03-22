@@ -12,6 +12,10 @@ AuthResponse _$AuthResponseFromJson(Map<String, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _$AuthResponseToJson(AuthResponse instance) => <String, dynamic>{
+Map<String, dynamic> _$AuthResponseToJson(AuthResponse instance) =>
+    <String, dynamic>{
       'token': instance.token,
     };
+
+
+

@@ -12,16 +12,12 @@ import 'package:masterstudy_app/ui/widgets/loading_error_widget.dart';
 
 class FavoritesScreen extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return _FavoritesScreenWidget();
-  }
+  Widget build(BuildContext context) => _FavoritesScreenWidget();
 }
 
 class _FavoritesScreenWidget extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() {
-    return _FavoritesScreenWidgetState();
-  }
+  State<StatefulWidget> createState() => _FavoritesScreenWidgetState();
 }
 
 class _FavoritesScreenWidgetState extends State<_FavoritesScreenWidget> {
@@ -32,28 +28,6 @@ class _FavoritesScreenWidgetState extends State<_FavoritesScreenWidget> {
   void initState() {
     super.initState();
     _bloc = BlocProvider.of<FavoritesBloc>(context)..add(FetchFavorites());
-  }
-
-  _buildEmptyList() {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          SizedBox(
-            width: 150,
-            height: 150,
-            child: SvgPicture.asset(
-              "assets/icons/empty_courses.svg",
-            ),
-          ),
-          Text(
-            localizations.getLocalization("no_user_favorites_screen_title"),
-            textScaleFactor: 1.0,
-            style: TextStyle(color: HexColor.fromHex("#D7DAE2"), fontSize: 18),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -70,7 +44,7 @@ class _FavoritesScreenWidgetState extends State<_FavoritesScreenWidget> {
             child: Text(
               localizations.getLocalization("favorites_title"),
               textScaleFactor: 1.0,
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.white, fontSize: 18),
             ),
           ),
         ),
@@ -78,12 +52,14 @@ class _FavoritesScreenWidgetState extends State<_FavoritesScreenWidget> {
           bloc: _bloc,
           builder: (context, state) {
             if (state is EmptyFavoritesState) return _buildEmptyList();
+
             if (state is ErrorFavoritesState)
               return Center(
                 child: LoadingErrorWidget(() {
                   _bloc?.add(FetchFavorites());
                 }),
               );
+
             if (state is LoadedFavoritesState) {
               return Padding(
                 padding: const EdgeInsets.only(left: 16.0, right: 16),
@@ -111,7 +87,7 @@ class _FavoritesScreenWidgetState extends State<_FavoritesScreenWidget> {
                     if (index < 2) paddingTop = 16.0;
                     if (index == state.favoriteCourses.length - 1) paddingBottom = 16.0;
                     return Padding(
-                      padding: EdgeInsets.only(top: paddingTop,bottom: paddingBottom),
+                      padding: EdgeInsets.only(top: paddingTop, bottom: paddingBottom),
                       child: CourseGridItemSelectable(
                         coursesBean: item,
                         onTap: () {
@@ -154,6 +130,28 @@ class _FavoritesScreenWidgetState extends State<_FavoritesScreenWidget> {
           },
         ));
   }
+
+  _buildEmptyList() {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          SizedBox(
+            width: 150,
+            height: 150,
+            child: SvgPicture.asset(
+              "assets/icons/empty_courses.svg",
+            ),
+          ),
+          Text(
+            localizations.getLocalization("no_user_favorites_screen_title"),
+            textScaleFactor: 1.0,
+            style: TextStyle(color: HexColor.fromHex("#D7DAE2"), fontSize: 18),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 enum CourseGridItemEditingState { primary, selected, shadowed }
@@ -185,11 +183,9 @@ class CourseGridItemSelectable extends StatelessWidget {
               Visibility(
                 visible: itemState == CourseGridItemEditingState.selected,
                 child: Container(
-                  height: 200,
+                  height: 212,
                   margin: const EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                      border: Border.all(color: mainColor!, width: 2)),
+                  decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(10)), border: Border.all(color: mainColor!, width: 2)),
                 ),
               ),
               Visibility(
@@ -213,9 +209,7 @@ class CourseGridItemSelectable extends StatelessWidget {
                 child: Container(
                   height: 200,
                   margin: const EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                      color: Colors.white.withOpacity(0.5)),
+                  decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(8.0)), color: Colors.white.withOpacity(0.5)),
                 ),
               ),
             ],

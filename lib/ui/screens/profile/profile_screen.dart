@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,15 +14,15 @@ import 'package:masterstudy_app/ui/screens/splash/splash_screen.dart';
 import 'package:package_info/package_info.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../../data/utils.dart';
+
 class ProfileScreen extends StatelessWidget {
   final Function myCoursesCallback;
 
   const ProfileScreen(this.myCoursesCallback) : super();
 
   @override
-  Widget build(BuildContext context) {
-    return ProfileScreenWidget(myCoursesCallback);
-  }
+  Widget build(BuildContext context) => ProfileScreenWidget(myCoursesCallback);
 }
 
 class ProfileScreenWidget extends StatefulWidget {
@@ -29,9 +31,7 @@ class ProfileScreenWidget extends StatefulWidget {
   const ProfileScreenWidget(this.myCoursesCallback) : super();
 
   @override
-  State<StatefulWidget> createState() {
-    return _ProfileScreenWidgetState();
-  }
+  State<StatefulWidget> createState() => _ProfileScreenWidgetState();
 }
 
 class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
@@ -42,8 +42,7 @@ class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
   @override
   void initState() {
     super.initState();
-    _bloc = BlocProvider.of<ProfileBloc>(context)
-      ..add(FetchProfileEvent());
+    _bloc = BlocProvider.of<ProfileBloc>(context)..add(FetchProfileEvent());
     PackageInfo.fromPlatform().then((value) {
       setState(() {
         version = value.version;
@@ -57,8 +56,7 @@ class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
       bloc: _bloc,
       listener: (context, state) {
         if (state is LogoutProfileState) {
-          Navigator.of(context).pushNamedAndRemoveUntil(
-              SplashScreen.routeName, (Route<dynamic> route) => false);
+          Navigator.of(context).pushNamedAndRemoveUntil(SplashScreen.routeName, (Route<dynamic> route) => false);
         }
       },
       child: BlocBuilder<ProfileBloc, ProfileState>(
@@ -66,97 +64,89 @@ class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
           return Scaffold(
               appBar: PreferredSize(
                 preferredSize: Size.fromHeight(0),
-                child: AppBar(
-                  brightness: Brightness.dark,
-                ),
+                child: AppBar(),
               ),
               body: SingleChildScrollView(
                 child: SafeArea(
                     child: Column(
-                      children: <Widget>[
-                        _buildHead(state),
-                        new SizedBox(
-                          height: 1.5,
-                          child: new Center(
-                            child: new Container(
-                              margin: new EdgeInsetsDirectional.only(
-                                  start: 2.0, end: 2.0),
-                              height: 5.0,
-                              color: HexColor.fromHex("#E5E5E5"),
-                            ),
-                          ),
+                  children: <Widget>[
+                    ///Header Profile
+                    _buildHead(state),
+
+                    ///Divider
+                    SizedBox(
+                      height: 1.5,
+                      child: new Center(
+                        child: new Container(
+                          margin: new EdgeInsetsDirectional.only(start: 2.0, end: 2.0),
+                          height: 5.0,
+                          color: HexColor.fromHex("#E5E5E5"),
                         ),
-                        _buildTile(
-                          localizations.getLocalization("view_my_profile"),
-                          "assets/icons/profile_icon.svg",
-                              () {
-                            if (state is LoadedProfileState)
-                              Navigator.pushNamed(
-                                context,
-                                DetailProfileScreen.routeName,
-                                arguments: DetailProfileScreenArgs(state.account),
-                              );
-                          },
-                        ),
-//                      _buildTile(
-//                        localizations.getLocalization("add_announcement"),
-//                        "assets/icons/announcement_icon.svg",
-//                            () {},
-//                      ),
-//                      _buildTile(
-//                        "Plans",
-//                        "assets/icons/assignnments_icon.svg",
-//                            () {
-//                          Navigator.of(context).pushNamed(
-//                            PlansScreen.routeName,
-//                          );
-//                        },
-//                      ),
-                        _buildTile(
-                          localizations.getLocalization("my_orders"),
-                          "assets/icons/orders_icon.svg",
-                              () {
-                            //if (state is LoadedProfileState)
-                            Navigator.of(context).pushNamed(
-                              OrdersScreen.routeName,
-                            );
-                          },
-                        ),
-                        _buildTile(
-                          localizations.getLocalization("my_courses"),
-                          "assets/icons/ms_nav_courses.svg",
-                              () {
-                            this.widget.myCoursesCallback();
-                          },
-                        ),
-                        _buildTile(
-                          localizations.getLocalization("settings"),
-                          "assets/icons/settings_icon.svg",
-                              () async {
-                            if (state is LoadedProfileState) {
-                              Navigator.pushNamed(
-                                context,
-                                ProfileEditScreen.routeName,
-                                arguments: ProfileEditScreenArgs(state.account),
-                              );
-                            }
-                          },
-                        ),
-                        _buildTile(localizations.getLocalization("logout"),
-                            "assets/icons/logout_icon.svg", () {
-                              showLogoutDialog(context);
-                            }, textColor: lipstick, iconColor: lipstick),
-                        Padding(
-                          padding: EdgeInsets.only(top: 20.0, bottom: 20.0),
-                          child: Text(
-                            "",
-                            textScaleFactor: 1.0,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 12.0),
-                          ),
-                        )
-                      ],
-                    )),
+                      ),
+                    ),
+
+                    ///View my profile
+                    _buildTile(
+                      localizations.getLocalization("view_my_profile"),
+                      "assets/icons/profile_icon.svg",
+                      () {
+                        if (state is LoadedProfileState)
+                          Navigator.pushNamed(
+                            context,
+                            DetailProfileScreen.routeName,
+                            arguments: DetailProfileScreenArgs(state.account),
+                          );
+                      },
+                    ),
+
+                    ///My orders
+                    _buildTile(
+                      localizations.getLocalization("my_orders"),
+                      "assets/icons/orders_icon.svg",
+                      () {
+                        //if (state is LoadedProfileState)
+                        Navigator.of(context).pushNamed(
+                          OrdersScreen.routeName,
+                        );
+                      },
+                    ),
+
+                    ///My courses
+                    _buildTile(
+                      localizations.getLocalization("my_courses"),
+                      "assets/icons/ms_nav_courses.svg",
+                      () {
+                        this.widget.myCoursesCallback();
+                      },
+                    ),
+
+                    ///Settings
+                    _buildTile(
+                      localizations.getLocalization("settings"),
+                      "assets/icons/settings_icon.svg",
+                      () async {
+                        if (state is LoadedProfileState) {
+                          Navigator.pushNamed(
+                            context,
+                            ProfileEditScreen.routeName,
+                            arguments: ProfileEditScreenArgs(state.account, state.account.avatar_url),
+                          );
+                        }
+                      },
+                    ),
+
+                    ///Logout
+                    _buildTile(
+                      localizations.getLocalization("logout"),
+                      "assets/icons/logout_icon.svg",
+                      () {
+                        showLogoutDialog(context);
+                      },
+                      textColor: lipstick,
+                      iconColor: lipstick,
+                    ),
+                  ],
+                )),
               ));
         },
       ),
@@ -194,34 +184,18 @@ class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
                     Text(
                       localizations.getLocalization("greeting_user"),
                       textScaleFactor: 1.0,
-                      style: Theme
-                          .of(context)
-                          .primaryTextTheme
-                          .subtitle2
-                          ?.copyWith(color: HexColor.fromHex("#AAAAAA")),
+                      style: Theme.of(context).primaryTextTheme.subtitle2?.copyWith(color: HexColor.fromHex("#AAAAAA")),
                     ),
                     Container(
                       width: double.infinity,
                       height: 28,
-                      constraints: BoxConstraints(
-                          maxWidth: MediaQuery
-                              .of(context)
-                              .size
-                              .width - 110),
+                      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width - 110),
                       child: Text(
-                        (state.account.meta!.first_name != '' &&
-                            state.account.meta!.last_name != '')
-                            ? "${state.account.meta!.first_name} ${state.account.meta!.last_name}"
-                            : state.account.login,
+                        (state.account.meta!.first_name != '' && state.account.meta!.last_name != '') ? "${state.account.meta!.first_name} ${state.account.meta!.last_name}" : state.account.login,
                         textScaleFactor: 1.0,
                         maxLines: 1,
                         softWrap: false,
-                        style: Theme
-                            .of(context)
-                            .primaryTextTheme
-                            .headline5
-                        !
-                            .copyWith(color: dark),
+                        style: Theme.of(context).primaryTextTheme.headline5!.copyWith(color: dark),
                       ),
                     ),
                   ],
@@ -279,8 +253,7 @@ class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
     );
   }
 
-  _buildTile(String title, String assetPath, VoidCallback onClick,
-      {textColor, iconColor}) {
+  _buildTile(String title, String assetPath, VoidCallback onClick, {textColor, iconColor}) {
     final String assetName = assetPath;
     final Widget svg = SvgPicture.asset(
       assetName,
@@ -289,8 +262,7 @@ class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
     return Column(
       children: <Widget>[
         ListTile(
-          contentPadding:
-          const EdgeInsets.only(left: 36.0, top: 15.0, bottom: 15.0),
+          contentPadding: const EdgeInsets.only(left: 36.0, top: 15.0, bottom: 15.0),
           leading: SizedBox(
             child: svg,
             width: 23,
@@ -344,9 +316,7 @@ class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
 
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      title: Text(localizations.getLocalization("logout"),
-          textScaleFactor: 1.0,
-          style: TextStyle(color: Colors.black, fontSize: 20.0)),
+      title: Text(localizations.getLocalization("logout"), textScaleFactor: 1.0, style: TextStyle(color: Colors.black, fontSize: 20.0)),
       content: Text(
         localizations.getLocalization("logout_message"),
         textScaleFactor: 1.0,

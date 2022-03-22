@@ -30,8 +30,7 @@ class DialogAuthorWidget extends StatelessWidget {
                 margin: EdgeInsets.only(top: 40.0, left: 20.0, right: 20.0),
                 color: Colors.white,
                 child: Padding(
-                  padding: EdgeInsets.only(
-                      top: 20.0, bottom: 15.0, left: 20.0, right: 20.0),
+                  padding: EdgeInsets.only(top: 20.0, bottom: 15.0, left: 20.0, right: 20.0),
                   child: _buildBody(context, this.courseState),
                 ),
               )
@@ -48,9 +47,7 @@ class DialogAuthorWidget extends StatelessWidget {
       if (state.courseDetailResponse.author.meta.first_name != null) {
         authorName = state.courseDetailResponse.author.meta.first_name;
         if (state.courseDetailResponse.author.meta.last_name != null) {
-          authorName = authorName +
-              " " +
-              state.courseDetailResponse.author.meta.last_name;
+          authorName = authorName + " " + state.courseDetailResponse.author.meta.last_name;
         }
       }
       return Column(
@@ -69,20 +66,14 @@ class DialogAuthorWidget extends StatelessWidget {
                       Text(
                         state.courseDetailResponse.author.meta.position ?? "",
                         textScaleFactor: 1.0,
-                        style: TextStyle(
-                            fontSize: 13.0,
-                            fontWeight: FontWeight.w500,
-                            color: HexColor.fromHex("#AAAAAA")),
+                        style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.w500, color: HexColor.fromHex("#AAAAAA")),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
                         child: Text(
                           authorName,
                           textScaleFactor: 1.0,
-                          style: TextStyle(
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.w600,
-                              color: HexColor.fromHex("#273044")),
+                          style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w600, color: HexColor.fromHex("#273044")),
                         ),
                       ),
                       Padding(
@@ -90,9 +81,7 @@ class DialogAuthorWidget extends StatelessWidget {
                         child: Row(
                           children: <Widget>[
                             RatingBar(
-                              initialRating: state
-                                  .courseDetailResponse.author.rating.average
-                                  .toDouble(),
+                              initialRating: state.courseDetailResponse.author.rating.average.toDouble(),
                               minRating: 0,
                               direction: Axis.horizontal,
                               tapOnlyMode: true,
@@ -112,23 +101,19 @@ class DialogAuthorWidget extends StatelessWidget {
                             ),
                             Padding(
                               padding: const EdgeInsets.only(left: 8.0),
-                              child: Text(
-                                  "${state.courseDetailResponse.author.rating.average.toDouble()}",
-                                  textScaleFactor: 1.0,
-                                  style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                      color: HexColor.fromHex("#273044"))),
+                              child: Text("${state.courseDetailResponse.author.rating.average.toDouble()}",
+                                  textScaleFactor: 1.0, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: HexColor.fromHex("#273044"))),
                             ),
                             Padding(
                               padding: const EdgeInsets.only(left: 3.0),
                               child: Text(
-                                "(${state.courseDetailResponse.author.rating.total_marks})",
+                                state.courseDetailResponse.author.rating.total_marks == null ? '' : '(${state.courseDetailResponse.author.rating.total_marks})',
                                 textScaleFactor: 1.0,
                                 style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                    color: HexColor.fromHex("#AAAAAA")),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: HexColor.fromHex("#AAAAAA"),
+                                ),
                               ),
                             ),
                           ],
@@ -138,10 +123,7 @@ class DialogAuthorWidget extends StatelessWidget {
                         //TODO: ADD FIELD FROM API
                         "",
                         textScaleFactor: 1.0,
-                        style: TextStyle(
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.w500,
-                            color: HexColor.fromHex("#273044")),
+                        style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.w500, color: HexColor.fromHex("#273044")),
                       )
                     ],
                   )),
@@ -153,10 +135,7 @@ class DialogAuthorWidget extends StatelessWidget {
                   children: <Widget>[
                     Expanded(
                       flex: 2,
-                      child: CircleAvatar(
-                          radius: 24,
-                          backgroundImage: NetworkImage(
-                              state.courseDetailResponse.author.avatar_url)),
+                      child: CircleAvatar(radius: 24, backgroundImage: NetworkImage(state.courseDetailResponse.author.avatar_url)),
                     )
                   ],
                 ),
@@ -167,6 +146,7 @@ class DialogAuthorWidget extends StatelessWidget {
             padding: EdgeInsets.only(top: 10.0),
             child: Row(
               children: <Widget>[
+                //Author info
                 Padding(
                   padding: EdgeInsets.only(right: 10.0),
                   child: MaterialButton(
@@ -176,8 +156,7 @@ class DialogAuthorWidget extends StatelessWidget {
                         Navigator.pushNamed(
                           context,
                           DetailProfileScreen.routeName,
-                          arguments: DetailProfileScreenArgs.fromId(
-                              state.courseDetailResponse.author.id),
+                          arguments: DetailProfileScreenArgs.fromId(state.courseDetailResponse.author.id),
                         );
                       },
                       child: Text(
@@ -185,60 +164,42 @@ class DialogAuthorWidget extends StatelessWidget {
                         textScaleFactor: 1.0,
                       )),
                 ),
+                //Facebook
                 Visibility(
-                  visible:
-                      state.courseDetailResponse.author.meta.facebook != null &&
-                          state.courseDetailResponse.author.meta.facebook != "",
+                  visible: state.courseDetailResponse.author.meta.facebook != null && state.courseDetailResponse.author.meta.facebook != "",
                   child: Padding(
                     padding: EdgeInsets.only(left: 20.0, right: 5.0),
                     child: GestureDetector(
                       onTap: () {
-                        _launchURL(
-                            state.courseDetailResponse.author.meta.facebook);
+                        _launchURL(state.courseDetailResponse.author.meta.facebook);
                       },
-                      child: SizedBox(
-                          width: 36,
-                          height: 36,
-                          child: Image(
-                              image: AssetImage('assets/icons/soc_fb.png'))),
+                      child: SizedBox(width: 36, height: 36, child: Image(image: AssetImage('assets/icons/soc_fb.png'))),
                     ),
                   ),
                 ),
+                //Twitter
                 Visibility(
-                  visible:
-                      state.courseDetailResponse.author.meta.twitter != null &&
-                          state.courseDetailResponse.author.meta.twitter != "",
+                  visible: state.courseDetailResponse.author.meta.twitter != null && state.courseDetailResponse.author.meta.twitter != "",
                   child: Padding(
                     padding: EdgeInsets.only(left: 5.0, right: 5.0),
                     child: GestureDetector(
                       onTap: () {
-                        _launchURL(
-                            state.courseDetailResponse.author.meta.twitter);
+                        _launchURL(state.courseDetailResponse.author.meta.twitter);
                       },
-                      child: SizedBox(
-                          width: 36,
-                          height: 36,
-                          child: Image(
-                              image: AssetImage('assets/icons/soc_twit.png'))),
+                      child: SizedBox(width: 36, height: 36, child: Image(image: AssetImage('assets/icons/soc_twit.png'))),
                     ),
                   ),
                 ),
+                //Instagram
                 Visibility(
-                  visible: state.courseDetailResponse.author.meta.instagram !=
-                          null &&
-                      state.courseDetailResponse.author.meta.instagram != "",
+                  visible: state.courseDetailResponse.author.meta.instagram != null && state.courseDetailResponse.author.meta.instagram != "",
                   child: Padding(
                     padding: EdgeInsets.only(left: 5.0, right: 5.0),
                     child: GestureDetector(
                       onTap: () {
-                        _launchURL(
-                            state.courseDetailResponse.author.meta.instagram);
+                        _launchURL(state.courseDetailResponse.author.meta.instagram);
                       },
-                      child: SizedBox(
-                          width: 36,
-                          height: 36,
-                          child: Image(
-                              image: AssetImage('assets/icons/soc_insta.png'))),
+                      child: SizedBox(width: 36, height: 36, child: Image(image: AssetImage('assets/icons/soc_insta.png'))),
                     ),
                   ),
                 ),

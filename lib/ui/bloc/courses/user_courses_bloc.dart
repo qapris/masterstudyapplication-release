@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:inject/inject.dart';
@@ -30,10 +31,10 @@ class UserCoursesBloc extends Bloc<UserCoursesEvent, UserCoursesState> {
           emit(EmptyCoursesState());
         } else {
           emit(InitialUserCoursesState());
-          // yield LoadedCoursesState(response.posts.map((e) => e.fromCache = false).toList());
-          print(response.posts.length);
+          emit(LoadedCoursesState(response.posts));
         }
       } catch (e, s) {
+        log(e.toString());
         print(e);
         print(s);
         var cache = await _cacheManager.getFromCache();

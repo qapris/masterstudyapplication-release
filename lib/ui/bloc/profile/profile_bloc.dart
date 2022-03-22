@@ -12,7 +12,7 @@ import './bloc.dart';
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final AccountRepository _accountRepository;
   final AuthRepository _authRepository;
-  late Account account;
+  Account? account;
 
   ProfileState get initialState => InitialProfileState();
 
@@ -40,6 +40,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         print(stacktrace);
       }
     }
+
     if (event is LogoutProfileEvent) {
       await _authRepository.logout();
       emit(LogoutProfileState());

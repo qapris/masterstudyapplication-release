@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'dart:ui';
 
@@ -19,8 +20,10 @@ import 'package:masterstudy_app/ui/screens/user_course_locked/user_course_locked
 import 'package:masterstudy_app/ui/screens/video_screen/video_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
+import '../../../data/utils.dart';
 import '../../../main.dart';
 
 class LessonVideoScreenArgs {
@@ -44,7 +47,17 @@ class LessonVideoScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final LessonVideoScreenArgs args = ModalRoute.of(context)?.settings.arguments as LessonVideoScreenArgs;
 
-    return BlocProvider<LessonVideoBloc>(create: (c) => _bloc, child: _LessonVideoScreenWidget(args.courseId, args.lessonId, args.authorAva, args.authorName, args.hasPreview, args.trial));
+    return BlocProvider<LessonVideoBloc>(
+      create: (c) => _bloc,
+      child: _LessonVideoScreenWidget(
+        args.courseId,
+        args.lessonId,
+        args.authorAva,
+        args.authorName,
+        args.hasPreview,
+        args.trial,
+      ),
+    );
   }
 }
 
@@ -59,19 +72,16 @@ class _LessonVideoScreenWidget extends StatefulWidget {
   const _LessonVideoScreenWidget(this.courseId, this.lessonId, this.authorAva, this.authorName, this.hasPreview, this.trial);
 
   @override
-  State<StatefulWidget> createState() {
-    return _LessonVideoScreenState();
-  }
+  State<StatefulWidget> createState() => _LessonVideoScreenState();
 }
 
 class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
   late LessonVideoBloc _bloc;
   late VideoPlayerController _controller;
   late YoutubePlayerController _youtubePlayerController;
-  bool completed = false;
-
   late VoidCallback listener;
 
+  bool completed = false;
   bool video = true;
   bool videoPlayed = false;
   bool videoLoaded = false;
@@ -105,28 +115,31 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
     );
   }
 
+  ///Title AppBar
   _buildTitle(state) {
     if (state is InitialLessonVideoState) {
-      return Center();
+      return const SizedBox();
     }
 
     if (state is LoadedLessonVideoState) {
+      var item = state.lessonResponse;
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
+          //Title and Label Course
           Flexible(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Text(
-                  state.lessonResponse.section?.number,
+                  item.section?.number,
                   textScaleFactor: 1.0,
                   style: TextStyle(fontSize: 14.0, color: Colors.white),
                 ),
                 Flexible(
                   child: Text(
-                    state.lessonResponse.section?.label,
+                    item.section?.label,
                     textScaleFactor: 1.0,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -139,21 +152,26 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
               ],
             ),
           ),
+          //Question Icon
           (widget.hasPreview)
               ? Center()
               : SizedBox(
                   width: 40,
                   height: 40,
-                  child: FlatButton(
-                    shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0), side: BorderSide(color: HexColor.fromHex("#3E4555"))),
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
+                      ),
+                      padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.zero),
+                      backgroundColor: MaterialStateProperty.all(HexColor.fromHex("#3E4555")),
+                    ),
                     onPressed: () {
                       Navigator.of(context).pushNamed(
                         QuestionsScreen.routeName,
                         arguments: QuestionsScreenArgs(widget.lessonId, 1),
                       );
                     },
-                    padding: EdgeInsets.all(0.0),
-                    color: HexColor.fromHex("#3E4555"),
                     child: SizedBox(
                         width: 24,
                         height: 24,
@@ -168,46 +186,53 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
     }
   }
 
+  ///Body of Video Lesson
   _buildBody(state) {
     if (state is LoadedLessonVideoState) {
+      var item = state.lessonResponse;
       return Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
+          //Text "Video $NUMBER"
           Padding(
-              padding: EdgeInsets.only(top: 10.0, right: 7.0, bottom: 10.0, left: 7.0),
-              child: Text(
-                "Video ${state.lessonResponse.section?.index}",
-                textScaleFactor: 1.0,
-                style: TextStyle(color: HexColor.fromHex("#FFFFFF")),
-              )),
+            padding: EdgeInsets.only(top: 10.0, right: 7.0, bottom: 10.0, left: 7.0),
+            child: Text(
+              "Video ${item.section?.index}",
+              textScaleFactor: 1.0,
+              style: TextStyle(color: HexColor.fromHex("#FFFFFF")),
+            ),
+          ),
+          //Title of Video Lesson
           Padding(
             padding: EdgeInsets.only(top: 20.0, right: 7.0, bottom: 20.0, left: 7.0),
             child: Html(
-              data: state.lessonResponse.title,
-              defaultTextStyle: TextStyle(fontSize: 34.0, fontWeight: FontWeight.w700, color: HexColor.fromHex("#FFFFFF")),
+              data: item.title,
+              style: {'body': Style(fontSize: FontSize(34.0), fontWeight: FontWeight.w700, color: HexColor.fromHex("#FFFFFF"))},
             ),
           ),
+          //Video
           Padding(
               padding: EdgeInsets.only(top: 20.0, right: 7.0, bottom: 20.0, left: 7.0),
-              child: (state.lessonResponse.video != "")
+              child: (item.video != "")
                   ? Container(
                       height: 211.0,
                       child: Stack(
                         children: <Widget>[
+                          //Background Photo of Video
                           Container(
                             width: MediaQuery.of(context).size.width,
                             height: 211.0,
                             decoration: BoxDecoration(
                               image: DecorationImage(
                                 fit: BoxFit.fill,
-                                image: NetworkImage(state.lessonResponse.video_poster),
+                                image: NetworkImage(item.video_poster),
                               ),
                             ),
                           ),
-                          Positioned(
-                            top: 80,
-                            left: 110,
+                          //Button "Play Video"
+                          Align(
+                            alignment: Alignment.center,
                             child: SizedBox(
                               width: 160,
                               height: 50,
@@ -228,33 +253,41 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
                                     )
                                   ],
                                 ),
-                                child: FlatButton(
-                                  shape: new RoundedRectangleBorder(
-                                    borderRadius: new BorderRadius.circular(30.0),
+                                //Button "Play Video"
+                                child: ElevatedButton(
+                                  style: ButtonStyle(
+                                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                      RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+                                    ),
+                                    padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.zero),
+                                    backgroundColor: MaterialStateProperty.all(HexColor.fromHex("#D7143A")),
                                   ),
                                   onPressed: () async {
+                                    Navigator.of(context).pushNamed(
+                                      VideoScreen.routeName,
+                                      arguments: VideoScreenArgs(item.title, item.video),
+                                    );
                                     //_buildVideoPopup(state);
-                                    if (Platform.isIOS) {
-                                      _launchURL(state.lessonResponse.video);
+                                    /*if (Platform.isIOS) {
+                                      _launchURL(item.video);
                                     } else {
                                       Navigator.of(context).pushNamed(
                                         VideoScreen.routeName,
-                                        arguments: VideoScreenArgs(state.lessonResponse.title, state.lessonResponse.video),
+                                        arguments: VideoScreenArgs(item.title, item.video),
                                       );
-                                    }
+                                    }*/
                                   },
-                                  padding: EdgeInsets.all(0.0),
-                                  color: HexColor.fromHex("#D7143A"),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: <Widget>[
                                       Padding(
-                                          padding: EdgeInsets.only(left: 0, right: 4.0),
-                                          child: Icon(
-                                            Icons.play_arrow,
-                                            color: Colors.white,
-                                          )),
+                                        padding: EdgeInsets.only(left: 0, right: 4.0),
+                                        child: Icon(
+                                          Icons.play_arrow,
+                                          color: Colors.white,
+                                        ),
+                                      ),
                                       Text(
                                         localizations.getLocalization("play_video_button"),
                                         textScaleFactor: 1.0,
@@ -269,7 +302,7 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
                         ],
                       ),
                     )
-                  : Center()),
+                  : const SizedBox()),
           _buildWebContent(state.lessonResponse.content)
         ],
       );
@@ -283,41 +316,46 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
   }
 
   late WebViewController _descriptionWebViewController;
-  late double descriptionHeight;
+  double? descriptionHeight;
 
+  ///Web Content
   _buildWebContent(String content) {
-    if (Platform.isAndroid && (androidInfo?.version.sdkInt == 28 || androidInfo?.version.sdkInt == 29)) {
-      return Html(data: content, useRichText: true, defaultTextStyle: TextStyle(color: HexColor.fromHex("#FFFFFF")));
+    if (Platform.isAndroid || Platform.isIOS /*&& (androidInfo?.version.sdkInt == 30 || androidInfo?.version.sdkInt == 31)*/) {
+      return Html(
+        data: content,
+        style: {'body': Style(fontSize: FontSize(14.0), color: Colors.white)},
+      );
     }
 
     double webContainerHeight;
     if (descriptionHeight != null) {
-      webContainerHeight = descriptionHeight;
+      webContainerHeight = descriptionHeight!;
     } else {
       webContainerHeight = 160;
     }
-    return Padding(
-      padding: EdgeInsets.only(right: 7.0, left: 7.0),
-      child: ConstrainedBox(
-          constraints: BoxConstraints(maxHeight: webContainerHeight),
-          child: WebView(
-            javascriptMode: JavascriptMode.unrestricted,
-            initialUrl: 'data:text/html;base64,${base64Encode(const Utf8Encoder().convert(content))}',
-            onPageFinished: (some) async {
-              double height = double.parse(await _descriptionWebViewController.evaluateJavascript("document.documentElement.scrollHeight;"));
-              setState(() {
-                descriptionHeight = height;
-                print("webviewh $height");
-              });
-            },
-            onWebViewCreated: (controller) async {
-              controller.clearCache();
-              this._descriptionWebViewController = controller;
-            },
-          )),
-    );
+
+    return ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: webContainerHeight),
+        child: WebView(
+          javascriptMode: JavascriptMode.unrestricted,
+          gestureNavigationEnabled: true,
+          initialUrl: 'data:/text/html;base64, ${base64Encode(const Utf8Encoder().convert(content))}',
+          onPageFinished: (some) async {
+            double height = double.parse(await _descriptionWebViewController.runJavascriptReturningResult("document.documentElement.scrollHeight;"));
+            setState(() {
+              descriptionHeight = height;
+              print("webview $height");
+            });
+          },
+          onWebViewCreated: (controller) async {
+            controller.clearCache();
+            this._descriptionWebViewController = controller;
+          },
+        ));
   }
 
+  ///Bottom Button
+  //Bottom button "Complete Lesson" and "arrow"
   _buildBottom(LessonVideoState state) {
     if (state is InitialLessonVideoState) {
       return Center(
@@ -473,10 +511,7 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
     }
   }
 
-  _launchURL(String url) async {
-    await launch(url);
-  }
-
+  ///Widgets inside button "Complete Lesson"
   _buildButtonChild(LessonVideoState state) {
     if (state is InitialLessonVideoState)
       return SizedBox(
@@ -508,5 +543,9 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
         ],
       );
     }
+  }
+
+  _launchURL(String url) async {
+    await launch(url);
   }
 }

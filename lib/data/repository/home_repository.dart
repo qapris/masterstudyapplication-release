@@ -46,7 +46,7 @@ class HomeRepositoryImpl implements HomeRepository {
       _sharedPreferences.setInt('second_color_b', appSettings.options?.secondary_color?.b.toInt());
       _sharedPreferences.setDouble('second_color_a', appSettings.options?.secondary_color?.a.toDouble());
     }
-    
+
     _sharedPreferences.setBool('app_view', appSettings.options?.app_view);
 
     return appSettings;

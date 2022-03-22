@@ -14,30 +14,27 @@ class TextLessonBloc extends Bloc<TextLessonEvent, TextLessonState> {
 
   TextLessonState get initialState => InitialTextLessonState();
 
-  TextLessonBloc(this.repository, this.cacheManager) : super(InitialTextLessonState());
+  TextLessonBloc(this.repository, this.cacheManager) : super(InitialTextLessonState()) {
+    on<TextLessonEvent>((event, emit) async => await textLessonBloc(event, emit));
+  }
 
-
-
-  @override
-  Stream<TextLessonState> mapEventToState(
-    TextLessonEvent event,
-  ) async* {
+  Future<void> textLessonBloc(TextLessonEvent event, Emitter<TextLessonState> emit) async {
     if (event is FetchEvent) {
-      try{
+      try {
         var response = await repository.getLesson(event.courseId, event.lessonId);
         print(response);
-        yield LoadedTextLessonState(response);
-        if(response.fromCache && response.type == "slides"){
-          yield CacheWarningLessonState();
+        emit(LoadedTextLessonState(response));
+        if (response.fromCache && response.type == "slides") {
+          emit(CacheWarningLessonState());
         }
-      }catch(e,s){
+      } catch (e, s) {
         print(e);
         print(s);
       }
-    }else if (event is CompleteLessonEvent){
-      try{
+    } else if (event is CompleteLessonEvent) {
+      try {
         var response = await repository.completeLesson(event.courseId, event.lessonId);
-      }catch(e,s){
+      } catch (e, s) {
         print(e);
         print(s);
       }

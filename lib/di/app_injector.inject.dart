@@ -1,3 +1,4 @@
+import '../ui/bloc/lesson_zoom/zoom_bloc.dart';
 import 'app_injector.dart' as _i1;
 import 'modules.dart' as _i2;
 import 'package:dio/src/dio.dart' as _i3;
@@ -52,24 +53,25 @@ import '../ui/bloc/plans/plans_bloc.dart' as _i51;
 import '../ui/bloc/orders/orders_bloc.dart' as _i52;
 import '../ui/bloc/restore_password/restore_password_bloc.dart' as _i53;
 import '../ui/screens/home/home_screen.dart' as _i54;
+import '../ui/bloc/lesson_zoom/bloc.dart' as _i55;
 
 class AppInjector$Injector implements _i1.AppInjector {
   AppInjector$Injector._(this._appModule);
 
   final _i2.AppModule _appModule;
 
-   _i3.Dio? _singletonDio;
-   _i4.UserApiProvider? _singletonUserApiProvider;
-   _i5.SharedPreferences? _sharedPreferences;
-   _i6.AuthRepository? _singletonAuthRepository;
-   _i7.HomeRepository? _singletonHomeRepository;
-   _i8.CoursesRepository? _singletonCoursesRepository;
-   _i9.InstructorsRepository? _singletonInstructorsRepository;
-   _i10.ReviewRepository? _singletonReviewRepository;
-   _i11.AssignmentRepository? _singletonAssignmentRepository;
-   _i12.CacheManager? _singletonCacheManager;
-   _i13.QuestionsRepository? _singletonQuestionsRepository;
-   _i14.FinalRepository? _singletonFinalRepository;
+  _i3.Dio? _singletonDio;
+  _i4.UserApiProvider? _singletonUserApiProvider;
+  _i5.SharedPreferences? _sharedPreferences;
+  _i6.AuthRepository? _singletonAuthRepository;
+  _i7.HomeRepository? _singletonHomeRepository;
+  _i8.CoursesRepository? _singletonCoursesRepository;
+  _i9.InstructorsRepository? _singletonInstructorsRepository;
+  _i10.ReviewRepository? _singletonReviewRepository;
+  _i11.AssignmentRepository? _singletonAssignmentRepository;
+  _i12.CacheManager? _singletonCacheManager;
+  _i13.QuestionsRepository? _singletonQuestionsRepository;
+  _i14.FinalRepository? _singletonFinalRepository;
 
   static _i15.Future<_i1.AppInjector> create(_i2.AppModule appModule) async {
     final injector = AppInjector$Injector._(appModule);
@@ -108,13 +110,14 @@ class AppInjector$Injector implements _i1.AppInjector {
       _createFinalBloc,
       _createPlansBloc,
       _createOrdersBloc,
-      _createRestorePasswordBloc);
+      _createRestorePasswordBloc,
+      _createLessonZoomBloc);
 
   _i17.AuthScreen _createAuthScreen() => _i17.AuthScreen(_createAuthBloc());
 
   _i18.AuthBloc _createAuthBloc() => _appModule.provideAuthBloc(_createAuthRepository());
 
-  _i6.AuthRepository _createAuthRepository() => _singletonAuthRepository ??= _appModule.userRepository(_createUserApiProvider(), _createSharedPreferences());
+  _i6.AuthRepository _createAuthRepository() => _singletonAuthRepository ??= _appModule.userRepository(_createUserApiProvider());
 
   _i4.UserApiProvider _createUserApiProvider() => _singletonUserApiProvider ??= _appModule.provideUserApiProvider(_createDio());
 
@@ -180,6 +183,8 @@ class AppInjector$Injector implements _i1.AppInjector {
 
   _i41.TextLessonBloc _createTextLessonBloc() => _i41.TextLessonBloc(_createLessonRepository(), _createCacheManager());
 
+  _i55.LessonZoomBloc _createLessonZoomBloc() => _i55.LessonZoomBloc(_createLessonRepository());
+
   _i42.QuizLessonBloc _createQuizLessonBloc() => _i42.QuizLessonBloc(_createLessonRepository(), _createCacheManager());
 
   _i43.LessonVideoBloc _createLessonVideoBloc() => _i43.LessonVideoBloc(_createLessonRepository());
@@ -199,6 +204,7 @@ class AppInjector$Injector implements _i1.AppInjector {
   _i49.QuizScreenBloc _createQuizScreenBloc() => _appModule.provideQuizScreenBloc(_createLessonRepository());
 
   _i50.FinalBloc _createFinalBloc() => _i50.FinalBloc(_createFinalRepository(), _createCacheManager());
+
   _i14.FinalRepository _createFinalRepository() => _singletonFinalRepository ??= _appModule.finalRepository(_createUserApiProvider());
 
   _i51.PlansBloc _createPlansBloc() => _i51.PlansBloc(_createPurchaseRepository());

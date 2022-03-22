@@ -6,11 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/models/AppSettings.dart';
 import 'package:masterstudy_app/main.dart';
-import 'package:masterstudy_app/ui/bloc/auth/auth_bloc.dart';
-import 'package:masterstudy_app/ui/bloc/auth/auth_event.dart';
-import 'package:masterstudy_app/ui/bloc/auth/auth_state.dart';
 import 'package:masterstudy_app/ui/screens/main_screens.dart';
-
+import '../../../data/utils.dart';
+import '../../bloc/auth/bloc.dart';
 import '../restore_password/restore_password_screen.dart';
 
 class AuthScreenArgs {
@@ -53,7 +51,11 @@ class AuthScreenWidgetState extends State<AuthScreenWidget> {
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(110.0), // here th
           child: AppBar(
+            elevation: 0,
+            systemOverlayStyle: SystemUiOverlayStyle.dark,
+            backgroundColor: Colors.white,
             title: Center(
+              //Logo MS
               child: Padding(
                 padding: const EdgeInsets.only(top: 0.0),
                 child: CachedNetworkImage(
@@ -64,11 +66,10 @@ class AuthScreenWidgetState extends State<AuthScreenWidget> {
                 ),
               ),
             ),
-            elevation: 0,
-            backgroundColor: Colors.white,
             bottom: TabBar(
               indicatorColor: mainColorA,
               tabs: [
+                //SignUp
                 Padding(
                   padding: const EdgeInsets.only(left: 0.0),
                   child: Tab(
@@ -79,6 +80,7 @@ class AuthScreenWidgetState extends State<AuthScreenWidget> {
                     ),
                   ),
                 ),
+                //SignIn
                 Tab(
                   icon: Text(
                     localizations.getLocalization("auth_sign_in_tab"),
@@ -88,7 +90,6 @@ class AuthScreenWidgetState extends State<AuthScreenWidget> {
                 ),
               ],
             ),
-            systemOverlayStyle: SystemUiOverlayStyle.dark,
           ),
         ),
         body: SafeArea(
@@ -144,6 +145,7 @@ class _SignUpPageState extends State<_SignUpPage> {
         if (state is SuccessAuthState) {
           WidgetsBinding.instance?.addPostFrameCallback((_) => Navigator.pushReplacementNamed(context, MainScreen.routeName, arguments: MainScreenArgs(widget.optionsBean)));
         }
+
         if (state is ErrorAuthState) {
           WidgetsBinding.instance?.addPostFrameCallback((_) => showDialogError(context, state.message));
         }
@@ -152,6 +154,7 @@ class _SignUpPageState extends State<_SignUpPage> {
           key: _formKey,
           child: Column(
             children: <Widget>[
+              //Login
               Padding(
                 padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 30.0),
                 child: TextFormField(
@@ -166,6 +169,7 @@ class _SignUpPageState extends State<_SignUpPage> {
                   },
                 ),
               ),
+              //Email
               Padding(
                 padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
                 child: TextFormField(
@@ -175,6 +179,7 @@ class _SignUpPageState extends State<_SignUpPage> {
                   validator: _validateEmail,
                 ),
               ),
+              //Password
               Padding(
                 padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
                 child: TextFormField(
@@ -201,24 +206,35 @@ class _SignUpPageState extends State<_SignUpPage> {
                       return localizations.getLocalization("password_empty_error_text");
                     }
                     if (value.length < 8) {
-                      return localizations.getLocalization("password_characters_count_error_text");
+                      return localizations.getLocalization("password_register_characters_count_error_text");
                     }
 
                     return null;
                   },
                 ),
               ),
-
+              //Button "Registration"
               Padding(
                 padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
                 child: MaterialButton(
                   minWidth: double.infinity,
                   color: mainColor,
-                  onPressed: register,
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      _bloc.add(
+                        RegisterEvent(
+                          _loginController.text,
+                          _emailController.text,
+                          _passwordController.text,
+                        ),
+                      );
+                    }
+                  },
                   child: setUpButtonChild(enableInputs),
                   textColor: Colors.white,
                 ),
               ),
+              //Button "DEMO auth"
               Visibility(
                 visible: demoEnabled,
                 child: Padding(
@@ -226,7 +242,9 @@ class _SignUpPageState extends State<_SignUpPage> {
                   child: new MaterialButton(
                     minWidth: double.infinity,
                     color: mainColor,
-                    onPressed: demoAuth,
+                    onPressed: () {
+                      _bloc.add(DemoAuthEvent());
+                    },
                     child: setUpButtonChildDemo(enableInputs),
                     textColor: Colors.white,
                   ),
@@ -241,31 +259,33 @@ class _SignUpPageState extends State<_SignUpPage> {
 
   void showDialogError(context, text) {
     showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text(
-              localizations.getLocalization("error_dialog_title"),
-              textScaleFactor: 1.0,
-              style: TextStyle(color: Colors.black, fontSize: 20.0),
-            ),
-            content: Text(text, textScaleFactor: 1.0),
-            actions: <Widget>[
-              ElevatedButton(
-                child: Text(
-                  localizations.getLocalization("ok_dialog_button"),
-                  textScaleFactor: 1.0,
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  _bloc.add(CloseDialogEvent());
-                },
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            localizations.getLocalization("error_dialog_title"),
+            textScaleFactor: 1.0,
+            style: TextStyle(color: Colors.black, fontSize: 20.0),
+          ),
+          content: Text(text, textScaleFactor: 1.0),
+          actions: <Widget>[
+            ElevatedButton(
+              child: Text(
+                localizations.getLocalization("ok_dialog_button"),
+                textScaleFactor: 1.0,
               ),
-            ],
-          );
-        });
+              onPressed: () {
+                Navigator.of(context).pop();
+                _bloc.add(CloseDialogEvent());
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
+  //Label in button "Registration"
   Widget setUpButtonChild(enable) {
     if (enable == true) {
       return new Text(
@@ -283,6 +303,7 @@ class _SignUpPageState extends State<_SignUpPage> {
     }
   }
 
+  //Label in button "Demo Auth"
   Widget setUpButtonChildDemo(enable) {
     if (enable == true) {
       return new Text(
@@ -300,16 +321,6 @@ class _SignUpPageState extends State<_SignUpPage> {
     }
   }
 
-  void register() {
-    if (_formKey.currentState!.validate()) {
-      _bloc.add(RegisterEvent(_loginController.text, _emailController.text, _passwordController.text));
-    }
-  }
-
-  void demoAuth() {
-    _bloc.add(DemoAuthEvent());
-  }
-
   String? _validateEmail(String? value) {
     if (value!.isEmpty) {
       // The form is empty
@@ -320,8 +331,6 @@ class _SignUpPageState extends State<_SignUpPage> {
     RegExp regExp = new RegExp(p);
 
     if (regExp.hasMatch(value)) {
-      // So, the email is valid
-      // ignore: null_check_always_fails
       return null;
     }
 
@@ -337,9 +346,7 @@ class _SignInPage extends StatefulWidget {
   const _SignInPage(this.optionsBean) : super();
 
   @override
-  State<StatefulWidget> createState() {
-    return _SignInPageState();
-  }
+  State<StatefulWidget> createState() => _SignInPageState();
 }
 
 class _SignInPageState extends State<_SignInPage> {
@@ -363,16 +370,20 @@ class _SignInPageState extends State<_SignInPage> {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         var enableInputs = !(state is LoadingAuthState);
+
         if (state is SuccessAuthState) {
           WidgetsBinding.instance?.addPostFrameCallback((_) => Navigator.pushReplacementNamed(context, MainScreen.routeName, arguments: MainScreenArgs(widget.optionsBean)));
         }
+
         if (state is ErrorAuthState) {
           WidgetsBinding.instance?.addPostFrameCallback((_) => showDialogError(context, state.message));
         }
+
         return Form(
           key: _formKey,
           child: Column(
             children: <Widget>[
+              //Login
               Padding(
                 padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 30.0),
                 child: TextFormField(
@@ -387,6 +398,7 @@ class _SignInPageState extends State<_SignInPage> {
                   },
                 ),
               ),
+              //Password
               Padding(
                 padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
                 child: TextFormField(
@@ -420,26 +432,37 @@ class _SignInPageState extends State<_SignInPage> {
                   },
                 ),
               ),
+              //Button "Войти"
               Padding(
                 padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
                 child: new MaterialButton(
                   minWidth: double.infinity,
                   color: mainColor,
-                  onPressed: auth,
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      _bloc.add(LoginEvent(_loginController.text, _passwordController.text));
+                    }
+                  },
                   child: setUpButtonChild(enableInputs),
                   textColor: Colors.white,
                 ),
               ),
-              // TODO Проверить Text на null
-              /*FlatButton(
+              // TODO Restore Password добавить локализацию
+              ElevatedButton(
                 child: Text(
-                  localizations.getLocalization("restore_password_button"),
+                  'Restore password',
+                  style: TextStyle(color: mainColor),
+                  // localizations.getLocalization("restore_password_button"),
                   textScaleFactor: 1.0,
+                ),
+                style: ButtonStyle(
+                  elevation: MaterialStateProperty.all(0.0),
+                  backgroundColor: MaterialStateProperty.all(Colors.transparent),
                 ),
                 onPressed: () {
                   Navigator.of(context).pushNamed(RestorePasswordScreen.routeName);
                 },
-              ),*/
+              ),
             ],
           ),
         );
@@ -455,7 +478,7 @@ class _SignInPageState extends State<_SignInPage> {
             title: Text(localizations.getLocalization("error_dialog_title"), textScaleFactor: 1.0, style: TextStyle(color: Colors.black, fontSize: 20.0)),
             content: Text(text),
             actions: <Widget>[
-              FlatButton(
+              ElevatedButton(
                 child: Text(
                   localizations.getLocalization("ok_dialog_button"),
                   textScaleFactor: 1.0,
@@ -470,6 +493,7 @@ class _SignInPageState extends State<_SignInPage> {
         });
   }
 
+  //Button label text
   Widget setUpButtonChild(enable) {
     if (enable == true) {
       return new Text(
@@ -484,12 +508,6 @@ class _SignInPageState extends State<_SignInPage> {
           valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
         ),
       );
-    }
-  }
-
-  void auth() {
-    if (_formKey.currentState!.validate()) {
-      _bloc.add(LoginEvent(_loginController.text, _passwordController.text));
     }
   }
 }

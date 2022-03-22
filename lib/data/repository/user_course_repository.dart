@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:masterstudy_app/data/cache/cache_manager.dart';
 import 'package:masterstudy_app/data/models/course/CourseDetailResponse.dart';
 import 'package:masterstudy_app/data/models/curriculum.dart';

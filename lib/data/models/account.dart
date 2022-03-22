@@ -12,6 +12,7 @@ class Account {
   String avatar_url;
   String email;
   String url;
+  List<dynamic> roles;
   MetaBean? meta;
   RatingBean? rating;
   String profile_url;
@@ -23,6 +24,7 @@ class Account {
       required this.avatar_url,
       required this.email,
       required this.url,
+      required this.roles,
       required this.meta,
       required this.rating,
       required this.profile_url});

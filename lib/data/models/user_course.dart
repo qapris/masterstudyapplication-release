@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:json_annotation/json_annotation.dart';
 import 'package:masterstudy_app/data/models/category.dart';
 
@@ -48,7 +50,7 @@ class PostsBean {
   String? lesson_type;
   String? hash;
   List<Category?> categories_object;
-  bool fromCache = false;
+  bool? fromCache;
 
   PostsBean(
       {required this.image_id,

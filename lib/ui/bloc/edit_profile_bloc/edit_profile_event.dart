@@ -14,7 +14,7 @@ class SaveEvent extends EditProfileEvent {
   final String facebook;
   final String twitter;
   final String instagram;
-  final File photo;
+  File? photo;
 
   SaveEvent(
     this.firstName,
@@ -25,7 +25,7 @@ class SaveEvent extends EditProfileEvent {
     this.facebook,
     this.twitter,
     this.instagram,
-    this.photo,
+    [this.photo]
   );
 }
 

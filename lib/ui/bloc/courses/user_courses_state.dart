@@ -21,7 +21,7 @@ class EmptyCoursesState extends UserCoursesState {
 
 // ignore: must_be_immutable
 class LoadedCoursesState extends UserCoursesState {
-  List<PostsBean> courses;
+  List<PostsBean?> courses;
 
   LoadedCoursesState(this.courses);
 

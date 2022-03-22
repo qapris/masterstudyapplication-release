@@ -9,10 +9,10 @@ import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/bloc/splash/bloc.dart';
 import 'package:masterstudy_app/ui/screens/auth/auth_screen.dart';
 import 'package:masterstudy_app/ui/widgets/loading_error_widget.dart';
+import '../../../data/utils.dart';
 import '../../screenS/main_screens.dart';
 
 @provide
-// ignore: must_be_immutable
 class SplashScreen extends StatelessWidget {
   static const String routeName = "splashScreen";
   SplashBloc bloc;
@@ -46,8 +46,10 @@ class SplashWidgetState extends State<SplashWidget> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SplashBloc, SplashState>(
-      builder: (context,state) {
-        return Center(child: _buildLogoBlock(state));
+      builder: (context, state) {
+        return Center(
+          child: _buildLogoBlock(state),
+        );
       },
     );
   }
@@ -84,7 +86,6 @@ class SplashWidgetState extends State<SplashWidget> {
         if (state.appSettings.addons != null) dripContentEnabled = state.appSettings.addons?.sequential_drip_content != null && state.appSettings.addons?.sequential_drip_content == "on";
         postsCount = state.appSettings.options!.posts_count.toString();
       }
-
 
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -123,6 +124,7 @@ class SplashWidgetState extends State<SplashWidget> {
     }
   }
 
+
   void openAuthPage(OptionsBean? optionsBean) {
     SchedulerBinding.instance?.addPostFrameCallback((_) {
       Future.delayed(const Duration(milliseconds: 2000), () {
@@ -137,5 +139,10 @@ class SplashWidgetState extends State<SplashWidget> {
         Navigator.of(context).pushReplacementNamed(MainScreen.routeName, arguments: MainScreenArgs(optionsBean));
       });
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

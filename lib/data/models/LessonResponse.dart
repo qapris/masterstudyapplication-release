@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:json_annotation/json_annotation.dart';
 
 import 'QuizResponse.dart';
@@ -6,7 +9,7 @@ part 'LessonResponse.g.dart';
 
 @JsonSerializable()
 class LessonResponse {
-  late final dynamic id;
+  dynamic id;
   SectionBean? section;
   String title;
   String type;
@@ -20,7 +23,7 @@ class LessonResponse {
   bool completed;
   bool next_lesson_available;
   String view_link;
-  List<Quiz_dataBean?> quiz_data;
+  List<Quiz_dataBean?> quiz_data = [];
   num time;
   num time_left;
   late bool fromCache;
@@ -41,12 +44,13 @@ class LessonResponse {
     required this.completed,
     required this.next_lesson_available,
     required this.view_link,
-    required this.quiz_data,
+    // required this.quiz_data,
     required this.time,
     required this.time_left,
     this.quiz_time,
     required this.fromCache,
   });
+
 
   factory LessonResponse.fromJson(Map<String, dynamic> json) => _$LessonResponseFromJson(json);
 

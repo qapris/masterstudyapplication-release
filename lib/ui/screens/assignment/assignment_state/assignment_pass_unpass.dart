@@ -82,9 +82,9 @@ class _AssignmentPassUnpassWidgetState extends State<AssignmentPassUnpassWidget>
                     padding: EdgeInsets.only(top: 5, bottom: 5.0, left: 7.0, right: 7.0),
                     child: Html(
                         data: (widget.assignmentResponse.comment != null) ? widget.assignmentResponse.comment : "",
-                        defaultTextStyle: TextStyle(
-                            fontSize: 13.0,
-                        ),
+                        style: {'body': Style(
+                            fontSize: FontSize(13.0),
+                        )},
                     )
                 ),
                 Padding(

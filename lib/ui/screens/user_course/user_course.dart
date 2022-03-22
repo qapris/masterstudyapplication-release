@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +16,10 @@ import 'package:masterstudy_app/ui/screens/detail_profile/detail_profile_screen.
 import 'package:masterstudy_app/ui/screens/lesson_video/lesson_video_screen.dart';
 import 'package:masterstudy_app/ui/screens/quiz_lesson/quiz_lesson_screen.dart';
 import 'package:masterstudy_app/ui/screens/text_lesson/text_lesson_screen.dart';
+import 'package:masterstudy_app/ui/screens/zoom/zoom.dart';
 import 'package:masterstudy_app/ui/widgets/loading_error_widget.dart';
+
+import '../../../data/utils.dart';
 
 class UserCourseScreenArgs {
   final String? course_id;
@@ -29,8 +34,17 @@ class UserCourseScreenArgs {
   String? hash;
   PostsBean? postsBean;
 
-  UserCourseScreenArgs(this.course_id, this.title, this.app_image, this.avatar_url, this.login, this.authorId, this.progress, this.lesson_type, this.lesson_id)
-      : this.postsBean = PostsBean(
+  UserCourseScreenArgs(
+    this.course_id,
+    this.title,
+    this.app_image,
+    this.avatar_url,
+    this.login,
+    this.authorId,
+    this.progress,
+    this.lesson_type,
+    this.lesson_id,
+  ) : this.postsBean = PostsBean(
           course_id: course_id,
           title: title,
           app_image: app_image,
@@ -80,9 +94,7 @@ class UserCourseScreen extends StatelessWidget {
   static const routeName = "userCourseScreen";
   final UserCourseBloc bloc;
 
-  UserCourseScreen(
-    this.bloc,
-  ) : super();
+  UserCourseScreen(this.bloc) : super();
 
   @override
   Widget build(BuildContext context) {
@@ -97,15 +109,13 @@ class UserCourseWidget extends StatefulWidget {
   const UserCourseWidget(this.args) : super();
 
   @override
-  State<StatefulWidget> createState() {
-    return UserCourseWidgetState();
-  }
+  State<StatefulWidget> createState() => UserCourseWidgetState();
 }
 
 class UserCourseWidgetState extends State<UserCourseWidget> {
   late ScrollController _scrollController;
-  String title = "";
   late UserCourseBloc _bloc;
+  String title = "";
   var unescape = new HtmlUnescape();
 
   bool get _isAppBarExpanded {
@@ -134,7 +144,6 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
   @override
   Widget build(BuildContext context) {
     num kef = (MediaQuery.of(context).size.height > 690) ? 3.3 : 3;
-
     return BlocBuilder<UserCourseBloc, UserCourseState>(
       bloc: BlocProvider.of(context),
       builder: (context, state) {
@@ -158,20 +167,24 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
                       background: Container(
                         child: Stack(
                           children: <Widget>[
+                            //Background Img AppBar
                             Hero(
-                                tag: widget.args.course_id ?? 0,
-                                child: CachedNetworkImage(
-                                  imageUrl: widget.args.app_image ?? '',
-                                  placeholder: (ctx, url) => SizedBox(
-                                    height: MediaQuery.of(context).size.height / 3 + MediaQuery.of(context).padding.top,
-                                  ),
-                                  width: double.infinity,
+                              tag: widget.args.course_id ?? 0,
+                              child: CachedNetworkImage(
+                                imageUrl: widget.args.app_image ?? 'http://ms.stylemix.biz/wp-content/uploads/elementor/thumbs/placeholder-1919x1279-plpkge6q8d1n11vbq6ckurd53ap3zw1gbw0n5fqs0o.gif',
+                                placeholder: (ctx, url) => SizedBox(
                                   height: MediaQuery.of(context).size.height / 3 + MediaQuery.of(context).padding.top,
-                                  fit: BoxFit.cover,
-                                )),
+                                ),
+                                width: double.infinity,
+                                height: MediaQuery.of(context).size.height / 3 + MediaQuery.of(context).padding.top,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            //Color for Background
                             Container(
                               decoration: BoxDecoration(color: HexColor.fromHex("#2A3045").withOpacity(0.7)),
                             ),
+                            //Info in AppBar
                             Container(
                               height: MediaQuery.of(context).size.height / kef,
                               child: Padding(
@@ -182,6 +195,7 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: <Widget>[
+                                        //User/Teacher/Student Profile
                                         Padding(
                                           padding: const EdgeInsets.only(top: 0.0),
                                           child: Row(
@@ -198,13 +212,17 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
                                                   }
                                                 },
                                                 child: CircleAvatar(
-                                                    backgroundImage: NetworkImage(
-                                                  (state is LoadedUserCourseState) ? widget.args.avatar_url : "",
-                                                )),
+                                                  backgroundImage: NetworkImage(
+                                                    (state is LoadedUserCourseState)
+                                                        ? widget.args.avatar_url
+                                                        : "http://ms.stylemix.biz/wp-content/uploads/elementor/thumbs/placeholder-1919x1279-plpkge6q8d1n11vbq6ckurd53ap3zw1gbw0n5fqs0o.gif",
+                                                  ),
+                                                ),
                                               )
                                             ],
                                           ),
                                         ),
+                                        //Lesson Title
                                         Padding(
                                           padding: const EdgeInsets.only(top: 8.0),
                                           child: Container(
@@ -216,6 +234,7 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
                                             ),
                                           ),
                                         ),
+                                        //ProgressIndicator
                                         Padding(
                                           padding: const EdgeInsets.only(top: 16.0),
                                           child: ClipRRect(
@@ -230,11 +249,13 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
                                             ),
                                           ),
                                         ),
+                                        //Button "Continue" and icon "Download"
                                         Padding(
                                           padding: const EdgeInsets.only(top: 16.0),
                                           child: Row(
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: <Widget>[
+                                              //Button "Continue"
                                               Expanded(
                                                 flex: 5,
                                                 child: MaterialButton(
@@ -252,7 +273,7 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
                                                           }
                                                         });
                                                         if (containsLastLesson) {
-                                                          _openLesson(widget.args.lesson_type!, widget.args.lesson_id);
+                                                          _openLesson(widget.args.lesson_type!, int.parse(widget.args.lesson_id!));
                                                         }
                                                       }
                                                     }
@@ -264,6 +285,7 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
                                                   textColor: Colors.white,
                                                 ),
                                               ),
+                                              //Icon "Download"
                                               Padding(
                                                 padding: const EdgeInsets.only(left: 20.0),
                                                 child: _buildCacheButton(state),
@@ -289,46 +311,7 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
       },
     );
   }
-
-  _openLesson(String type, dynamic id) {
-    // Future screenFuture = null;
-    Future screenFuture;
-    switch (type) {
-      case "quiz":
-        screenFuture = Navigator.of(context).pushNamed(
-          QuizLessonScreen.routeName,
-          arguments: QuizLessonScreenArgs(int.parse(widget.args.course_id!), id, widget.args.avatar_url, widget.args.login!),
-        );
-        break;
-      case "text":
-        screenFuture = Navigator.of(context).pushNamed(
-          TextLessonScreen.routeName,
-          arguments: TextLessonScreenArgs(int.parse(widget.args.course_id!), id, widget.args.avatar_url, widget.args.login!, false, true),
-        );
-        break;
-      case "video":
-        screenFuture = Navigator.of(context).pushNamed(
-          LessonVideoScreen.routeName,
-          arguments: LessonVideoScreenArgs(int.tryParse(widget.args.course_id!)!, id, widget.args.avatar_url, widget.args.login!, false, true),
-        );
-        break;
-      case "assignment":
-        screenFuture = Navigator.of(context).pushNamed(
-          AssignmentScreen.routeName,
-          arguments: AssignmentScreenArgs(int.tryParse(widget.args.course_id!)!, id, widget.args.avatar_url, widget.args.login!),
-        );
-        break;
-      default:
-        screenFuture = Navigator.of(context).pushNamed(
-          TextLessonScreen.routeName,
-          arguments: TextLessonScreenArgs(int.tryParse(widget.args.course_id!)!, id, widget.args.avatar_url, widget.args.login!, false, true),
-        );
-    }
-    if (screenFuture != null) {
-      screenFuture.then((value) => {_bloc.add(FetchEvent(widget.args))});
-    }
-  }
-
+  ///Method for download lessons
   _buildCacheButton(state) {
     if (state is LoadedUserCourseState) {
       Widget icon;
@@ -366,8 +349,10 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
     }
   }
 
+  ///Initial widget
   _buildBody(state) {
-    if (state is InitialUserCourseState) return _buildLoading();
+    if (state is InitialUserCourseState) return Center(child: CircularProgressIndicator());
+
     if (state is LoadedUserCourseState) {
       widget.args.lesson_id = state.response?.current_lesson_id;
       widget.args.lesson_type = state.response?.lesson_type;
@@ -381,10 +366,20 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
       );
   }
 
-  _buildLoading() => Center(
-        child: CircularProgressIndicator(),
-      );
+  ///ListView with Curriculum
+  _buildCurriculum(LoadedUserCourseState state) {
+    if (state.sections == null || state.sections.isEmpty) {
+      return _buildEmptyList();
+    }
+    return ListView.builder(
+      itemCount: state.sections.length,
+      itemBuilder: (context, index) {
+        return _buildSection(state.sections[index]!);
+      },
+    );
+  }
 
+  ///EmptyList for Course/Lessons
   _buildEmptyList() {
     return Center(
       child: Column(
@@ -407,17 +402,7 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
     );
   }
 
-  _buildCurriculum(LoadedUserCourseState state) {
-    if (state.sections == null || state.sections.isEmpty) {
-      return _buildEmptyList();
-    }
-    return ListView.builder(
-        itemCount: state.sections.length,
-        itemBuilder: (context, index) {
-          return _buildSection(state.sections[index]);
-        });
-  }
-
+  ///Sections of course lessons
   _buildSection(SectionItem sectionItem) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -429,11 +414,13 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
+              //Number Section
               Text(
                 sectionItem.number,
                 textScaleFactor: 1.0,
                 style: TextStyle(color: HexColor.fromHex("#AAAAAA")),
               ),
+              //Title Section
               Text(
                 sectionItem.title,
                 textScaleFactor: 1.0,
@@ -452,31 +439,46 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
     );
   }
 
+  ///Widget: Icon type lesson, and title lesson
   Widget _buildLesson(Section_itemsBean section_itemsBean) {
     bool locked = section_itemsBean.locked! && dripContentEnabled;
+    String? duration = section_itemsBean.duration ?? '';
     Widget icon = Center();
-    String duration = section_itemsBean.duration!;
 
-    if (section_itemsBean.type == "video")
-      icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/ico_play.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
-    if (section_itemsBean.type == "stream")
-      icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/video-camera.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
-    if (section_itemsBean.type == "slide")
-      icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/slides_icon.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
-    if (section_itemsBean.type == "assignment")
-      icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/assignment_icon.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
-    if (section_itemsBean.type == "quiz") {
-      duration = section_itemsBean.questions!;
-      icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/ico_question.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
+
+    switch (section_itemsBean.type) {
+      case 'video':
+        icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/ico_play.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
+        break;
+      case 'stream':
+        icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/video-camera.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
+        break;
+      case 'slide':
+        icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/slides_icon.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
+        break;
+      case 'assignment':
+        icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/assignment_icon.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
+        break;
+      case 'quiz':
+        duration = section_itemsBean.questions;
+        icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/ico_question.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
+        break;
+      case 'text':
+        icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/ico_text.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
+        break;
+      case 'zoom_conference':
+        icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/ico_zoom.svg",));
+        break;
+      case '':
+        icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/ico_text.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
+        break;
     }
-    if (section_itemsBean.type == "text" || section_itemsBean.type == "")
-      icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/ico_text.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 2.0),
       child: InkWell(
         onTap: () {
-          if (!locked) _openLesson(section_itemsBean.type!, section_itemsBean.item_id);
+          if (!locked) _openLesson(section_itemsBean.type!, section_itemsBean.item_id!);
         },
         child: Container(
           decoration: BoxDecoration(color: HexColor.fromHex("#F3F5F9")),
@@ -485,11 +487,14 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
+                //Icon and Title of Lesson
                 Flexible(
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
+                      //Icon Type of Lesson
                       icon,
+                      //Title Lesson
                       Flexible(
                         child: Padding(
                           padding: const EdgeInsets.only(left: 8.0, right: 8.0),
@@ -506,23 +511,32 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
                     ],
                   ),
                 ),
+                //Icon 'Замок' и 'Время и текст'
                 Stack(
                   children: <Widget>[
+                    //Icon "Замок" если курс не куплен
                     Visibility(
                       visible: locked,
                       child: SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/ico_lock.svg", color: mainColor)),
                     ),
+                    //Icon "Время" и время курса (Duration)
                     Visibility(
-                      visible: !locked && duration != null && duration.isNotEmpty,
+                      visible: true,
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          SizedBox(width: 14, height: 14, child: SvgPicture.asset('assets/icons/duration_curriculum_icon.svg')),
+                          //Icon 'Время'
+                          SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: SvgPicture.asset('assets/icons/duration_curriculum_icon.svg'),
+                          ),
+                          //Text
                           Padding(
                             padding: const EdgeInsets.only(left: 8.0),
                             child: Text(
-                              duration ,
+                              duration!,
                               textScaleFactor: 1.0,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(color: Colors.black.withOpacity(0.3)),
@@ -539,5 +553,52 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
         ),
       ),
     );
+  }
+
+  ///Open Lesson
+  _openLesson(String? type, int id) {
+    print(type);
+    print(id);
+    Future screenFuture;
+    switch (type) {
+      case "quiz":
+        screenFuture = Navigator.of(context).pushNamed(
+          QuizLessonScreen.routeName,
+          arguments: QuizLessonScreenArgs(int.parse(widget.args.course_id!), id, widget.args.avatar_url, widget.args.login!),
+        );
+        break;
+      case "text":
+        screenFuture = Navigator.of(context).pushNamed(
+          TextLessonScreen.routeName,
+          arguments: TextLessonScreenArgs(int.parse(widget.args.course_id!), id, widget.args.avatar_url, widget.args.login!, false, true),
+        );
+        break;
+      case "video":
+        screenFuture = Navigator.of(context).pushNamed(
+          LessonVideoScreen.routeName,
+          arguments: LessonVideoScreenArgs(int.tryParse(widget.args.course_id!)!, id, widget.args.avatar_url, widget.args.login!, false, true),
+        );
+        break;
+      case "assignment":
+        screenFuture = Navigator.of(context).pushNamed(
+          AssignmentScreen.routeName,
+          arguments: AssignmentScreenArgs(int.tryParse(widget.args.course_id!)!, id, widget.args.avatar_url, widget.args.login!),
+        );
+        break;
+      case "zoom_conference":
+        screenFuture = Navigator.of(context).pushNamed(
+          LessonZoomScreen.routeName,
+          arguments: LessonZoomScreenArgs(int.tryParse(widget.args.course_id!)!, id, widget.args.avatar_url, widget.args.login!, false, true),
+        );
+        break;
+      default:
+        screenFuture = Navigator.of(context).pushNamed(
+          TextLessonScreen.routeName,
+          arguments: TextLessonScreenArgs(int.tryParse(widget.args.course_id!)!, id, widget.args.avatar_url, widget.args.login!, false, true),
+        );
+    }
+    if (screenFuture != null) {
+      screenFuture.then((value) => {_bloc.add(FetchEvent(widget.args))});
+    }
   }
 }
