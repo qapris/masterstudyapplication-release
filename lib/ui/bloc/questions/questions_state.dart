@@ -1,6 +1,8 @@
 import 'package:masterstudy_app/data/models/QuestionsResponse.dart';
 import 'package:meta/meta.dart';
 
+import '../../../data/models/QuestionAddResponse.dart';
+
 @immutable
 abstract class QuestionsState {}
 
@@ -10,7 +12,7 @@ class LoadedQuestionsState extends QuestionsState {
     final QuestionsResponse questionsResponseAll;
     final QuestionsResponse questionsResponseMy;
 
-    LoadedQuestionsState(this.questionsResponseAll, this.questionsResponseMy);
+    LoadedQuestionsState(this.questionsResponseAll, this.questionsResponseMy );
 }
 
 class LoadedMyQuestionsState extends QuestionsState {
@@ -19,5 +21,7 @@ class LoadedMyQuestionsState extends QuestionsState {
 
     LoadedMyQuestionsState(this.questionsResponseAll, this.questionsResponseMy);
 }
+
+class TimerStartState extends QuestionsState {}
 
 class ErrorQuestionsState extends QuestionsState {}

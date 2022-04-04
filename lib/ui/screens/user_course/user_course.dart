@@ -33,6 +33,7 @@ class UserCourseScreenArgs {
   String? lesson_id;
   String? hash;
   PostsBean? postsBean;
+  dynamic isFirstStart;
 
   UserCourseScreenArgs(
     this.course_id,
@@ -43,8 +44,9 @@ class UserCourseScreenArgs {
     this.authorId,
     this.progress,
     this.lesson_type,
-    this.lesson_id,
-  ) : this.postsBean = PostsBean(
+    this.lesson_id, {
+    this.isFirstStart,
+  }) : this.postsBean = PostsBean(
           course_id: course_id,
           title: title,
           app_image: app_image,
@@ -153,6 +155,7 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
               headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
                 return <Widget>[
                   SliverAppBar(
+                    backgroundColor: mainColor,
                     title: Text(
                       title,
                       textScaleFactor: 1.0,
@@ -266,7 +269,7 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
                                                       if (state.response?.sections != null && state.response?.sections != null) {
                                                         var containsLastLesson = false;
                                                         state.response?.sections.forEach((section) {
-                                                          if (section?.section_items != null && section?.section_items != null) {
+                                                          if (section?.section_items != null) {
                                                             section?.section_items.forEach((sectionItem) {
                                                               if (sectionItem?.item_id == int.tryParse(widget.args.lesson_id!)) containsLastLesson = true;
                                                             });
@@ -311,6 +314,7 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
       },
     );
   }
+
   ///Method for download lessons
   _buildCacheButton(state) {
     if (state is LoadedUserCourseState) {
@@ -330,20 +334,23 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
           color: Colors.white,
         );
       }
-      return SizedBox(
-        width: 50,
-        height: 50,
-        child: FlatButton(
-            shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
-            onPressed: () {
-              if (state is LoadedUserCourseState && !state.showCachingProgress! && !state.isCached!) {
-                _bloc.add(CacheCourseEvent(widget.args));
-              }
-            },
-            padding: EdgeInsets.only(left: 0.0),
-            color: HexColor.fromHex("#FFFFFF").withOpacity(0.1),
-            child: icon),
-      );
+
+      return widget.args.isFirstStart == true
+          ? SizedBox()
+          : SizedBox(
+              width: 50,
+              height: 50,
+              child: FlatButton(
+                  shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+                  onPressed: () {
+                    if (state is LoadedUserCourseState && !state.showCachingProgress! && !state.isCached!) {
+                      _bloc.add(CacheCourseEvent(widget.args));
+                    }
+                  },
+                  padding: EdgeInsets.only(left: 0.0),
+                  color: HexColor.fromHex("#FFFFFF").withOpacity(0.1),
+                  child: icon),
+            );
     } else {
       return SizedBox(width: 50, height: 50);
     }
@@ -358,6 +365,7 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
       widget.args.lesson_type = state.response?.lesson_type;
       return _buildCurriculum(state);
     }
+
     if (state is ErrorUserCourseState)
       return Center(
         child: LoadingErrorWidget(() {
@@ -393,7 +401,7 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
             ),
           ),
           Text(
-            localizations.getLocalization("empty_sections_course"),
+            localizations!.getLocalization("empty_sections_course"),
             textScaleFactor: 1.0,
             style: TextStyle(color: HexColor.fromHex("#D7DAE2"), fontSize: 18),
           ),
@@ -432,7 +440,7 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
         if (sectionItem.section_items != null && sectionItem.section_items.isNotEmpty)
           Column(
             children: sectionItem.section_items.map((value) {
-              return _buildLesson(value!);
+              return _buildLesson(value!, sectionItem.items);
             }).toList(),
           )
       ],
@@ -440,11 +448,10 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
   }
 
   ///Widget: Icon type lesson, and title lesson
-  Widget _buildLesson(Section_itemsBean section_itemsBean) {
+  Widget _buildLesson(Section_itemsBean section_itemsBean, List<String?> items) {
     bool locked = section_itemsBean.locked! && dripContentEnabled;
     String? duration = section_itemsBean.duration ?? '';
     Widget icon = Center();
-
 
     switch (section_itemsBean.type) {
       case 'video':
@@ -466,8 +473,16 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
       case 'text':
         icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/ico_text.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
         break;
+      case 'lesson':
+        icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/ico_text.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
+        break;
       case 'zoom_conference':
-        icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/ico_zoom.svg",));
+        icon = SizedBox(
+            width: 24,
+            height: 24,
+            child: SvgPicture.asset(
+              "assets/icons/ico_zoom.svg",
+            ));
         break;
       case '':
         icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/ico_text.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
@@ -557,8 +572,6 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
 
   ///Open Lesson
   _openLesson(String? type, int id) {
-    print(type);
-    print(id);
     Future screenFuture;
     switch (type) {
       case "quiz":

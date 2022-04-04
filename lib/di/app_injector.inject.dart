@@ -54,6 +54,11 @@ import '../ui/bloc/orders/orders_bloc.dart' as _i52;
 import '../ui/bloc/restore_password/restore_password_bloc.dart' as _i53;
 import '../ui/screens/home/home_screen.dart' as _i54;
 import '../ui/bloc/lesson_zoom/bloc.dart' as _i55;
+import '../data/cache/app_settings_local.dart' as _i56;
+import '../data/cache/localization_local.dart' as _i57;
+import '../data/cache/progress_course_local.dart' as _i58;
+import '../data/cache/course_curriculum_local.dart' as _i59;
+import '../data/cache/account_local.dart' as _i60;
 
 class AppInjector$Injector implements _i1.AppInjector {
   AppInjector$Injector._(this._appModule);
@@ -72,6 +77,11 @@ class AppInjector$Injector implements _i1.AppInjector {
   _i12.CacheManager? _singletonCacheManager;
   _i13.QuestionsRepository? _singletonQuestionsRepository;
   _i14.FinalRepository? _singletonFinalRepository;
+  _i56.AppLocalStorage? _singletonAppLocalStorage;
+  _i57.LocalizationLocalStorage? _singletonLocalizationLocalStorage;
+  _i58.ProgressCoursesLocalStorage? _singletonProgressCoursesLocalStorage;
+  _i59.CurriculumLocalStorage? _singletonCurriculumLocalStorage;
+  _i60.AccountLocalStorage? _singletonAccountLocalStorage;
 
   static _i15.Future<_i1.AppInjector> create(_i2.AppModule appModule) async {
     final injector = AppInjector$Injector._(appModule);
@@ -80,38 +90,39 @@ class AppInjector$Injector implements _i1.AppInjector {
   }
 
   _i16.MyApp _createMyApp() => _i16.MyApp(
-      _createAuthScreen,
-      _createHomeBloc,
-      _createSplashScreen,
-      _createFavoritesBloc,
-      _createProfileBloc,
-      _createEditProfileBloc,
-      _createDetailProfileBloc,
-      _createSearchScreenBloc,
-      _createSearchDetailBloc,
-      _createCourseBloc,
-      _createHomeSimpleBloc,
-      _createCategoryDetailBloc,
-      _createProfileAssignmentBloc,
-      _createAssignmentBloc,
-      _createReviewWriteBloc,
-      _createUserCoursesBloc,
-      _createUserCourseBloc,
-      _createUserCourseLockedBloc,
-      _createTextLessonBloc,
-      _createQuizLessonBloc,
-      _createLessonVideoBloc,
-      _createLessonStreamBloc,
-      _createVideoBloc,
-      _createQuestionsBloc,
-      _createQuestionAskBloc,
-      _createQuestionDetailsBloc,
-      _createQuizScreenBloc,
-      _createFinalBloc,
-      _createPlansBloc,
-      _createOrdersBloc,
-      _createRestorePasswordBloc,
-      _createLessonZoomBloc);
+        _createAuthScreen,
+        _createHomeBloc,
+        _createSplashScreen,
+        _createFavoritesBloc,
+        _createProfileBloc,
+        _createEditProfileBloc,
+        _createDetailProfileBloc,
+        _createSearchScreenBloc,
+        _createSearchDetailBloc,
+        _createCourseBloc,
+        _createHomeSimpleBloc,
+        _createCategoryDetailBloc,
+        _createProfileAssignmentBloc,
+        _createAssignmentBloc,
+        _createReviewWriteBloc,
+        _createUserCoursesBloc,
+        _createUserCourseBloc,
+        _createUserCourseLockedBloc,
+        _createTextLessonBloc,
+        _createQuizLessonBloc,
+        _createLessonVideoBloc,
+        _createLessonStreamBloc,
+        _createVideoBloc,
+        _createQuestionsBloc,
+        _createQuestionAskBloc,
+        _createQuestionDetailsBloc,
+        _createQuizScreenBloc,
+        _createFinalBloc,
+        _createPlansBloc,
+        _createOrdersBloc,
+        _createRestorePasswordBloc,
+        _createLessonZoomBloc,
+      );
 
   _i17.AuthScreen _createAuthScreen() => _i17.AuthScreen(_createAuthBloc());
 
@@ -127,7 +138,8 @@ class AppInjector$Injector implements _i1.AppInjector {
 
   _i19.HomeBloc _createHomeBloc() => _i19.HomeBloc(_createHomeRepository(), _createCoursesRepository(), _createInstructorsRepository());
 
-  _i7.HomeRepository _createHomeRepository() => _singletonHomeRepository ??= _appModule.homeRepository(_createUserApiProvider(), _createSharedPreferences());
+  _i7.HomeRepository _createHomeRepository() =>
+      _singletonHomeRepository ??= _appModule.homeRepository(_createUserApiProvider(), _createSharedPreferences(), _createAppLocalStorage(), _createLocalizationLocalStorage());
 
   _i8.CoursesRepository _createCoursesRepository() => _singletonCoursesRepository ??= _appModule.coursesRepository(_createUserApiProvider());
 
@@ -141,7 +153,7 @@ class AppInjector$Injector implements _i1.AppInjector {
 
   _i23.ProfileBloc _createProfileBloc() => _i23.ProfileBloc(_createAccountRepository(), _createAuthRepository());
 
-  _i24.AccountRepository _createAccountRepository() => _appModule.provideAccountRepository(_createUserApiProvider());
+  _i24.AccountRepository _createAccountRepository() => _appModule.provideAccountRepository(_createUserApiProvider(), _createAccountLocalStorage());
 
   _i25.EditProfileBloc _createEditProfileBloc() => _i25.EditProfileBloc(_createAccountRepository());
 
@@ -169,11 +181,22 @@ class AppInjector$Injector implements _i1.AppInjector {
 
   _i12.CacheManager _createCacheManager() => _singletonCacheManager ??= _i12.CacheManager();
 
+  _i56.AppLocalStorage _createAppLocalStorage() => _singletonAppLocalStorage ??= _i56.AppLocalStorage();
+
+  _i57.LocalizationLocalStorage _createLocalizationLocalStorage() => _singletonLocalizationLocalStorage ??= _i57.LocalizationLocalStorage();
+
+  _i58.ProgressCoursesLocalStorage _createProgressCoursesLocalStorage() => _singletonProgressCoursesLocalStorage ??= _i58.ProgressCoursesLocalStorage();
+
+  _i59.CurriculumLocalStorage _createCurriculumLocalStorage() => _singletonCurriculumLocalStorage ??= _i59.CurriculumLocalStorage();
+
+  _i60.AccountLocalStorage _createAccountLocalStorage() => _singletonAccountLocalStorage ??= _i60.AccountLocalStorage();
+
   _i35.ReviewWriteBloc _createReviewWriteBloc() => _i35.ReviewWriteBloc(_createAccountRepository(), _createReviewRepository());
 
   _i36.UserCoursesBloc _createUserCoursesBloc() => _i36.UserCoursesBloc(_createUserCourseRepository(), _createCacheManager());
 
-  _i37.UserCourseRepository _createUserCourseRepository() => _appModule.provideUserCourseRepository(_createUserApiProvider(), _createCacheManager());
+  _i37.UserCourseRepository _createUserCourseRepository() =>
+      _appModule.provideUserCourseRepository(_createUserApiProvider(), _createCacheManager(), _createProgressCoursesLocalStorage(), _createCurriculumLocalStorage());
 
   _i38.UserCourseBloc _createUserCourseBloc() => _i38.UserCourseBloc(_createUserCourseRepository(), _createCacheManager(), _createLessonRepository());
 

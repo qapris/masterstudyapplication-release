@@ -33,6 +33,7 @@ class LessonVideoBloc extends Bloc<LessonVideoEvent, LessonVideoState> {
       try {
         var response = await _lessonRepository.completeLesson(event.courseId, event.lessonId);
       } catch (e, s) {
+        log(e.toString());
         print(e);
         print(s);
       }

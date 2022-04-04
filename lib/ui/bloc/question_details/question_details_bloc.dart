@@ -16,11 +16,12 @@ class QuestionDetailsBloc extends Bloc<QuestionDetailsEvent, QuestionDetailsStat
   QuestionDetailsState get initialState => InitialQuestionDetailsState();
 
   QuestionDetailsBloc(this._questionsRepository) : super(InitialQuestionDetailsState()) {
-    on<QuestionDetailsEvent>((event, emit) async => await _questionDetail(event, emit));
-  }
 
-  Future<void> _questionDetail(QuestionDetailsEvent event, Emitter<QuestionDetailsState> emit) async {
-    if (event is QuestionAddEvent) {
+    on<FetchEvent>((event, emit) async {
+      emit(LoadedQuestionDetailsState());
+    });
+
+    on<QuestionAddEvent>((event, emit) async {
       try {
         emit(ReplyAddingState());
         QuestionAddResponse addAnswer = await _questionsRepository.addQuestion(event.lessonId, event.comment, event.parent);
@@ -28,8 +29,8 @@ class QuestionDetailsBloc extends Bloc<QuestionDetailsEvent, QuestionDetailsStat
       } catch (error) {
         print(error);
       }
-    }
 
-    emit(LoadedQuestionDetailsState());
+      emit(LoadedQuestionDetailsState());
+    });
   }
 }

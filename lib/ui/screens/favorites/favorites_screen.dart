@@ -40,9 +40,10 @@ class _FavoritesScreenWidgetState extends State<_FavoritesScreenWidget> {
         backgroundColor: HexColor.fromHex("#F3F5F9"),
         appBar: AppBar(
           elevation: 0,
+          backgroundColor: mainColor,
           title: Center(
             child: Text(
-              localizations.getLocalization("favorites_title"),
+              localizations!.getLocalization("favorites_title"),
               textScaleFactor: 1.0,
               style: TextStyle(color: Colors.white, fontSize: 18),
             ),
@@ -144,7 +145,7 @@ class _FavoritesScreenWidgetState extends State<_FavoritesScreenWidget> {
             ),
           ),
           Text(
-            localizations.getLocalization("no_user_favorites_screen_title"),
+            localizations!.getLocalization("no_user_favorites_screen_title"),
             textScaleFactor: 1.0,
             style: TextStyle(color: HexColor.fromHex("#D7DAE2"), fontSize: 18),
           ),

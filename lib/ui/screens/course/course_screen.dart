@@ -1,8 +1,5 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,8 +9,6 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:masterstudy_app/data/models/OrdersResponse.dart';
 import 'package:masterstudy_app/data/models/category.dart';
 import 'package:masterstudy_app/data/models/course/CourcesResponse.dart';
-import 'package:masterstudy_app/data/network/api_provider.dart';
-import 'package:masterstudy_app/data/utils.dart';
 import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/bloc/course/bloc.dart';
 import 'package:masterstudy_app/ui/screens/category_detail/category_detail_screen.dart';
@@ -28,7 +23,6 @@ import 'package:masterstudy_app/ui/widgets/dialog_author.dart';
 import 'package:masterstudy_app/ui/widgets/loading_error_widget.dart';
 import 'package:share/share.dart';
 import 'package:transparent_image/transparent_image.dart';
-
 import '../../../main.dart';
 import 'tabs/faq_widget.dart';
 
@@ -95,11 +89,11 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
   late AnimationController animation;
   late Animation<double> _fadeInFadeOut;
   late CourseBloc _bloc;
+  late bool _isFav;
   var _favIcoColor = Colors.white;
   var screenHeight;
   String title = "";
   bool hasTrial = true;
-  late bool _isFav;
   num kef = 2;
 
   @override
@@ -200,6 +194,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
                   }
                   return <Widget>[
                     SliverAppBar(
+                      backgroundColor: mainColor,
                       title: Text(
                         title,
                         textScaleFactor: 1.0,
@@ -250,13 +245,15 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
                           indicatorColor: mainColorA,
                           tabs: [
                             Tab(
-                              text: localizations.getLocalization("course_overview_tab"),
+                              text: localizations!.getLocalization("course_overview_tab"),
                             ),
-                            Tab(text: localizations.getLocalization("course_curriculum_tab")),
+                            Tab(
+                              text: localizations!.getLocalization("course_curriculum_tab"),
+                            ),
                             if (state is LoadedCourseState)
                               if (state.courseDetailResponse.faq != null && state.courseDetailResponse.faq!.isNotEmpty)
                                 Tab(
-                                  text: localizations.getLocalization("course_faq_tab"),
+                                  text: localizations!.getLocalization("course_faq_tab"),
                                 ),
                           ],
                         ),
@@ -404,6 +401,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
       ),
     );
   }
+
   bool get _isAppBarExpanded {
     if (screenHeight == null) screenHeight = MediaQuery.of(context).size.height;
     if (_scrollController.offset > (screenHeight / kef - (kToolbarHeight * kef))) return _scrollController.hasClients && _scrollController.offset > (screenHeight / kef - (kToolbarHeight * kef));
@@ -420,17 +418,17 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
     if (state is LoadedCourseState)
       return TabBarView(
         children: <Widget>[
+          //OverviewWidget
           OverviewWidget(state.courseDetailResponse, state.reviewResponse, () {
             _scrollController.jumpTo(screenHeight / kef - (kToolbarHeight * kef));
           }),
+          //CurriculumWidget
           CurriculumWidget(state.courseDetailResponse),
-          if (state.courseDetailResponse.faq != null && state.courseDetailResponse.faq!.isNotEmpty)
-            FaqWidget(
-              state.courseDetailResponse,
-            ),
-
+          //FaqWidget
+          if (state.courseDetailResponse.faq != null && state.courseDetailResponse.faq!.isNotEmpty) FaqWidget(state.courseDetailResponse),
         ],
       );
+
     if (state is ErrorCourseState) {
       return LoadingErrorWidget(() {
         _bloc.add(FetchEvent(widget.coursesBean.id!));
@@ -478,10 +476,8 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
                   } else {
                     if (!state.courseDetailResponse.has_access) {
                       if (_bloc.selectedPaymetId == -1) {
-                        print('1');
                         _bloc.add(AddToCart(state.courseDetailResponse.id));
                       } else {
-                        print('2');
                         _bloc.add(UsePlan(state.courseDetailResponse.id));
                       }
                     }
@@ -504,7 +500,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Text(
-                localizations.getLocalization("course_free_price"),
+                localizations!.getLocalization("course_free_price"),
                 textScaleFactor: 1.0,
               ),
               (!Platform.isIOS) ? Icon(Icons.arrow_drop_down) : Text("")
@@ -512,13 +508,13 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
           );
         } else {
           String? selectedPlan;
-          if (_bloc.selectedPaymetId == -1) selectedPlan = "${localizations.getLocalization("course_regular_price")} ${state.courseDetailResponse.price?.price}";
+          if (_bloc.selectedPaymetId == -1) selectedPlan = "${localizations!.getLocalization("course_regular_price")} ${state.courseDetailResponse.price?.price}";
           if (state.userPlans.isNotEmpty) {
             state.userPlans.forEach((value) {
               if (int.parse(value.subscription_id) == _bloc.selectedPaymetId) selectedPlan = value.name;
             });
           }
-          if (_products.isNotEmpty) selectedPlan = "${localizations.getLocalization("course_regular_price")} ${_products[0].price}";
+          if (_products.isNotEmpty) selectedPlan = "${localizations!.getLocalization("course_regular_price")} ${_products[0].price}";
           return GestureDetector(
             onTap: () async {
               if (!Platform.isIOS) {
@@ -569,12 +565,15 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text(localizations.getLocalization("error_dialog_title"), textScaleFactor: 1.0, style: TextStyle(color: Colors.black, fontSize: 20.0)),
-            content: Text(localizations.getLocalization("in_app_not_found")),
+            title: Text(localizations!.getLocalization("error_dialog_title"), textScaleFactor: 1.0, style: TextStyle(color: Colors.black, fontSize: 20.0)),
+            content: Text(localizations!.getLocalization("in_app_not_found")),
             actions: <Widget>[
-              FlatButton(
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: mainColor,
+                ),
                 child: Text(
-                  localizations.getLocalization("ok_dialog_button"),
+                  localizations!.getLocalization("ok_dialog_button"),
                   textScaleFactor: 1.0,
                 ),
                 onPressed: () {
@@ -617,21 +616,13 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
       onPressed: () {
         Navigator.of(context).pushNamed(
           UserCourseScreen.routeName,
-          arguments: UserCourseScreenArgs(
-            state.courseDetailResponse.id.toString(),
-            widget.coursesBean.title,
-            widget.coursesBean.images?.small,
-            state.courseDetailResponse.author?.avatar_url,
-            state.courseDetailResponse.author?.login,
-            "0",
-            "1",
-            "",
-            "",
-          ),
+          arguments: UserCourseScreenArgs(state.courseDetailResponse.id.toString(), widget.coursesBean.title, widget.coursesBean.images?.small, state.courseDetailResponse.author?.avatar_url,
+              state.courseDetailResponse.author?.login, "0", "1", "", "",
+              isFirstStart: true),
         );
       },
       child: Text(
-        localizations.getLocalization("start_course_button"),
+        localizations!.getLocalization("start_course_button"),
         textScaleFactor: 1.0,
         style: TextStyle(color: white),
       ),

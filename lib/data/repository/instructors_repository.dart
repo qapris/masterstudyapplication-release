@@ -6,7 +6,7 @@ import 'package:masterstudy_app/data/utils.dart';
 enum InstructorsSort { rating }
 
 abstract class InstructorsRepository {
-  Future<List<InstructorBean>> getInstructors(InstructorsSort sort, {int page, int perPage});
+  Future<List<InstructorBean?>> getInstructors(InstructorsSort sort, {int page, int perPage});
 }
 
 @provide
@@ -16,7 +16,7 @@ class InstructorsRepositoryImpl extends InstructorsRepository {
   InstructorsRepositoryImpl(this.apiProvider);
 
   @override
-  Future<List<InstructorBean>> getInstructors(InstructorsSort sort, {int? page, int? perPage}) async {
+  Future<List<InstructorBean?>> getInstructors(InstructorsSort sort, {int? page, int? perPage}) async {
     Map<String, dynamic> query = Map();
 
     switch (sort) {

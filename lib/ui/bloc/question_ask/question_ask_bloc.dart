@@ -14,19 +14,18 @@ class QuestionAskBloc extends Bloc<QuestionAskEvent, QuestionAskState> {
   QuestionAskState get initialState => InitialQuestionAskState();
 
   QuestionAskBloc(this._questionsRepository) : super(InitialQuestionAskState()) {
-    on<QuestionAskEvent>((event, emit) async => await _questionBloc(event, emit));
-  }
+    on<FetchEvent>((event, emit) async {
+      emit(InitialQuestionAskState());
+    });
 
-  Future<void> _questionBloc(QuestionAskEvent event, Emitter<QuestionAskState> emit) async {
-    if (event is QuestionAddEvent) {
+    on<QuestionAddEvent>((event, emit) async {
       try {
         QuestionAddResponse addAnswer = await _questionsRepository.addQuestion(event.lessonId, event.comment, 0);
         emit(QuestionAddedState(addAnswer));
       } catch (error) {
         print(error);
       }
-    }
-
-    emit(LoadedQuestionAskState());
+    });
   }
+
 }

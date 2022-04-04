@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,8 +12,9 @@ import 'package:masterstudy_app/ui/widgets/course_grid_item.dart';
 
 class SearchDetailScreenArgs {
   final String searchText;
+  final dynamic categoryId;
 
-  SearchDetailScreenArgs(this.searchText);
+  SearchDetailScreenArgs(this.searchText,{this.categoryId});
 }
 
 class SearchDetailScreen extends StatelessWidget {
@@ -24,7 +27,7 @@ class SearchDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     SearchDetailScreenArgs args = ModalRoute.of(context)?.settings.arguments as SearchDetailScreenArgs;
     return BlocProvider<SearchDetailBloc>(
-      child: SearchDetailWidget(args.searchText),
+      child: SearchDetailWidget(args.searchText,args.categoryId),
       create: (_) => _bloc,
     );
   }
@@ -32,13 +35,12 @@ class SearchDetailScreen extends StatelessWidget {
 
 class SearchDetailWidget extends StatefulWidget {
   final String searchText;
+  final dynamic categoryId;
 
-  const SearchDetailWidget(this.searchText) : super();
+  const SearchDetailWidget(this.searchText,this.categoryId) : super();
 
   @override
-  State<StatefulWidget> createState() {
-    return _SearchDetailWidgetState();
-  }
+  State<StatefulWidget> createState() => _SearchDetailWidgetState();
 }
 
 class _SearchDetailWidgetState extends State<SearchDetailWidget> {
@@ -49,12 +51,11 @@ class _SearchDetailWidgetState extends State<SearchDetailWidget> {
   void initState() {
     super.initState();
 
-    if(widget.searchText != "") {
+    if (widget.searchText != "") {
       this._searchQuery.text = widget.searchText;
     }
 
-    _bloc = BlocProvider.of<SearchDetailBloc>(context)..add(FetchEvent(this._searchQuery.text));
-
+    _bloc = BlocProvider.of<SearchDetailBloc>(context)..add(FetchEvent(this._searchQuery.text,widget.categoryId));
   }
 
   @override
@@ -62,22 +63,19 @@ class _SearchDetailWidgetState extends State<SearchDetailWidget> {
     return Scaffold(
       backgroundColor: HexColor.fromHex("#F3F5F9"),
       appBar: AppBar(
-        brightness: Brightness.light,
         iconTheme: IconThemeData(
           color: Colors.black, //change your color here
         ),
         backgroundColor: Colors.white,
         title: TextField(
           autofocus: true,
+          cursorColor: mainColor,
           style: TextStyle(fontSize: 20),
           controller: _searchQuery,
           onChanged: (value) {
-            if (value.trim().length > 1) _bloc.add(FetchEvent(value));
+            if (value.trim().length > 1) _bloc.add(FetchEvent(value,widget.categoryId));
           },
-          decoration: InputDecoration(
-              border: InputBorder.none,
-              hintText: localizations.getLocalization("search_bar_title"),
-              hintStyle: TextStyle(color: Colors.grey)),
+          decoration: InputDecoration(border: InputBorder.none, hintText: localizations!.getLocalization("search_bar_title"), hintStyle: TextStyle(color: Colors.grey)),
         ),
       ),
       body: BlocBuilder<SearchDetailBloc, SearchDetailState>(
@@ -143,7 +141,7 @@ class _SearchDetailWidgetState extends State<SearchDetailWidget> {
             color: Colors.grey[400],
           ),
           Text(
-            localizations.getLocalization("nothing_found_search"),
+            localizations!.getLocalization("nothing_found_search"),
             textScaleFactor: 1.0,
             style: TextStyle(color: Colors.grey[500], fontSize: 22),
           ),

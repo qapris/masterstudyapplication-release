@@ -191,7 +191,7 @@ class _LessonStreamScreenState extends State<_LessonStreamScreenWidget> {
                       _launchURL(state.lessonResponse.video);
                     },
                     child: Text(
-                      localizations.getLocalization("go_to_live_button"),
+                      localizations!.getLocalization("go_to_live_button"),
                       textScaleFactor: 1.0,
                       style: TextStyle(fontSize: 14.0),
                     ))),
@@ -287,7 +287,7 @@ class _LessonStreamScreenState extends State<_LessonStreamScreenWidget> {
                         color: mainColor,
                         onPressed: () {},
                         child: Text(
-                          localizations.getLocalization("complete_lesson_button"),
+                          localizations!.getLocalization("complete_lesson_button"),
                           textScaleFactor: 1.0,
                           style: TextStyle(fontSize: 14.0),
                         ))),

@@ -5,7 +5,7 @@ part 'curriculum.g.dart';
 @JsonSerializable()
 class CurriculumResponse {
   final List<SectionItem?> sections;
-  final String? progress_percent;
+  dynamic progress_percent;
   final String? current_lesson_id;
   final String? lesson_type;
 

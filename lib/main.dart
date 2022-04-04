@@ -1,13 +1,16 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/adapter.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/repository/localization_repository.dart';
@@ -75,6 +78,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'data/models/AppSettings.dart';
 import 'data/push/push_manager.dart';
 import 'data/utils.dart';
 import 'di/app_injector.dart';
@@ -85,7 +89,7 @@ typedef Provider<T> = T Function();
 
 final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
 
-late LocalizationRepository localizations;
+LocalizationRepository? localizations;
 Color? mainColor, mainColorA, secondColor;
 
 StreamController pushStreamController = StreamController<Map<String, dynamic>>();
@@ -94,30 +98,6 @@ Stream pushStream = pushStreamController.stream.asBroadcastStream();
 bool dripContentEnabled = false;
 bool demoEnabled = false;
 bool appView = false;
-
-Future<bool> setColors() async {
-  final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  try {
-    final mcr = sharedPreferences.getInt("main_color_r");
-    final mcg = sharedPreferences.getInt("main_color_g");
-    final mcb = sharedPreferences.getInt("main_color_b");
-    final mca = sharedPreferences.getDouble("main_color_a");
-
-    final scr = sharedPreferences.getInt("second_color_r");
-    final scg = sharedPreferences.getInt("second_color_g");
-    final scb = sharedPreferences.getInt("second_color_b");
-    final sca = sharedPreferences.getDouble("second_color_a");
-
-    mainColor = Color.fromRGBO(mcr, mcg, mcb, mca);
-    mainColorA = Color.fromRGBO(mcr, mcg, mcb, 0.999);
-    secondColor = Color.fromRGBO(scr, scg, scb, sca);
-  } catch (e) {
-    mainColor = blue_blue;
-    mainColorA = blue_blue_a;
-    secondColor = seaweed;
-  }
-  return true;
-}
 
 Future<String> getDefaultLocalization() async {
   String data = await rootBundle.loadString('assets/localization/default_locale.json');
@@ -140,6 +120,7 @@ Future<dynamic>? myBackgroundMessageHandler(Map<String, dynamic> message) {
 
 void main() async {
   //System style AppBar
+
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarBrightness: Brightness.light,
     statusBarColor: Colors.grey.withOpacity(0.4), //top bar color
@@ -147,10 +128,18 @@ void main() async {
   ));
   WidgetsFlutterBinding.ensureInitialized();
 
-  await setColors();
+  await Hive.initFlutter();
+
+  //Register adapters for hive
+  // Hive.registerAdapter(HomeLayoutBeanAdapter());
+  // Hive.registerAdapter(AddonsBeanAdapter());
+  // Hive.registerAdapter(AppSettingsAdapter());
+  // Hive.registerAdapter(OptionsBeanAdapter());
+
+
+  // db = await Hive.openBox('db');
+
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-  // androidInfo = await deviceInfo.androidInfo;
-  // iosDeviceInfo = await deviceInfo.iosInfo;
 
   //SharedPreferences
   preferences = await SharedPreferences.getInstance();
@@ -266,6 +255,25 @@ class MyApp extends StatefulWidget {
     );
   }
 
+  @override
+  State<StatefulWidget> createState() => MyAppState();
+}
+
+class MyAppState extends State<MyApp> {
+  late StreamSubscription<List<PurchaseDetails>> _subscription;
+
+  /// Is the API available on the device
+  bool _available = true;
+
+  /// The In App Purchase plugin
+  InAppPurchase _iap = InAppPurchase.instance;
+
+  /// Products for sale
+  List<ProductDetails> _products = [];
+
+  /// Past purchases
+  List<PurchaseDetails> _purchases = [];
+
   ///Theme for App
   ThemeData _buildShrineTheme() {
     final ThemeData base = ThemeData.light();
@@ -297,27 +305,9 @@ class MyApp extends StatefulWidget {
   }
 
   @override
-  State<StatefulWidget> createState() => MyAppState();
-}
-
-class MyAppState extends State<MyApp> {
-  late StreamSubscription<List<PurchaseDetails>> _subscription;
-
-  /// Is the API available on the device
-  bool _available = true;
-
-  /// The In App Purchase plugin
-  InAppPurchase _iap = InAppPurchase.instance;
-
-  /// Products for sale
-  List<ProductDetails> _products = [];
-
-  /// Past purchases
-  List<PurchaseDetails> _purchases = [];
-
-  @override
   void initState() {
     _initialize();
+
     super.initState();
   }
 
@@ -411,7 +401,7 @@ class MyAppState extends State<MyApp> {
       child: OverlaySupport(
         child: MaterialApp(
           title: 'Masterstudy',
-          theme: widget._buildShrineTheme(),
+          theme: _buildShrineTheme(),
           initialRoute: SplashScreen.routeName,
           debugShowCheckedModeBanner: false,
           navigatorKey: navigatorKey,

@@ -6,6 +6,7 @@ import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/cache/cache_manager.dart';
 import 'package:masterstudy_app/data/models/user_course.dart';
 import 'package:masterstudy_app/data/repository/user_course_repository.dart';
+import 'package:masterstudy_app/data/utils.dart';
 
 import './bloc.dart';
 
@@ -25,8 +26,12 @@ class UserCoursesBloc extends Bloc<UserCoursesEvent, UserCoursesState> {
   Future<void> _userCourses(UserCoursesEvent event, Emitter<UserCoursesState> emit) async {
     if (event is FetchEvent) {
       if (state is ErrorUserCoursesState) emit(InitialUserCoursesState());
+
       try {
         UserCourseResponse response = await _userCourseRepository.getUserCourses();
+
+        _userCourseRepository.saveLocalUserCourses(response);
+
         if (response.posts.isEmpty) {
           emit(EmptyCoursesState());
         } else {
@@ -34,25 +39,38 @@ class UserCoursesBloc extends Bloc<UserCoursesEvent, UserCoursesState> {
           emit(LoadedCoursesState(response.posts));
         }
       } catch (e, s) {
-        log(e.toString());
-        print(e);
-        print(s);
+        log('2'.toString());
         var cache = await _cacheManager.getFromCache();
+
         if (cache != null) {
+          List<UserCourseResponse> response = await _userCourseRepository.getUserCoursesLocal();
+
+          for (var el in response) {
+            for (var el1 in el.posts) {
+              for (var el2 in cache.courses) {
+                if (el1!.hash == el2!.hash) {
+                  el2.postsBean!.progress = el1.progress;
+                  el2.postsBean!.progress_label = el1.progress_label;
+                }
+              }
+            }
+          }
+
           try {
-            List<PostsBean> list = [];
+            List<PostsBean?> list = [];
+
             cache.courses.forEach((element) {
-              // list.add(element.postsBean.fromCache = true);
+              list.add(element?.postsBean!);
             });
+
             emit(LoadedCoursesState(list));
           } catch (e, s) {
-            print(e);
-            print(s);
             emit(ErrorUserCoursesState());
           }
-        } else {
-          emit(ErrorUserCoursesState());
+        }else {
+          emit(EmptyCacheCoursesState());
         }
+
       }
     }
   }

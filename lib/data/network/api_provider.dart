@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
@@ -29,9 +30,6 @@ import '../utils.dart';
 @provide
 @singleton
 class UserApiProvider {
-  // static const BASE_URL = "https://stylemixthemes.com/masterstudy/academy";
-  static const BASE_URL = "http://ms.stylemix.biz";
-  static const String apiEndpoint = BASE_URL + "/wp-json/ms_lms/v1/";
   final _dio;
 
   UserApiProvider(this._dio);
@@ -113,7 +111,9 @@ class UserApiProvider {
 
   //getInstructors
   Future<InstructorsResponse> getInstructors(Map<String, dynamic> params) async {
-    Response response = await _dio.get(apiEndpoint + "instructors/", queryParameters: params);
+    Response response = await _dio.get(apiEndpoint + "instructors", queryParameters: params);
+    log(response.toString());
+    log(response.realUri.toString());
     return InstructorsResponse.fromJson(response.data);
   }
 
@@ -136,7 +136,6 @@ class UserApiProvider {
       "file": await MultipartFile.fromFile(file.path, filename: fileName),
     });
 
-
     Response response = await dio.post(
       apiEndpoint + "account/edit_profile/",
       data: formData,
@@ -144,10 +143,6 @@ class UserApiProvider {
         headers: {"requirestoken": "true"},
       ),
     );
-
-    log(response.data.toString());
-    log(response.toString());
-
 
     return response;
   }
@@ -207,6 +202,7 @@ class UserApiProvider {
         options: Options(
           headers: {"requirestoken": "true"},
         ));
+
     return ReviewAddResponse.fromJson(response.data);
   }
 
@@ -224,14 +220,12 @@ class UserApiProvider {
 
   //getCourseCurriculum
   Future<CurriculumResponse> getCourseCurriculum(int id) async {
-    log(id.toString());
     Response response = await dio.post(apiEndpoint + "course_curriculum",
         data: {"id": id},
         options: Options(
           headers: {"requirestoken": "true"},
         ));
 
-    log(response.data.toString());
     return CurriculumResponse.fromJson(response.data);
   }
 
@@ -303,8 +297,6 @@ class UserApiProvider {
 
   //getLesson
   Future<LessonResponse> getLesson(dynamic courseId, dynamic lessonId) async {
-    log(courseId.toString());
-    log(lessonId.toString());
     Response response = await dio.post(apiEndpoint + "course/lesson",
         data: {"course_id": courseId, "item_id": lessonId},
         options: Options(
@@ -349,17 +341,30 @@ class UserApiProvider {
         options: Options(
           headers: {"requirestoken": "true"},
         ));
+
     return QuestionsResponse.fromJson(response.data);
   }
 
   //addQuestion
   Future<QuestionAddResponse> addQuestion(int lessonId, String comment, int parent) async {
-    Response response = await dio.put(apiEndpoint + "lesson/questions",
-        data: {"id": lessonId, "comment": comment, "parent": parent},
-        options: Options(
-          headers: {"requirestoken": "true"},
-        ));
-    return QuestionAddResponse.fromJson(response.data);
+    late Response response;
+    var data = {
+      'id': lessonId,
+      'comment': comment,
+      'parent': parent,
+    };
+
+     response = await dio.put(
+      apiEndpoint + "lesson/questions",
+      data: data,
+      options: Options(
+        headers: {"requirestoken": "true"},
+      ),
+    );
+
+     log(response.toString());
+      return QuestionAddResponse.fromJson(response.data);
+
   }
 
   //popularSearches
@@ -397,7 +402,6 @@ class UserApiProvider {
 
   //addToCart
   Future<AddToCartResponse> addToCart(int courseId) async {
-    log(courseId.toString());
     Response response = await dio.put(apiEndpoint + "add_to_cart",
         data: {"id": courseId},
         options: Options(
@@ -408,8 +412,6 @@ class UserApiProvider {
 
   //usePlan
   Future<bool?> usePlan(int courseId, int subscriptionId) async {
-    log(courseId.toString());
-    log(subscriptionId.toString());
     Response response = await dio.put(apiEndpoint + "use_plan",
         data: {"course_id": courseId, "subscription_id": subscriptionId},
         options: Options(
@@ -449,7 +451,6 @@ class UserApiProvider {
   //restorePassword
   Future<Response> restorePassword(String email) async {
     Response response = await _dio.post(apiEndpoint + "account/restore_password", data: {"email": email});
-    log(response.toString());
     return response;
   }
 

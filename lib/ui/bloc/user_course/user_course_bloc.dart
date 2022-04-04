@@ -1,10 +1,16 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:developer';
 import 'package:bloc/bloc.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/cache/cache_manager.dart';
 import 'package:masterstudy_app/data/models/CachedCourse.dart';
+import 'package:masterstudy_app/data/models/curriculum.dart';
 import 'package:masterstudy_app/data/repository/lesson_repository.dart';
 import 'package:masterstudy_app/data/repository/user_course_repository.dart';
+import '../../../data/models/user_course.dart';
+import '../../../data/utils.dart';
 import './bloc.dart';
 
 @provide
@@ -14,21 +20,25 @@ class UserCourseBloc extends Bloc<UserCourseEvent, UserCourseState> {
   final CacheManager cacheManager;
 
   UserCourseState get initialState => InitialUserCourseState();
+  bool flag = false;
 
   UserCourseBloc(this._repository, this.cacheManager, this._lessonsRepository) : super(InitialUserCourseState()) {
-    on<UserCourseEvent>((event, emit) async => await _userCourse(event, emit));
-  }
-
-  Future<void> _userCourse(UserCourseEvent event, Emitter<UserCourseState> emit) async {
-    if (event is FetchEvent) {
-      int courseId = int.parse(event.userCourseScreenArgs.course_id!);
-
-      var isCached = await cacheManager.isCached(courseId);
-
+    on<FetchEvent>((event, emit) async {
+      //ErrorState
       if (state is ErrorUserCourseState) emit(InitialUserCourseState());
 
+      //GetCourseId
+      int courseId = int.parse(event.userCourseScreenArgs.course_id!);
+
+      //Check isCached or not cached
+      var isCached = await cacheManager.isCached(courseId);
+
       try {
+        //getCourseCurriculum
         var response = await _repository.getCourseCurriculum(courseId);
+
+        //LocaleSaveCurriculum
+        _repository.saveLocalCurriculum(response, courseId);
 
         emit(LoadedUserCourseState(
           response.sections,
@@ -36,16 +46,71 @@ class UserCourseBloc extends Bloc<UserCourseEvent, UserCourseState> {
           response.current_lesson_id,
           response.lesson_type,
           response = response,
-          await cacheManager.isCached(courseId),
+          isCached,
           false,
         ));
 
         if (isCached) {
-          print(event.userCourseScreenArgs.postsBean?.hash);
+          //getCurrentCourseHash
           var currentHash = (await cacheManager.getFromCache())?.courses.firstWhere((element) => courseId == element?.id)?.hash;
-          print(currentHash);
-          if (event.userCourseScreenArgs.postsBean?.hash != (await cacheManager.getFromCache())?.courses.firstWhere((element) => courseId == element?.id)?.hash) {
-            mapCacheCourseEventToState(CacheCourseEvent(event.userCourseScreenArgs));
+
+          if (event.userCourseScreenArgs.postsBean?.hash != currentHash) {
+            if (state is LoadedUserCourseState) {
+              var state = this.state as LoadedUserCourseState;
+
+              emit(LoadedUserCourseState(
+                state.sections,
+                state.progress,
+                state.current_lesson_id,
+                state.lesson_type,
+                state.response,
+                false,
+                true,
+              ));
+
+              try {
+                CachedCourse course = CachedCourse(
+                    id: int.parse(event.userCourseScreenArgs.course_id!),
+                    postsBean: event.userCourseScreenArgs.postsBean?..fromCache = true,
+                    curriculumResponse: (state as LoadedUserCourseState).response,
+                    hash: event.userCourseScreenArgs.hash!,
+                    lessons: []);
+
+                var sections = (state as LoadedUserCourseState).response?.sections.map((e) => e?.section_items);
+
+                List<int?> iDs = [];
+
+                sections?.forEach((element) {
+                  element?.forEach((element) {
+                    iDs.add(element?.item_id);
+                  });
+                });
+
+                course.lessons = await _lessonsRepository.getAllLessons(int.parse(event.userCourseScreenArgs.course_id!), iDs);
+
+                await cacheManager.writeToCache(course).then((value) => emit(LoadedUserCourseState(
+                  state.sections,
+                  state.progress,
+                  state.current_lesson_id,
+                  state.lesson_type,
+                  state.response,
+                  true,
+                  false,
+                )));
+              } catch (e, s) {
+                print(e);
+                print(s);
+                emit(LoadedUserCourseState(
+                  state.sections,
+                  state.progress,
+                  state.current_lesson_id,
+                  state.lesson_type,
+                  state.response,
+                  false,
+                  false,
+                ));
+              }
+            }
           }
         }
       } catch (e, s) {
@@ -70,45 +135,67 @@ class UserCourseBloc extends Bloc<UserCourseEvent, UserCourseState> {
         } else {
           emit(ErrorUserCourseState());
         }
-
-        print(e);
-        print(s);
       }
-    }
-    if (event is CacheCourseEvent) {
-      mapCacheCourseEventToState(event);
-    }
-  }
+    });
 
-  Future<UserCourseState> mapCacheCourseEventToState(CacheCourseEvent event) async {
-    if (state is LoadedUserCourseState) {
-      var state = this.state as LoadedUserCourseState;
-      emit(LoadedUserCourseState(state.sections, state.progress, state.current_lesson_id, state.lesson_type, state.response, false, true));
-      try {
-        CachedCourse course = CachedCourse(
-            id: int.parse(event.userCourseScreenArgs.course_id!),
-            postsBean: event.userCourseScreenArgs.postsBean?..fromCache = true,
-            curriculumResponse: (state as LoadedUserCourseState).response,
-            hash: event.userCourseScreenArgs.hash!,
-            lessons: []);
+    on<CacheCourseEvent>((event, emit) async {
+      if (state is LoadedUserCourseState) {
+        var state = this.state as LoadedUserCourseState;
 
-        var sections = (state as LoadedUserCourseState).response?.sections.map((e) => e?.section_items);
-        List<int?> iDs = [];
-        sections?.forEach((element) {
-          element?.forEach((element) {
-            iDs.add(element?.item_id);
+        emit(LoadedUserCourseState(
+          state.sections,
+          state.progress,
+          state.current_lesson_id,
+          state.lesson_type,
+          state.response,
+          false,
+          true,
+        ));
+
+        try {
+          CachedCourse course = CachedCourse(
+              id: int.parse(event.userCourseScreenArgs.course_id!),
+              postsBean: event.userCourseScreenArgs.postsBean?..fromCache = true,
+              curriculumResponse: (state as LoadedUserCourseState).response,
+              hash: event.userCourseScreenArgs.hash!,
+              lessons: []);
+
+          var sections = (state as LoadedUserCourseState).response?.sections.map((e) => e?.section_items);
+
+          List<int?> iDs = [];
+
+          sections?.forEach((element) {
+            element?.forEach((element) {
+              iDs.add(element?.item_id);
+            });
           });
-        });
-        print(iDs.length);
-        course.lessons = await _lessonsRepository.getAllLessons(int.parse(event.userCourseScreenArgs.course_id!), iDs);
-        await cacheManager.writeToCache(course);
-        emit(LoadedUserCourseState(state.sections, state.progress, state.current_lesson_id, state.lesson_type, state.response, true, false));
-      } catch (e, s) {
-        print(e);
-        print(s);
-        emit(LoadedUserCourseState(state.sections, state.progress, state.current_lesson_id, state.lesson_type, state.response, false, false));
+
+          course.lessons = await _lessonsRepository.getAllLessons(int.parse(event.userCourseScreenArgs.course_id!), iDs);
+
+          await cacheManager.writeToCache(course).then((value) => emit(LoadedUserCourseState(
+                state.sections,
+                state.progress,
+                state.current_lesson_id,
+                state.lesson_type,
+                state.response,
+                true,
+                false,
+              )));
+        } catch (e, s) {
+          print(e);
+          print(s);
+          emit(LoadedUserCourseState(
+            state.sections,
+            state.progress,
+            state.current_lesson_id,
+            state.lesson_type,
+            state.response,
+            false,
+            false,
+          ));
+        }
       }
-    }
-    return mapCacheCourseEventToState(event);
+    });
   }
+
 }

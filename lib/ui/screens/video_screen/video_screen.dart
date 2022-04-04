@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/bloc/video/bloc.dart';
@@ -50,10 +51,30 @@ class _VideoScreenState extends State<_VideoScreenWidget> {
   bool video = false;
   bool videoPlayed = false;
   bool videoLoaded = false;
+  bool isYoutube = false;
+
+  //Enable orientation
+  void _enableRotation() {
+    if(isYoutube) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
+    }else {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
+    }
+
+  }
 
   @override
   initState() {
     super.initState();
+    _enableRotation();
     _bloc = BlocProvider.of<VideoBloc>(context)..add(FetchEvent(widget.title, widget.videoLink));
 
     ///Function for check format video and play youtube/vimeo
@@ -71,6 +92,9 @@ class _VideoScreenState extends State<_VideoScreenWidget> {
           });
         });
     } else if (video == false && !widget.videoLink.toString().contains('vimeo')) {
+      setState(() {
+        isYoutube = true;
+      });
       String? videoId = YoutubePlayer.convertUrlToId(widget.videoLink);
       if (videoId != "") {
         _youtubePlayerController = YoutubePlayerController(
@@ -81,14 +105,14 @@ class _VideoScreenState extends State<_VideoScreenWidget> {
         );
       }
     } else if (video == false && widget.videoLink.toString().contains('vimeo')) {
-      var convertedVimeoCode = widget.videoLink.toString().replaceAll(new RegExp(r'[^0-9]'),'');
-      vimeoPlayer = SizedBox( width: 400,height: 200, child: VimeoPlayer(videoId: convertedVimeoCode));
+      var convertedVimeoCode = widget.videoLink.toString().replaceAll(new RegExp(r'[^0-9]'), '');
+      vimeoPlayer = VimeoPlayer(videoId: convertedVimeoCode);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    log(widget.videoLink.toString().replaceAll(new RegExp(r'[^0-9]'),'').toString());
+    print(MediaQuery.of(context).size.height * (10 / 100));
     return BlocBuilder<VideoBloc, VideoState>(
       bloc: _bloc,
       builder: (context, state) {
@@ -112,8 +136,12 @@ class _VideoScreenState extends State<_VideoScreenWidget> {
                   width: 42,
                   height: 30,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       Navigator.of(context).pop(true);
+                      await SystemChrome.setPreferredOrientations([
+                        DeviceOrientation.portraitUp,
+                        DeviceOrientation.portraitDown,
+                      ]);
                     },
                     style: ButtonStyle(
                       padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.zero),
@@ -128,24 +156,32 @@ class _VideoScreenState extends State<_VideoScreenWidget> {
               )
             ],
           ),
-          body: Padding(
-            padding: EdgeInsets.all(10.0),
-            child: _buildBody(state),
+          body: SafeArea(
+            child: OrientationBuilder(builder: (context, orientation) {
+              return Padding(
+                padding: EdgeInsets.only(top: 0.0, right: 20, bottom: 10, left: 20),
+                child: _buildBody(state, orientation),
+              );
+            }),
           ),
         );
       },
     );
   }
 
-  _buildBody(state) {
+  _buildBody(state, orientation) {
     if (state is LoadedVideoState) {
-      return SingleChildScrollView(
+      return isYoutube ? SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            loadPlayer(),
-          ],
+          children: <Widget>[loadPlayer(orientation)],
+        ),
+      ) : SizedBox(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[loadPlayer(orientation)],
         ),
       );
     }
@@ -157,7 +193,7 @@ class _VideoScreenState extends State<_VideoScreenWidget> {
     }
   }
 
-  loadPlayer() {
+  loadPlayer(orientation) {
     if (video) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -204,7 +240,13 @@ class _VideoScreenState extends State<_VideoScreenWidget> {
         ],
       );
     } else if (widget.videoLink.toString().contains('vimeo')) {
-      return vimeoPlayer!;
+      return orientation == Orientation.portrait
+          ? SizedBox(
+              width: 400,
+              height: 200,
+              child: vimeoPlayer!,
+            )
+          : SizedBox(width: double.infinity, height: MediaQuery.of(context).size.height * (75 / 100), child: vimeoPlayer!);
     } else {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,

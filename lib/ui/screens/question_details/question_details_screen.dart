@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
@@ -10,6 +11,8 @@ import 'package:masterstudy_app/data/models/QuestionsResponse.dart';
 import 'package:masterstudy_app/main.dart';
 import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/bloc/question_details/bloc.dart';
+
+import '../../../data/utils.dart';
 
 class QuestionDetailsScreenArgs {
   final QuestionBean questionBean;
@@ -50,6 +53,35 @@ class QuestionDetailsWidgetState extends State<QuestionDetailsWidget> {
   List<QuestionAddBean> newReply = [];
   late List<ReplyBean?> aList;
 
+  bool sendRequest = false;
+  bool isLoading = false;
+  final interval = const Duration(seconds: 1);
+
+  final int timerMaxSeconds = 20;
+
+  int currentSeconds = 0;
+
+  String get timerText => '${((timerMaxSeconds - currentSeconds) ~/ 60).toString().padLeft(2, '0')}: ${((timerMaxSeconds - currentSeconds) % 60).toString().padLeft(2, '0')}';
+
+  startTimeout() {
+    var duration = interval;
+    timer = Timer.periodic(duration, (timer) {
+      setState(() {
+        sendRequest = true;
+      });
+      setState(() {
+        currentSeconds = timer.tick;
+        if (timer.tick >= timerMaxSeconds) timer.cancel();
+      });
+
+      if (timer.tick == 20) {
+        setState(() {
+          sendRequest = false;
+        });
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -65,34 +97,45 @@ class QuestionDetailsWidgetState extends State<QuestionDetailsWidget> {
         if (state is ReplyAddedState) {
           setState(() {
             this.newReply.insert(0, state.questionAddResponse.comment!);
+            isLoading = false;
+            sendRequest = true;
           });
+
+          startTimeout();
         }
       },
       child: BlocBuilder<QuestionDetailsBloc, QuestionDetailsState>(builder: (context, state) {
         return Scaffold(
-            appBar: AppBar(
-              backgroundColor: HexColor.fromHex("#273044"),
-              title: Text(
-                localizations.getLocalization("question_ask_screen_title"),
-                textScaleFactor: 1.0,
-                style: TextStyle(color: Colors.white, fontSize: 16.0),
+          appBar: AppBar(
+            backgroundColor: HexColor.fromHex("#273044"),
+            title: Text(
+              localizations!.getLocalization("question_ask_screen_title"),
+              textScaleFactor: 1.0,
+              style: TextStyle(color: Colors.white, fontSize: 16.0),
+            ),
+          ),
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.only(top: 30.0, left: 20.0, right: 20.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  _buildBodyHead(state),
+                  _buildAddedReply(),
+                  Padding(padding: EdgeInsets.only(top: 0), child: (widget.questionBean.replies.length != 0) ? _buildList(aList) : Center()),
+                ],
               ),
             ),
-            body: SingleChildScrollView(
-                child: Padding(
-                    padding: EdgeInsets.only(top: 30.0, left: 20.0, right: 20.0),
-                    child: Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-                      _buildBodyHead(state),
-                      _buildAddedReply(),
-                      Padding(padding: EdgeInsets.only(top: 0), child: (widget.questionBean.replies.length != 0) ? _buildList(aList) : Center()),
-                    ]))));
+          ),
+        );
       }),
     );
   }
 
   _buildBodyHead(QuestionDetailsState state) {
     var enableInputs = !(state is ReplyAddingState);
-
+    FocusNode myFocusNode = new FocusNode();
     if (state is InitialQuestionDetailsState)
       return Center(
         child: CircularProgressIndicator(),
@@ -158,35 +201,63 @@ class QuestionDetailsWidgetState extends State<QuestionDetailsWidget> {
                 maxLines: 2,
                 enabled: enableInputs,
                 textAlignVertical: TextAlignVertical.top,
+                cursorColor: mainColor!,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: localizations.getLocalization("enter_your_answer"),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: mainColor!),
+                  ),
+                  labelStyle: TextStyle(color: myFocusNode.hasFocus ? mainColor : Colors.black),
+                  labelText: localizations!.getLocalization("enter_your_answer"),
                   alignLabelWithHint: true,
                 ),
               )),
           Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 40.0),
-            child: new MaterialButton(
-              minWidth: double.infinity,
-              color: mainColor,
-              onPressed: addReply,
-              child: setUpButtonChild(enableInputs),
-              textColor: Colors.white,
+            child: SizedBox(
+              height: 45,
+              width: double.infinity,
+              child: new ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: secondColor,
+                ),
+                onPressed: sendRequest
+                    ? null
+                    : () {
+                        setState(() {
+                          isLoading = true;
+                        });
+                        _bloc.add(QuestionAddEvent(widget.lessonId, _reply.text, int.tryParse(widget.questionBean.comment_ID)!));
+                        _reply.clear();
+                      },
+                child: sendRequest
+                    ? Text(
+                        timerText,
+                        textScaleFactor: 1.0,
+                      )
+                    : isLoading
+                        ? SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation(Colors.white),
+                            ),
+                          )
+                        : Text(
+                            "SUBMIT QUESTION",
+                            textScaleFactor: 1.0,
+                          ),
+              ),
             ),
           )
         ],
       );
   }
 
-  addReply() {
-    _bloc.add(QuestionAddEvent(widget.lessonId, _reply.text, int.tryParse(widget.questionBean.comment_ID)!));
-    _reply.clear();
-  }
-
   Widget setUpButtonChild(enable) {
     if (enable == true) {
       return new Text(
-        localizations.getLocalization("submit_question_answer"),
+        localizations!.getLocalization("submit_question_answer"),
         textScaleFactor: 1.0,
       );
     } else {
@@ -203,12 +274,13 @@ class QuestionDetailsWidgetState extends State<QuestionDetailsWidget> {
   _buildAddedReply() {
     if (this.newReply.length > 0) {
       return ListView.builder(
-          primary: false,
-          shrinkWrap: true,
-          itemCount: newReply.length,
-          itemBuilder: (context, index) {
-            return _buildReply(this.newReply[index]);
-          });
+        primary: false,
+        shrinkWrap: true,
+        itemCount: newReply.length,
+        itemBuilder: (context, index) {
+          return _buildReply(this.newReply[index]);
+        },
+      );
     }
 
     return Center();
@@ -216,12 +288,13 @@ class QuestionDetailsWidgetState extends State<QuestionDetailsWidget> {
 
   _buildList(List<ReplyBean?> replies) {
     return ListView.builder(
-        primary: false,
-        shrinkWrap: true,
-        itemCount: replies.length,
-        itemBuilder: (context, index) {
-          return _buildQuestion(replies[index]!);
-        });
+      primary: false,
+      shrinkWrap: true,
+      itemCount: replies.length,
+      itemBuilder: (context, index) {
+        return _buildQuestion(replies[index]!);
+      },
+    );
   }
 
   _buildQuestion(ReplyBean reply) {
@@ -286,7 +359,8 @@ class QuestionDetailsWidgetState extends State<QuestionDetailsWidget> {
           ),
           Padding(
             padding: EdgeInsets.only(top: 10.0),
-            child: Html(data: reply.content, style: {'body': Style(fontSize: FontSize(14.0), color: HexColor.fromHex("#273044"))}),
+            // child: Html(data: reply.content, style: {'body': Style(fontSize: FontSize(14.0), color: HexColor.fromHex("#273044"))}),
+            child: Text(reply.content, style: TextStyle(fontSize: 14.0, color: HexColor.fromHex("#273044"))),
           ),
         ],
       ),
@@ -360,5 +434,11 @@ class QuestionDetailsWidgetState extends State<QuestionDetailsWidget> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
   }
 }

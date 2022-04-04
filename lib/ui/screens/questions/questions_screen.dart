@@ -1,10 +1,14 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:masterstudy_app/data/models/QuestionAddResponse.dart';
 import 'package:masterstudy_app/data/models/QuestionsResponse.dart';
 import 'package:masterstudy_app/main.dart';
 import 'package:masterstudy_app/theme/theme.dart';
@@ -12,6 +16,8 @@ import 'package:masterstudy_app/ui/bloc/questions/bloc.dart';
 import 'package:masterstudy_app/ui/screens/question_ask/question_ask_screen.dart';
 import 'package:masterstudy_app/ui/screens/question_details/question_details_screen.dart';
 import 'package:masterstudy_app/ui/screens/detail_profile/detail_profile_screen.dart';
+
+import '../../../data/utils.dart';
 
 class QuestionsScreenArgs {
   final int lessonId;
@@ -48,12 +54,47 @@ class QuestionsWidgetState extends State<QuestionsWidget> {
   late QuestionsResponse questionsAll;
   late QuestionsResponse questionsMy;
   TextEditingController reply = TextEditingController();
-  bool sendRequest = false;
+  List<TextEditingController> _controllers = [];
+
+
+  final interval = const Duration(seconds: 1);
+
+  final int timerMaxSeconds = 20;
+
+  int currentSeconds = 0;
+
+  String get timerText => '${((timerMaxSeconds - currentSeconds) ~/ 60).toString().padLeft(2, '0')}: ${((timerMaxSeconds - currentSeconds) % 60).toString().padLeft(2, '0')}';
+
+  bool isLoadingTimer = false;
+  bool isLoadingButton = false;
+
+  startTimeout() {
+    var duration = interval;
+    timer = Timer.periodic(duration, (timer) {
+      setState(() {
+        isLoadingButton = true;
+        isLoadingTimer = true;
+      });
+
+      setState(() {
+        currentSeconds = timer.tick;
+        if (timer.tick >= timerMaxSeconds) timer.cancel();
+      });
+
+      if (timer.tick == 20) {
+        setState(() {
+          isLoadingButton = false;
+          isLoadingTimer = false;
+        });
+      }
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    _bloc = BlocProvider.of<QuestionsBloc>(context)..add(FetchEvent(widget.lessonId, widget.page, "", ""));
+    _bloc = BlocProvider.of<QuestionsBloc>(context);
+    _bloc.add(FetchEvent(widget.lessonId, widget.page, "", ""));
   }
 
   @override
@@ -61,11 +102,15 @@ class QuestionsWidgetState extends State<QuestionsWidget> {
     return BlocListener(
         bloc: _bloc,
         listener: (context, state) {
-          if (state is LoadedMyQuestionsState) {
+          if (state is LoadedQuestionsState) {
             setState(() {
               questionsAll = state.questionsResponseAll;
               questionsMy = state.questionsResponseMy;
             });
+          }
+
+          if (state is TimerStartState) {
+            startTimeout();
           }
         },
         child: BlocBuilder<QuestionsBloc, QuestionsState>(
@@ -73,26 +118,33 @@ class QuestionsWidgetState extends State<QuestionsWidget> {
             return DefaultTabController(
               length: 2,
               child: Scaffold(
+                resizeToAvoidBottomInset: false,
                 appBar: AppBar(
                   backgroundColor: HexColor.fromHex("#273044"),
                   title: Text(
-                    localizations.getLocalization("question_ask_screen_title"),
+                    localizations!.getLocalization("question_ask_screen_title"),
                     textScaleFactor: 1.0,
                     style: TextStyle(color: Colors.white, fontSize: 16.0),
                   ),
                   bottom: ColoredTabBar(
-                      Colors.white,
-                      TabBar(
-                        indicatorColor: mainColorA,
-                        tabs: [
-                          Tab(
-                            text: localizations.getLocalization("all_questions"),
-                          ),
-                          Tab(text: localizations.getLocalization("my_questions")),
-                        ],
-                      )),
+                    Colors.white,
+                    TabBar(
+                      indicatorColor: mainColorA,
+                      tabs: [
+                        Tab(
+                          text: localizations!.getLocalization("all_questions"),
+                        ),
+                        Tab(text: localizations!.getLocalization("my_questions")),
+                      ],
+                    ),
+                  ),
                 ),
-                body: _buildBody(state),
+                body: GestureDetector(
+                  child: _buildBody(state),
+                  onTap: () {
+                    FocusScope.of(context).unfocus();
+                  },
+                ),
                 bottomNavigationBar: _buildBottom(state),
               ),
             );
@@ -100,7 +152,7 @@ class QuestionsWidgetState extends State<QuestionsWidget> {
         ));
   }
 
-  ///Body
+  //Body
   _buildBody(QuestionsState state) {
     if (state is InitialQuestionsState)
       return Center(
@@ -114,187 +166,205 @@ class QuestionsWidgetState extends State<QuestionsWidget> {
       return TabBarView(
         children: <Widget>[
           //All questions
-          SingleChildScrollView(
-              child: (questionsAll.posts.length != 0)
-                  ? Column(
+          questionsAll.posts.length != 0
+              ? ListView.builder(
+                  shrinkWrap: true,
+                  primary: false,
+                  itemCount: questionsAll.posts.length,
+                  itemBuilder: (BuildContext ctx, int index) {
+                    return Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.only(top: 20.0, right: 7.0, left: 7.0),
-                          child: _buildList(questionsAll.posts),
-                        ),
+                        Padding(padding: EdgeInsets.only(top: 30.0, right: 27.0, left: 27.0, bottom: 10), child: _buildQuestion(questionsAll.posts[index])),
                       ],
-                    )
-                  : Center(
-                      child: Padding(
-                      padding: EdgeInsets.only(top: 30.0),
-                      child: Text(
-                        localizations.getLocalization("no_questions"),
-                        textScaleFactor: 1.0,
-                      ),
-                    ))),
+                    );
+                  },
+                )
+              : Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 30.0),
+                    child: Text(
+                      localizations!.getLocalization("no_questions"),
+                      textScaleFactor: 1.0,
+                    ),
+                  ),
+                ),
           //My questions
-          SingleChildScrollView(
-              child: (questionsMy.posts.length != 0)
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.only(top: 20.0, right: 7.0, left: 7.0),
-                          child: _buildMyList(questionsMy.posts),
-                        ),
-                      ],
-                    )
-                  : Center(
-                      child: Padding(
-                      padding: EdgeInsets.only(top: 30.0),
-                      child: Text(
-                        localizations.getLocalization("no_questions"),
-                        textScaleFactor: 1.0,
-                      ),
-                    ))),
+          questionsMy.posts.length != 0
+              ? ListView.builder(
+                  shrinkWrap: true,
+                  primary: false,
+                  itemCount: questionsMy.posts.length,
+                  itemBuilder: (BuildContext ctx, int index) {
+                    _controllers.add(new TextEditingController());
+                    return Padding(
+                      padding: EdgeInsets.only(top: 30.0, right: 27.0, left: 27.0, bottom: 10),
+                      child: _buildMyQuestion(questionsMy.posts[index]!, _controllers[index]),
+                    );
+                  },
+                )
+              : Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 30.0),
+                    child: Text(
+                      localizations!.getLocalization("no_questions"),
+                      textScaleFactor: 1.0,
+                    ),
+                  ),
+                ),
         ],
       );
     }
   }
 
-  _buildList(List<QuestionBean?> questions) {
-    return ListView.builder(
-      primary: false,
-      shrinkWrap: true,
-      itemCount: questions.length,
-      itemBuilder: (context, index) {
-        return _buildQuestion(questions[index]);
-      },
-    );
-  }
-
-  _buildMyList(List<QuestionBean?> questions) {
-    return ListView.builder(
-        primary: false,
-        shrinkWrap: true,
-        itemCount: questions.length,
-        itemBuilder: (context, index) {
-          return _buildMyQuestion(questions[index]!);
-        });
-  }
-
+  //AllQuestion
   _buildQuestion(QuestionBean? question) {
-    return Padding(
-      padding: EdgeInsets.only(top: 10.0, bottom: 10.0, left: 20.0, right: 20.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
-        children: <Widget>[
-          GestureDetector(
-            onTap: () {
-              Navigator.of(context).pushNamed(
-                QuestionDetailsScreen.routeName,
-                arguments: QuestionDetailsScreenArgs(widget.lessonId, question!),
-              );
-            },
-            child: Html(data: question?.content, style: {'body': Style(fontSize: FontSize(17.0), fontWeight: FontWeight.w700, color: HexColor.fromHex("#273044"))}),
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 10.0, bottom: 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: SvgPicture.asset(
-                      (question?.replies.length == 0) ? "assets/icons/reply_no.svg" : "assets/icons/reply_has.svg",
-                      color: (question?.replies.length == 0) ? HexColor.fromHex("#AAAAAA") : secondColor,
-                    )),
-                Padding(
-                  padding: EdgeInsets.only(left: 10.0),
-                  child: Text(
-                    question!.replies_count!,
-                    textScaleFactor: 1.0,
-                    style: TextStyle(fontSize: 15.0, color: (question.replies.length == 0) ? HexColor.fromHex("#AAAAAA") : secondColor),
-                  ),
-                )
-              ],
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 20.0),
-            child: Container(
-                height: 1.0,
-                decoration: BoxDecoration(
-                  color: HexColor.fromHex("#E2E5EB"),
-                )),
-          )
-        ],
-      ),
-    );
-  }
-
-  _buildMyQuestion(QuestionBean question) {
-    return Padding(
-      padding: EdgeInsets.only(top: 10.0, bottom: 10.0, left: 20.0, right: 20.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
-        children: <Widget>[
-          Column(
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.max,
+      children: <Widget>[
+        GestureDetector(
+          onTap: () {
+            Navigator.of(context).pushNamed(
+              QuestionDetailsScreen.routeName,
+              arguments: QuestionDetailsScreenArgs(widget.lessonId, question!),
+            );
+          },
+          // child: Html(data: question?.content, style: {'body': Style(fontSize: FontSize(17.0), fontWeight: FontWeight.w700, color: HexColor.fromHex("#273044"))}),
+          child: Text(question!.content, style: TextStyle(fontSize: 17.0, fontWeight: FontWeight.w700, color: HexColor.fromHex("#273044"))),
+        ),
+        Padding(
+          padding: EdgeInsets.only(top: 10.0, bottom: 0),
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(bottom: 10.0),
-                child: Html(data: question.content, style: {'body': Style(fontSize: FontSize(17.0), fontWeight: FontWeight.w700, color: HexColor.fromHex("#273044"))}),
-              ),
-              Text(question.datetime, textScaleFactor: 1.0, style: TextStyle(color: HexColor.fromHex("#AAAAAA"))),
-              Padding(
-                  padding: EdgeInsets.only(top: 20.0, bottom: 40.0),
-                  child: TextFormField(
-                    textInputAction: TextInputAction.done,
-                    maxLines: 2,
-                    textAlignVertical: TextAlignVertical.top,
-                    onFieldSubmitted: (text) {
-                      _bloc.add(MyQuestionAddEvent(questionsAll, widget.lessonId, text, int.tryParse(question.comment_ID)!));
-                    },
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: "Enter your answer",
-                      alignLabelWithHint: true,
-                    ),
+              SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: SvgPicture.asset(
+                    (question.replies.length == 0) ? "assets/icons/reply_no.svg" : "assets/icons/reply_has.svg",
+                    color: (question.replies.length == 0) ? HexColor.fromHex("#AAAAAA") : secondColor,
                   )),
-              _buildMyAnswerList(question.replies)
+              Padding(
+                padding: EdgeInsets.only(left: 10.0),
+                child: Text(
+                  question.replies_count!,
+                  textScaleFactor: 1.0,
+                  style: TextStyle(fontSize: 15.0, color: (question.replies.length == 0) ? HexColor.fromHex("#AAAAAA") : secondColor),
+                ),
+              )
             ],
           ),
-          Padding(
-            padding: EdgeInsets.only(top: 20.0),
-            child: Container(
-                height: 1.0,
-                decoration: BoxDecoration(
-                  color: HexColor.fromHex("#E2E5EB"),
-                )),
-          )
-        ],
-      ),
+        ),
+        Padding(
+          padding: EdgeInsets.only(top: 20.0),
+          child: Container(
+              height: 1.0,
+              decoration: BoxDecoration(
+                color: HexColor.fromHex("#E2E5EB"),
+              )),
+        )
+      ],
     );
   }
 
-  _buildMyAnswerList(List<ReplyBean?> replies) {
-    return (replies.length > 0)
-        ? ListView.builder(
-            primary: false,
-            shrinkWrap: true,
-            itemCount: replies.length,
-            itemBuilder: (context, index) {
-              return _buildMyAnswer(replies[index]!);
-            })
-        : Center();
+  //MyQuestion
+  _buildMyQuestion(QuestionBean question, TextEditingController controller) {
+    FocusNode myFocusNode = new FocusNode();
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.max,
+      children: <Widget>[
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            //Question
+            Padding(
+              padding: EdgeInsets.only(bottom: 10.0),
+              // child: Html(data: question.content, style: {'body': Style(fontSize: FontSize(17.0), fontWeight: FontWeight.w700, color: HexColor.fromHex("#273044"))}),
+              child: Text(question.content, style: TextStyle(fontSize: 17.0, fontWeight: FontWeight.w700, color: HexColor.fromHex("#273044"))),
+            ),
+            //Time
+            Text(question.datetime, textScaleFactor: 1.0, style: TextStyle(color: HexColor.fromHex("#AAAAAA"))),
+            //Enter your answer
+            Padding(
+                padding: EdgeInsets.only(top: 20.0, bottom: 40.0),
+                child: TextFormField(
+                  textInputAction: TextInputAction.done,
+                  maxLines: 2,
+                  controller: controller,
+                  cursorColor: mainColor,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: "Enter your answer",
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: mainColor!),
+                    ),
+                    labelStyle: TextStyle(color: myFocusNode.hasFocus ? mainColor : Colors.black),
+                  ),
+                )),
+            SizedBox(
+              height: 45,
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(primary: secondColor),
+                onPressed: isLoadingButton
+                    ? null
+                    : () {
+                        if (controller.text != '') {
+                          setState(() {
+                            isLoadingButton = true;
+                          });
+
+                          _bloc.add(
+                            MyQuestionAddEvent(questionsAll, widget.lessonId, controller.text, int.tryParse(question.comment_ID)!),
+                          );
+                          controller.clear();
+                        }
+                      },
+                child: isLoadingTimer
+                    ? Text(
+                        timerText,
+                        textScaleFactor: 1.0,
+                      )
+                    : isLoadingButton
+                        ? SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation(Colors.white),
+                            ),
+                          )
+                        : Text(
+                            "SUBMIT",
+                            textScaleFactor: 1.0,
+                          ),
+              ),
+            ),
+            //MyAnswerList
+            for (var el in question.replies) _buildMyAnswer(el!),
+            // _buildMyAnswer(question.replies)
+          ],
+        ),
+        // Custom Divider
+        Padding(
+          padding: EdgeInsets.only(top: 20.0),
+          child: Container(
+              height: 1.0,
+              decoration: BoxDecoration(
+                color: HexColor.fromHex("#E2E5EB"),
+              )),
+        )
+      ],
+    );
   }
 
+  //MyAnswer
   _buildMyAnswer(ReplyBean reply) {
     return Padding(
       padding: EdgeInsets.only(top: 10.0, bottom: 30.0),
@@ -442,5 +512,11 @@ class QuestionsWidgetState extends State<QuestionsWidget> {
 
   _refreshState() {
     _bloc.add(FetchEvent(widget.lessonId, widget.page, "", ""));
+  }
+
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
   }
 }

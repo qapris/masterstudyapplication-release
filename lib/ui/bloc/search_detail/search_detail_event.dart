@@ -5,6 +5,7 @@ abstract class SearchDetailEvent {}
 
 class FetchEvent extends SearchDetailEvent {
   final String query;
+  final dynamic categoryId;
 
-  FetchEvent(this.query);
+  FetchEvent(this.query,this.categoryId);
 }

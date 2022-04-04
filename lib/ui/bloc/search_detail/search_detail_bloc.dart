@@ -26,7 +26,7 @@ class SearchDetailBloc extends Bloc<SearchDetailEvent, SearchDetailState> {
         try {
           emit(LoadingSearchDetailState());
 
-          CourcesResponse response = await _coursesRepository.getCourses(searchQuery: event.query);
+          CourcesResponse response = await _coursesRepository.getCourses(searchQuery: event.query,categoryId: event.categoryId);
 
           emit(LoadedSearchDetailState(response.courses));
         } catch (error, stacktrace) {

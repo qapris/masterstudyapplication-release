@@ -1,8 +1,14 @@
+import 'dart:async';
+import 'dart:collection';
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:html_unescape/html_unescape.dart';
@@ -35,21 +41,55 @@ class _CoursesWidget extends StatefulWidget {
 
 class _CoursesWidgetState extends State<_CoursesWidget> {
   late UserCoursesBloc _bloc;
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+  ConnectivityResult _connectionStatus = ConnectivityResult.none;
+  final Connectivity _connectivity = Connectivity();
 
   @override
   void initState() {
     super.initState();
+    initConnectivity();
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
     _bloc = BlocProvider.of<UserCoursesBloc>(context)..add(FetchEvent());
+    updateCompletedLesson();
+  }
+
+  void updateCompletedLesson() async {
+    ///Lessons Offline Mode
+    final myList = recordMap;
+    final jsonList = myList.map((item) => jsonEncode(item)).toList();
+    final uniqueJsonList = jsonList.toSet().toList();
+    final result = uniqueJsonList.map((item) => jsonDecode(item)).toList();
+
+    ///Lessons Offline Mode
+
+    if (_connectionStatus == ConnectivityResult.wifi || _connectionStatus == ConnectivityResult.mobile) {
+      try {
+        for (var el in result) {
+          Response response = await dio.put(
+            apiEndpoint + "course/lesson/complete",
+            data: {"course_id": el['course_id'], "item_id": el['lesson_id']},
+            options: Options(
+              headers: {"requirestoken": "true"},
+            ),
+          );
+        }
+      } catch (e) {
+        log(e.toString());
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    updateCompletedLesson();
     return Scaffold(
         backgroundColor: HexColor.fromHex("#F3F5F9"),
         appBar: AppBar(
           centerTitle: true,
+          backgroundColor: mainColor,
           title: Text(
-            localizations.getLocalization("user_courses_screen_title"),
+            localizations!.getLocalization("user_courses_screen_title"),
             textScaleFactor: 1.0,
             style: TextStyle(color: Colors.white, fontSize: 18),
           ),
@@ -58,6 +98,12 @@ class _CoursesWidgetState extends State<_CoursesWidget> {
           bloc: _bloc,
           // ignore: missing_return
           builder: (context, state) {
+            if (state is EmptyCacheCoursesState) {
+              return Center(
+                child: Text('You haven"t loaded courses'),
+              );
+            }
+
             if (state is LoadedCoursesState) return _buildList(state.courses);
 
             if (state is ErrorUserCoursesState)
@@ -93,7 +139,7 @@ class _CoursesWidgetState extends State<_CoursesWidget> {
             ),
           ),
           Text(
-            localizations.getLocalization("no_user_courses_screen_title"),
+            localizations!.getLocalization("no_user_courses_screen_title"),
             textScaleFactor: 1.0,
             style: TextStyle(color: HexColor.fromHex("#D7DAE2"), fontSize: 18),
           ),
@@ -108,7 +154,7 @@ class _CoursesWidgetState extends State<_CoursesWidget> {
                   this.widget.addCoursesCallback();
                 },
                 child: Text(
-                  localizations.getLocalization("add_courses_button"),
+                  localizations!.getLocalization("add_courses_button"),
                   textScaleFactor: 1.0,
                 ),
                 textColor: Colors.white,
@@ -129,6 +175,34 @@ class _CoursesWidgetState extends State<_CoursesWidget> {
       },
     );
   }
+
+  @override
+  void dispose() {
+    _connectivitySubscription.cancel();
+    super.dispose();
+  }
+
+  Future<void> initConnectivity() async {
+    late ConnectivityResult result;
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException catch (e) {
+      log(e.toString());
+      return;
+    }
+
+    if (!mounted) {
+      return Future.value(null);
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    setState(() {
+      _connectionStatus = result;
+    });
+  }
 }
 
 class _CourseWidget extends StatelessWidget {
@@ -146,12 +220,14 @@ class _CourseWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ///From list delete same id
+
     var unescape = new HtmlUnescape();
     double imgHeight = (MediaQuery.of(context).size.width > 450) ? 370.0 : 160.0;
 
     ///Function for set category
     String category = "";
-    if (postsBean.categories_object != null && postsBean.categories_object.isNotEmpty) {
+    if (postsBean.categories_object.isNotEmpty) {
       if (postsBean.categories_object.first?.name != null) {
         category = postsBean.categories_object.first!.name;
       }
@@ -278,7 +354,7 @@ class _CourseWidget extends StatelessWidget {
                         _openCourse(context);
                       },
                       child: Text(
-                        localizations.getLocalization("continue_button"),
+                        localizations!.getLocalization("continue_button"),
                         textScaleFactor: 1.0,
                       ),
                       textColor: Colors.white,

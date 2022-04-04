@@ -13,6 +13,7 @@ class CacheManager {
   Future writeToCache(CachedCourse course) async {
     cache = await _readCache();
     debugPrint("writing to cache ...");
+
     if (cache.isEmpty) {
       debugPrint("cache is empty");
       debugPrint("writing course");
@@ -20,7 +21,7 @@ class CacheManager {
       var courseToCache = new CachedCourses(courses: [course].toList());
       cache = jsonEncode(courseToCache.toJson());
       debugPrint("cache after :$cache");
-      debugPrint("cource writed");
+      debugPrint("course writed");
     } else {
       debugPrint("writing course");
       CachedCourses currentCache = CachedCourses.fromJson(json.decode(cache));
@@ -28,6 +29,7 @@ class CacheManager {
       currentCache.courses.add(course);
       cache = jsonEncode(currentCache.toJson());
     }
+
     _writeCache(cache);
   }
 

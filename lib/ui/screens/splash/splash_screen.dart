@@ -1,7 +1,13 @@
+import 'dart:developer';
+import 'dart:io';
+import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/models/AppSettings.dart';
 import 'package:masterstudy_app/main.dart';
@@ -9,6 +15,7 @@ import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/bloc/splash/bloc.dart';
 import 'package:masterstudy_app/ui/screens/auth/auth_screen.dart';
 import 'package:masterstudy_app/ui/widgets/loading_error_widget.dart';
+import 'package:path_provider/path_provider.dart';
 import '../../../data/utils.dart';
 import '../../screenS/main_screens.dart';
 
@@ -36,8 +43,81 @@ class SplashWidget extends StatefulWidget {
 }
 
 class SplashWidgetState extends State<SplashWidget> {
+  File? newImage;
+
+  Future getAppSettingColor() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+
+    ///If user connect to mobile or wifi
+    if (connectivityResult == ConnectivityResult.wifi || connectivityResult == ConnectivityResult.mobile) {
+      Response response = await dio.get('$apiEndpoint' + 'app_settings');
+      if (response.statusCode == 200) {
+        try {
+          var mainColorItem = response.data['options']['main_color'];
+          var secondColorItem = response.data['options']['secondary_color'];
+
+          if (mainColorItem != null) {
+            mainColor = Color.fromRGBO(
+              mainColorItem['r'],
+              mainColorItem['g'],
+              mainColorItem['b'],
+              double.parse(mainColorItem['a'].toString()),
+            );
+          } else {
+            mainColor = blue_blue;
+          }
+
+          if (secondColorItem != null) {
+            secondColor = Color.fromRGBO(
+              secondColorItem['r'],
+              secondColorItem['g'],
+              secondColorItem['b'],
+              double.parse(secondColorItem['a'].toString()),
+            );
+          } else {
+            secondColor = seaweed;
+          }
+
+          mainColorA = Color.fromRGBO(
+            mainColorItem['r'],
+            mainColorItem['g'],
+            mainColorItem['b'],
+            0.999,
+          );
+        } catch (e) {
+          mainColor = blue_blue;
+          mainColorA = blue_blue_a;
+          secondColor = seaweed;
+        }
+      }
+    } else {
+      try {
+        final mcr = preferences.getInt("main_color_r");
+        final mcg = preferences.getInt("main_color_g");
+        final mcb = preferences.getInt("main_color_b");
+        final mca = preferences.getDouble("main_color_a");
+
+        final scr = preferences.getInt("second_color_r");
+        final scg = preferences.getInt("second_color_g");
+        final scb = preferences.getInt("second_color_b");
+        final sca = preferences.getDouble("second_color_a");
+
+        mainColor = Color.fromRGBO(mcr, mcg, mcb, mca);
+        mainColorA = Color.fromRGBO(mcr, mcg, mcb, 0.999);
+        secondColor = Color.fromRGBO(scr, scg, scb, sca);
+      } catch (e) {
+        mainColor = blue_blue;
+        mainColorA = blue_blue_a;
+        secondColor = seaweed;
+      }
+    }
+    return true;
+  }
+
   @override
   void initState() {
+    //GetAppColor
+    getAppSettingColor();
     //SplashBloc
     BlocProvider.of<SplashBloc>(context).add(CheckAuthSplashEvent());
     super.initState();
@@ -61,60 +141,107 @@ class SplashWidgetState extends State<SplashWidget> {
       );
 
     if (state is CloseSplash) {
-      if (state.isSigned) {
-        if (state.appSettings != null) {
-          openMainPage(state.appSettings.options!);
-        } else {
-          openMainPage;
-        }
-      } else {
-        if (state.appSettings != null) {
-          openAuthPage(state.appSettings.options!);
-        } else {
-          openAuthPage(null);
-        }
-      }
       String imgUrl = "";
       String postsCount = "";
       appLogoUrl = imgUrl;
 
-      if (state.appSettings != null) {
-        imgUrl = state.appSettings.options?.logo == null ? "" : state.appSettings.options!.logo;
-        if (state.appSettings.demo != null) {
-          demoEnabled = state.appSettings.demo;
-        }
-        if (state.appSettings.addons != null) dripContentEnabled = state.appSettings.addons?.sequential_drip_content != null && state.appSettings.addons?.sequential_drip_content == "on";
-        postsCount = state.appSettings.options!.posts_count.toString();
+      ///Cached img to file
+      Future<File> _fileFromImageUrl() async {
+        var url = state.appSettings!.options!.logo;
+        final Response res = await Dio().get<List<int>>(
+          url,
+          options: Options(responseType: ResponseType.bytes),
+        );
+
+        // Get App local storage
+        final Directory appDir = await getApplicationDocumentsDirectory();
+
+        // Generate Image Name
+        final String imageName = url.split('/').last;
+
+        // Create Empty File in app dir & fill with new image
+        newImage = File('${appDir.path}/$imageName');
+
+        newImage!.writeAsBytesSync(res.data as List<int>);
+
+        return newImage!;
       }
 
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          CachedNetworkImage(
-            imageUrl: imgUrl,
-            placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-            errorWidget: (context, url, error) => SizedBox(width: 83.0, child: Image(image: AssetImage('assets/icons/logo.png'))),
-            width: 83.0,
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 20.0, bottom: 5.0),
-            child: Text(
-              postsCount,
-              textScaleFactor: 1.0,
-              style: TextStyle(color: mainColor, fontSize: 40.0),
+      if (state.isSigned) {
+        if (state.appSettings != null) {
+          openMainPage(state.appSettings!.options!);
+        } else {
+          log('2'.toString());
+          openMainPage(state.appSettings!.options);
+        }
+      } else {
+        if (state.appSettings != null) {
+          openAuthPage(state.appSettings!.options!);
+        } else {
+          openAuthPage(null);
+        }
+      }
+
+      if (state.appSettings != null) {
+        ///Logo
+        if (state.appSettings!.options!.logo != null) {
+          _fileFromImageUrl();
+          imgUrl = state.appSettings!.options?.logo == null ? "" : state.appSettings!.options!.logo;
+          appLogoUrl = state.appSettings!.options?.logo == null ? "" : state.appSettings!.options!.logo;
+        }
+
+        ///Demo
+        if (state.appSettings!.demo != null) {
+          demoEnabled = state.appSettings!.demo;
+        }
+
+        ///Addons about count course
+        if (state.appSettings!.addons != null) dripContentEnabled = state.appSettings!.addons?.sequential_drip_content != null && state.appSettings!.addons?.sequential_drip_content == "on";
+        postsCount = state.appSettings!.options!.posts_count.toString();
+
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            imgUrl.contains('svg')
+                ? SvgPicture.network(imgUrl)
+                : CachedNetworkImage(
+                    imageUrl: imgUrl,
+                    placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) {
+                      if (newImage.toString().contains('svg')) {
+                        SizedBox(width: 83.0, child: SvgPicture.asset(newImage.toString()));
+                      } else if (!newImage.toString().contains('svg')) {
+                        SizedBox(width: 83.0, child: Image.file(File(newImage.toString())));
+                      }
+                      return SizedBox(
+                        width: 83.0,
+                        child: Image.asset('assets/icons/logo.png'),
+                      );
+                    },
+                    width: 83.0,
+                  ),
+            //Count course
+            Padding(
+              padding: EdgeInsets.only(top: 20.0, bottom: 5.0),
+              child: Text(
+                postsCount,
+                textScaleFactor: 1.0,
+                style: TextStyle(color: mainColor, fontSize: 40.0),
+              ),
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(bottom: 0),
-            child: Text(
-              (postsCount != "") ? "COURSES" : "",
-              textScaleFactor: 1.0,
-              style: TextStyle(color: HexColor.fromHex("#000000"), fontSize: 14.0, fontWeight: FontWeight.w500),
+            //Text "Course"
+            Padding(
+              padding: EdgeInsets.only(bottom: 0),
+              child: Text(
+                (postsCount != "") ? "COURSES" : "",
+                textScaleFactor: 1.0,
+                style: TextStyle(color: HexColor.fromHex("#000000"), fontSize: 14.0, fontWeight: FontWeight.w500),
+              ),
             ),
-          ),
-        ],
-      );
+          ],
+        );
+      }
     }
 
     if (state is ErrorSplashState) {
@@ -124,7 +251,6 @@ class SplashWidgetState extends State<SplashWidget> {
     }
   }
 
-
   void openAuthPage(OptionsBean? optionsBean) {
     SchedulerBinding.instance?.addPostFrameCallback((_) {
       Future.delayed(const Duration(milliseconds: 2000), () {
@@ -133,10 +259,10 @@ class SplashWidgetState extends State<SplashWidget> {
     });
   }
 
-  void openMainPage(OptionsBean optionsBean) {
+  void openMainPage(OptionsBean? optionsBean) {
     SchedulerBinding.instance?.addPostFrameCallback((_) {
       Future.delayed(const Duration(milliseconds: 2000), () {
-        Navigator.of(context).pushReplacementNamed(MainScreen.routeName, arguments: MainScreenArgs(optionsBean));
+        Navigator.of(context).pushReplacementNamed(MainScreen.routeName, arguments: MainScreenArgs(optionsBean!));
       });
     });
   }

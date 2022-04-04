@@ -1,6 +1,8 @@
 import 'package:masterstudy_app/data/models/AppSettings.dart';
 import 'package:meta/meta.dart';
 
+import '../../../data/utils.dart';
+
 @immutable
 abstract class SplashState {}
 
@@ -8,10 +10,12 @@ class InitialSplashState extends SplashState {}
 
 class CloseSplash extends SplashState {
   final bool isSigned;
-  final AppSettings appSettings;
+  final AppSettings? appSettings;
 
   CloseSplash(this.isSigned,this.appSettings);
 }
+
+class SplashOfflineState extends SplashState {}
 
 class ErrorSplashState extends SplashState {}
 

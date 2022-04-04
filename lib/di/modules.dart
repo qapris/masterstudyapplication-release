@@ -1,6 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:inject/inject.dart';
+import 'package:masterstudy_app/data/cache/account_local.dart';
+import 'package:masterstudy_app/data/cache/app_settings_local.dart';
 import 'package:masterstudy_app/data/cache/cache_manager.dart';
+import 'package:masterstudy_app/data/cache/course_curriculum_local.dart';
+import 'package:masterstudy_app/data/cache/localization_local.dart';
+import 'package:masterstudy_app/data/cache/progress_course_local.dart';
 import 'package:masterstudy_app/data/network/api_provider.dart';
 import 'package:masterstudy_app/data/network/interceptors/interceptor.dart';
 import 'package:masterstudy_app/data/network/interceptors/loggining_interceptor.dart';
@@ -31,8 +36,8 @@ class AppModule {
   @singleton
   @provide
   HomeRepository homeRepository(UserApiProvider apiProvider,
-      SharedPreferences sharedPreferences) =>
-      new HomeRepositoryImpl(apiProvider, sharedPreferences);
+      SharedPreferences sharedPreferences, AppLocalStorage appLocalStorage, LocalizationLocalStorage localizationLocalStorage) =>
+      new HomeRepositoryImpl(apiProvider, sharedPreferences, appLocalStorage, localizationLocalStorage);
 
   @singleton
   @provide
@@ -89,13 +94,13 @@ class AppModule {
       new AuthBloc(repository);
 
   @provide
-  AccountRepository provideAccountRepository(UserApiProvider apiProvider) =>
-      new AccountRepositoryImpl(apiProvider);
+  AccountRepository provideAccountRepository(UserApiProvider apiProvider, AccountLocalStorage accountLocalStorage) =>
+      new AccountRepositoryImpl(apiProvider, accountLocalStorage);
 
   @provide
   UserCourseRepository provideUserCourseRepository(
-      UserApiProvider apiProvider,CacheManager cacheManager) =>
-      new UserCourseRepositoryImpl(apiProvider,cacheManager);
+      UserApiProvider apiProvider,CacheManager cacheManager, ProgressCoursesLocalStorage progressCoursesLocalStorage, CurriculumLocalStorage curriculumLocalStorage) =>
+      new UserCourseRepositoryImpl(apiProvider,cacheManager, progressCoursesLocalStorage, curriculumLocalStorage);
 
   @provide
   LessonRepository provideLessonRepository(UserApiProvider apiProvider,CacheManager manager) =>
@@ -104,7 +109,7 @@ class AppModule {
   @provide
   SplashBloc provideSplashBloc(AuthRepository repository,
       HomeRepository homeRepository, UserApiProvider apiProvider) =>
-      new SplashBloc(repository, homeRepository, apiProvider);
+      new SplashBloc(repository, homeRepository, apiProvider,);
 
   @provide
   QuizScreenBloc provideQuizScreenBloc(LessonRepository repository) =>

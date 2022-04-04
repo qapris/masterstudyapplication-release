@@ -160,7 +160,7 @@ class DialogAuthorWidget extends StatelessWidget {
                         );
                       },
                       child: Text(
-                        localizations.getLocalization("profile_button"),
+                        localizations!.getLocalization("profile_button"),
                         textScaleFactor: 1.0,
                       )),
                 ),

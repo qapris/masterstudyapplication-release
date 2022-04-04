@@ -5,12 +5,10 @@ part 'InstructorsResponse.g.dart';
 @JsonSerializable()
 class InstructorsResponse {
   num page;
-  final dynamic data;
-
-  /*List<InstructorBean> data;*/
+  List<InstructorBean?> data;
   num total_pages;
 
-  InstructorsResponse({required this.page, this.data, required this.total_pages});
+  InstructorsResponse({required this.page, required this.data, required this.total_pages});
 
   factory InstructorsResponse.fromJson(Map<String, dynamic> json) => _$InstructorsResponseFromJson(json);
 

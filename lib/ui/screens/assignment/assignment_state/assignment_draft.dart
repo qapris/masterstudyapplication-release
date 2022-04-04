@@ -246,15 +246,18 @@ class AssignmentDraftWidgetState extends State<AssignmentDraftWidget> {
         );
     }
 
+
     void uploadFile() async {
-        FocusScopeNode currentFocus = FocusScope.of(context);
+      FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+      FocusScopeNode currentFocus = FocusScope.of(context);
 
         if (!currentFocus.hasPrimaryFocus) {
             currentFocus.unfocus();
         }
 
         try {
-            File file = await FilePicker.getFile();
+            File file = (await FilePicker.platform.pickFiles()) as File;
             setState(() {
                 if(file != null) {
                     files.add(file);

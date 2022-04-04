@@ -1,3 +1,4 @@
+import 'package:hive_flutter/adapters.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'AppSettings.g.dart';
@@ -21,6 +22,7 @@ class AppSettings {
   Map<String, dynamic> toJson() => _$AppSettingsToJson(this);
 }
 
+
 @JsonSerializable()
 class HomeLayoutBean {
   num id;
@@ -33,6 +35,7 @@ class HomeLayoutBean {
 
   Map<String, dynamic> toJson() => _$HomeLayoutBeanToJson(this);
 }
+
 
 @JsonSerializable()
 class AddonsBean {
@@ -48,23 +51,23 @@ class AddonsBean {
   String course_bundle;
   String multi_instructors;
 
-  AddonsBean(
-      {required this.shareware,
-      required this.sequential_drip_content,
-      required this.gradebook,
-      required this.live_streams,
-      required this.enterprise_courses,
-      required this.assignments,
-      required this.point_system,
-      required this.statistics,
-      required this.online_testing,
-      required this.course_bundle,
-      required this.multi_instructors});
+  AddonsBean({required this.shareware,
+    required this.sequential_drip_content,
+    required this.gradebook,
+    required this.live_streams,
+    required this.enterprise_courses,
+    required this.assignments,
+    required this.point_system,
+    required this.statistics,
+    required this.online_testing,
+    required this.course_bundle,
+    required this.multi_instructors});
 
   factory AddonsBean.fromJson(Map<String, dynamic> json) => _$AddonsBeanFromJson(json);
 
   Map<String, dynamic> toJson() => _$AddonsBeanToJson(this);
 }
+
 
 @JsonSerializable()
 class OptionsBean {
@@ -87,6 +90,7 @@ class OptionsBean {
   Map<String, dynamic> toJson() => _$OptionsBeanToJson(this);
 }
 
+
 @JsonSerializable()
 class ColorBean {
   num r;
@@ -100,3 +104,5 @@ class ColorBean {
 
   Map<String, dynamic> toJson() => _$ColorBeanToJson(this);
 }
+
+

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -27,9 +29,7 @@ class OrdersScreen extends StatelessWidget {
 
 class OrdersWidget extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() {
-    return OrdersWidgetState();
-  }
+  State<StatefulWidget> createState() => OrdersWidgetState();
 }
 
 class OrdersWidgetState extends State<OrdersWidget> {
@@ -49,9 +49,10 @@ class OrdersWidgetState extends State<OrdersWidget> {
         return Scaffold(
           backgroundColor: HexColor.fromHex("#F3F5F9"),
           appBar: AppBar(
+            backgroundColor: mainColor,
             centerTitle: true,
             title: Text(
-              localizations.getLocalization("user_orders_title"),
+              localizations!.getLocalization("user_orders_title"),
               textScaleFactor: 1.0,
               style: TextStyle(color: Colors.white, fontSize: 20),
             ),
@@ -63,12 +64,16 @@ class OrdersWidgetState extends State<OrdersWidget> {
   }
 
   _buildBody(state) {
+
     if (state is LoadedOrdersState)
+
       return ListView.builder(
-          itemCount: state.orders.length,
-          itemBuilder: (context, index) {
-            return OrderWidget(state.orders[index], index == 0);
-          });
+        itemCount: state.orders.length,
+        itemBuilder: (context, index) {
+          return OrderWidget(state.orders[index], index == 0);
+        },
+      );
+
     if (state is EmptyOrdersState) return _buildEmptyList();
 
     return Center(
@@ -89,7 +94,7 @@ class OrdersWidgetState extends State<OrdersWidget> {
             ),
           ),
           Text(
-            localizations.getLocalization("no_user_orders_screen_title"),
+            localizations!.getLocalization("no_user_orders_screen_title"),
             textScaleFactor: 1.0,
             style: TextStyle(color: HexColor.fromHex("#D7DAE2"), fontSize: 18),
           ),
@@ -106,9 +111,7 @@ class OrderWidget extends StatefulWidget {
   OrderWidget(this.orderBean, this.opened) : super();
 
   @override
-  State<StatefulWidget> createState() {
-    return OrderWidgetState();
-  }
+  State<StatefulWidget> createState() => OrderWidgetState();
 }
 
 class OrderWidgetState extends State<OrderWidget> {
@@ -189,8 +192,7 @@ class OrderWidgetState extends State<OrderWidget> {
                 child: Text(
                   widget.orderBean.order_key,
                   textScaleFactor: 1.0,
-                  style: TextStyle(
-                      color: HexColor.fromHex("#999999"), fontSize: 20),
+                  style: TextStyle(color: HexColor.fromHex("#999999"), fontSize: 20),
                 ),
               ),
             )
@@ -200,7 +202,7 @@ class OrderWidgetState extends State<OrderWidget> {
 
   _buildCartItem(Cart_itemsBean item) {
     return InkWell(
-      onTap: (){
+      onTap: () {
         Navigator.pushNamed(
           context,
           CourseScreen.routeName,
@@ -215,12 +217,7 @@ class OrderWidgetState extends State<OrderWidget> {
               flex: 1,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: FadeInImage.memoryNetwork(
-                    fit: BoxFit.cover,
-                    width: 200,
-                    height: 100,
-                    placeholder: kTransparentImage,
-                    image: item.image_url),
+                child: FadeInImage.memoryNetwork(fit: BoxFit.cover, width: 200, height: 100, placeholder: kTransparentImage, image: item.image_url),
               ),
             ),
             Flexible(
@@ -243,7 +240,15 @@ class OrderWidgetState extends State<OrderWidget> {
                         textScaleFactor: 1.0,
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                    )
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        'Status: ${widget.orderBean.status}',
+                        textScaleFactor: 1.0,
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
                   ],
                 ),
               ),

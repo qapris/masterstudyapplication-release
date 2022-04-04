@@ -340,7 +340,7 @@ class QuizLessonWidgetState extends State<QuizLessonWidget> {
         ),
       );
     return Text(
-      localizations.getLocalization("start_quiz"),
+      localizations!.getLocalization("start_quiz"),
       textScaleFactor: 1.0,
     );
   }
