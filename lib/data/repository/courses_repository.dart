@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/models/PopularSearchesResponse.dart';
 import 'package:masterstudy_app/data/models/course/CourcesResponse.dart';

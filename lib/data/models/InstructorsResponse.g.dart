@@ -9,7 +9,7 @@ part of 'InstructorsResponse.dart';
 InstructorsResponse _$InstructorsResponseFromJson(Map<String, dynamic> json) {
   return InstructorsResponse(
     page: json['page'] as num,
-    data: (json['data'] as List).map((e) => e == null ? null : InstructorBean.fromJson(e as Map<String, dynamic>)).toList(),
+    data: json['data'] == null ? [] : (json['data'] as List).map((e) => e == null ? null : InstructorBean.fromJson(e as Map<String, dynamic>)).toList(),
     total_pages: json['total_pages'] as num,
   );
 }

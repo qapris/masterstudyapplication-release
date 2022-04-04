@@ -17,9 +17,7 @@ class HomeSimpleScreen extends StatefulWidget {
   const HomeSimpleScreen() : super();
 
   @override
-  State<StatefulWidget> createState() {
-    return _HomeSimpleScreenState();
-  }
+  State<StatefulWidget> createState() => _HomeSimpleScreenState();
 }
 
 class _HomeSimpleScreenState extends State<HomeSimpleScreen> {
@@ -34,7 +32,7 @@ class _HomeSimpleScreenState extends State<HomeSimpleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: HexColor.fromHex("F3F5F9"),
+        backgroundColor: HexColor.fromHex("F3F5F9"),
         appBar: AppBar(
           bottom: PreferredSize(
               preferredSize: const Size.fromHeight(26),
@@ -42,8 +40,7 @@ class _HomeSimpleScreenState extends State<HomeSimpleScreen> {
                 padding: const EdgeInsets.only(bottom: 10.0, left: 10, right: 10),
                 child: InkWell(
                   onTap: () {
-                    Navigator.of(context).pushNamed(SearchDetailScreen.routeName,
-                        arguments: SearchDetailScreenArgs(""));
+                    Navigator.of(context).pushNamed(SearchDetailScreen.routeName, arguments: SearchDetailScreenArgs(""));
                   },
                   child: new Card(
                     shape: RoundedRectangleBorder(
@@ -61,11 +58,10 @@ class _HomeSimpleScreenState extends State<HomeSimpleScreen> {
                               children: <Widget>[
                                 new Expanded(
                                     child: new Text(
-                                      localizations.getLocalization("search_bar_title"),
-                                      textScaleFactor: 1.0,
-                                      style: TextStyle(
-                                          color: Colors.black.withOpacity(0.5)),
-                                    )),
+                                  localizations!.getLocalization("search_bar_title"),
+                                  textScaleFactor: 1.0,
+                                  style: TextStyle(color: Colors.black.withOpacity(0.5)),
+                                )),
                                 Icon(
                                   Icons.search,
                                   color: Colors.grey,
@@ -96,12 +92,8 @@ class _HomeSimpleScreenState extends State<HomeSimpleScreen> {
           children: <Widget>[
             Padding(
                 padding: const EdgeInsets.only(top: 25.0, left: 30.0, right: 30.0, bottom: 10.0),
-                child: Text(localizations.getLocalization("new_courses_title"),
-                    textScaleFactor: 1.0,
-                    style: Theme.of(context)
-                        .primaryTextTheme
-                        .headline5
-                        ?.copyWith(color: dark, fontStyle: FontStyle.normal))),
+                child: Text(localizations!.getLocalization("new_courses_title"),
+                    textScaleFactor: 1.0, style: Theme.of(context).primaryTextTheme.headline5?.copyWith(color: dark, fontStyle: FontStyle.normal))),
             _buildCourses(state)
           ],
         ),

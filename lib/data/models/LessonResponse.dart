@@ -14,6 +14,7 @@ class LessonResponse {
   String title;
   String type;
   String content;
+  List<Materials?> materials;
   String video;
   String video_poster;
   String prev_lesson_type;
@@ -35,6 +36,7 @@ class LessonResponse {
     required this.title,
     required this.type,
     required this.content,
+    required this.materials,
     required this.video,
     required this.video_poster,
     required this.prev_lesson_type,
@@ -50,7 +52,6 @@ class LessonResponse {
     this.quiz_time,
     required this.fromCache,
   });
-
 
   factory LessonResponse.fromJson(Map<String, dynamic> json) => _$LessonResponseFromJson(json);
 
@@ -68,4 +69,18 @@ class SectionBean {
   factory SectionBean.fromJson(Map<String, dynamic> json) => _$SectionBeanFromJson(json);
 
   Map<String, dynamic> toJson() => _$SectionBeanToJson(this);
+}
+
+@JsonSerializable()
+class Materials {
+  final String label;
+  final dynamic url;
+  final String size;
+  final String type;
+
+  Materials({required this.label, this.url, required this.size, required this.type});
+
+  factory Materials.fromJson(Map<String, dynamic> json) => _$MaterialsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$MaterialsToJson(this);
 }

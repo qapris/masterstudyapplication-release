@@ -67,6 +67,7 @@ Cart_itemsBean _$Cart_itemsBeanFromJson(Map<String, dynamic> json) {
     cart_item_id: json['cart_item_id'] as int,
     title: json['title'] as String,
     image: json['image'] as String,
+    status: json['status'] as String,
     price: json['price'] as String,
     terms: (json['terms'] as List).map((e) => e as String).toList(),
     price_formatted: json['price_formatted'] as String,

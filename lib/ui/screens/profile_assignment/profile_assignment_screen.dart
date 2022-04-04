@@ -41,7 +41,7 @@ class _ProfileAssignmentScreenWidgetState extends State<_ProfileAssignmentScreen
             backgroundColor: HexColor.fromHex('#F3F5F9'),
             appBar: AppBar(
                 title: Text(
-                    localizations.getLocalization("profile_assignment_title"),
+                    localizations!.getLocalization("profile_assignment_title"),
                     textScaleFactor: 1.0,
                     style: TextStyle(
                         color: Colors.white,
@@ -65,7 +65,7 @@ class _ProfileAssignmentScreenWidgetState extends State<_ProfileAssignmentScreen
                                 ))
                         ),
                         Text(
-                        localizations.getLocalization("assignment_content"),
+                        localizations!.getLocalization("assignment_content"),
                             textScaleFactor: 1.0,
                             style: TextStyle(
                                 color: HexColor.fromHex('#2A3045'),

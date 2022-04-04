@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -51,6 +52,7 @@ class _ProfileEditWidget extends StatefulWidget {
 class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  FocusNode myFocusNode = new FocusNode();
 
   TextEditingController _firstNameController = TextEditingController();
   TextEditingController _lastNameController = TextEditingController();
@@ -85,30 +87,46 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          backgroundColor: mainColor,
           centerTitle: true,
           title: Text(
-            localizations.getLocalization("edit_profile_title"),
+            localizations!.getLocalization("edit_profile_title"),
             textScaleFactor: 1.0,
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: Colors.white, fontSize: 18),
           ),
         ),
         body: BlocListener(
           bloc: _bloc,
           listener: (context, state) {
-            if (state is CloseEditProfileState) {
+            if (state is UpdateEditProfileState) {
               //SnackBar after edit profile
               BlocProvider.of<ProfileBloc>(context)..add(FetchProfileEvent());
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(
-                  localizations.getLocalization("profile_updated_message"),
+                  localizations!.getLocalization("profile_updated_message"),
                   textScaleFactor: 1.0,
                 ),
                 duration: const Duration(seconds: 2),
                 action: SnackBarAction(
-                  label: 'Назад',
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                  },
+                  label: 'Ok',
+                  onPressed: () {},
+                ),
+              ));
+            }
+
+            if (state is CloseEditProfileState) {
+              // TODO: Добавить перевод для кнопки отмены
+              //SnackBar after edit profile
+              BlocProvider.of<ProfileBloc>(context)..add(FetchProfileEvent());
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(
+                  'Profile change canceled',
+                  textScaleFactor: 1.0,
+                ),
+                duration: const Duration(seconds: 2),
+                action: SnackBarAction(
+                  label: 'Ok',
+                  onPressed: () {},
                 ),
               ));
             }
@@ -122,6 +140,7 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
         ));
   }
 
+  final ImagePicker _picker = ImagePicker();
   File? _image;
 
   _buildBody(state, avatar_url) {
@@ -135,10 +154,15 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
 
     ///Check avatar
     if (_image == null && avatar_url != null) {
-      image = Image.network(
-        avatar_url.avatar_url.toString(),
-        fit: BoxFit.cover,
-        height: 100.0,
+      image = CachedNetworkImage(
+        imageUrl: avatar_url.avatar_url.toString(),
+        placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+        errorWidget: (context, url, error) {
+          return SizedBox(
+            width: 100.0,
+            child: Image.asset('assets/icons/logo.png'),
+          );
+        },
         width: 100.0,
       );
     } else if (_image != null) {
@@ -190,10 +214,10 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
                 padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(8)),
               ),
               onPressed: () async {
-                var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+                XFile? image = await _picker.pickImage(source: ImageSource.gallery);
 
                 setState(() {
-                  _image = image;
+                  _image = File(image!.path);
                 });
               },
               child: Padding(
@@ -207,7 +231,7 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
                         height: 23,
                       ),
                       Text(
-                        localizations.getLocalization("change_photo_button"),
+                        localizations!.getLocalization("change_photo_button"),
                         textScaleFactor: 1.0,
                         style: TextStyle(
                           fontSize: 16.0,
@@ -223,7 +247,20 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
             child: TextFormField(
               controller: _firstNameController,
               enabled: enableInputs,
-              decoration: InputDecoration(labelText: localizations.getLocalization("first_name"), filled: true),
+              cursorColor: mainColor,
+              decoration: InputDecoration(
+                labelText: localizations!.getLocalization("first_name"),
+                filled: true,
+                labelStyle: TextStyle(
+                  color: myFocusNode.hasFocus ? Colors.black : Colors.black,
+                ),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: mainColor!, width: 2),
+                ),
+              ),
             ),
           ),
           //LastName
@@ -232,7 +269,20 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
             child: TextFormField(
               controller: _lastNameController,
               enabled: enableInputs,
-              decoration: InputDecoration(labelText: localizations.getLocalization("last_name"), filled: true),
+              cursorColor: mainColor,
+              decoration: InputDecoration(
+                labelText: localizations!.getLocalization("last_name"),
+                filled: true,
+                labelStyle: TextStyle(
+                  color: myFocusNode.hasFocus ? Colors.black : Colors.black,
+                ),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: mainColor!, width: 2),
+                ),
+              ),
             ),
           ),
           //Occupation
@@ -242,7 +292,20 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
                   child: TextFormField(
                     controller: _occupationController,
                     enabled: enableInputs,
-                    decoration: InputDecoration(labelText: localizations.getLocalization("occupation"), filled: true),
+                    cursorColor: mainColor,
+                    decoration: InputDecoration(
+                      labelText: localizations!.getLocalization("occupation"),
+                      filled: true,
+                      labelStyle: TextStyle(
+                        color: myFocusNode.hasFocus ? Colors.black : Colors.black,
+                      ),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: mainColor!, width: 2),
+                      ),
+                    ),
                   ),
                 )
               : const SizedBox(),
@@ -253,23 +316,48 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
               controller: _emailController,
               enabled: enableInputs,
               validator: _validateEmail,
-              decoration: InputDecoration(labelText: localizations.getLocalization("email_label_text"), helperText: localizations.getLocalization("email_helper_text"), filled: true),
+              cursorColor: mainColor,
+              decoration: InputDecoration(
+                labelText: localizations!.getLocalization("email_label_text"),
+                helperText: localizations!.getLocalization("email_helper_text"),
+                filled: true,
+                labelStyle: TextStyle(
+                  color: myFocusNode.hasFocus ? Colors.black : Colors.black,
+                ),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: mainColor!, width: 2),
+                ),
+              ),
             ),
           ),
           //Password
-          Padding(
+          /* Padding(
             padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
             child: TextFormField(
               controller: _passwordController,
               enabled: enableInputs,
               obscureText: passwordVisible,
+              cursorColor: mainColor,
               decoration: InputDecoration(
-                  labelText: localizations.getLocalization("password_label_text"),
-                  helperText: localizations.getLocalization("password_registration_helper_text"),
+                  labelText: localizations!.getLocalization("password_label_text"),
+                  helperText: localizations!.getLocalization("password_registration_helper_text"),
                   filled: true,
+                  labelStyle: TextStyle(
+                    color: myFocusNode.hasFocus ? Colors.black : Colors.black,
+                  ),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: mainColor!, width: 2),
+                  ),
                   suffixIcon: IconButton(
                     icon: Icon(
                       passwordVisible ? Icons.visibility : Icons.visibility_off,
+                      color: Colors.grey,
                     ),
                     onPressed: () {
                       setState(() {
@@ -283,14 +371,14 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
                   return null;
                 } else {
                   if (value.length < 8) {
-                    return localizations.getLocalization("password_register_characters_count_error_text");
+                    return localizations!.getLocalization("password_register_characters_count_error_text");
                   }
                 }
 
                 return null;
               },
             ),
-          ),
+          ),*/
           //Bio
           Padding(
             padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
@@ -298,7 +386,22 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
               controller: _bioController,
               enabled: enableInputs,
               maxLines: 5,
-              decoration: InputDecoration(labelText: localizations.getLocalization("bio"), helperText: localizations.getLocalization("bio_helper"), filled: true),
+              textCapitalization: TextCapitalization.sentences,
+              cursorColor: mainColor,
+              decoration: InputDecoration(
+                labelText: localizations!.getLocalization("bio"),
+                helperText: localizations!.getLocalization("bio_helper"),
+                filled: true,
+                labelStyle: TextStyle(
+                  color: myFocusNode.hasFocus ? Colors.black : Colors.black,
+                ),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: mainColor!, width: 2),
+                ),
+              ),
             ),
           ),
           //Facebook
@@ -307,7 +410,21 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
             child: TextFormField(
               controller: _facebookController,
               enabled: enableInputs,
-              decoration: InputDecoration(labelText: 'Facebook', hintText: localizations.getLocalization("enter_url"), filled: true),
+              cursorColor: mainColor,
+              decoration: InputDecoration(
+                labelText: 'Facebook',
+                hintText: localizations!.getLocalization("enter_url"),
+                filled: true,
+                labelStyle: TextStyle(
+                  color: myFocusNode.hasFocus ? Colors.black : Colors.black,
+                ),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: mainColor!, width: 2),
+                ),
+              ),
             ),
           ),
           //Twitter
@@ -316,7 +433,21 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
             child: TextFormField(
               controller: _twitterController,
               enabled: enableInputs,
-              decoration: InputDecoration(labelText: 'Twitter', hintText: localizations.getLocalization("enter_url"), filled: true),
+              cursorColor: mainColor,
+              decoration: InputDecoration(
+                labelText: 'Twitter',
+                hintText: localizations!.getLocalization("enter_url"),
+                filled: true,
+                labelStyle: TextStyle(
+                  color: myFocusNode.hasFocus ? Colors.black : Colors.black,
+                ),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: mainColor!, width: 2),
+                ),
+              ),
             ),
           ),
           //Instagram
@@ -325,7 +456,21 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
             child: TextFormField(
               controller: _instagramController,
               enabled: enableInputs,
-              decoration: InputDecoration(labelText: 'Instagram', hintText: localizations.getLocalization("enter_url"), filled: true),
+              cursorColor: mainColor,
+              decoration: InputDecoration(
+                labelText: 'Instagram',
+                hintText: localizations!.getLocalization("enter_url"),
+                filled: true,
+                labelStyle: TextStyle(
+                  color: myFocusNode.hasFocus ? Colors.black : Colors.black,
+                ),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: mainColor!, width: 2),
+                ),
+              ),
             ),
           ),
           //Button Save
@@ -376,7 +521,7 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
             ),
             child: FlatButton(
               child: Text(
-                localizations.getLocalization("cancel_button"),
+                localizations!.getLocalization("cancel_button"),
                 textScaleFactor: 1.0,
                 style: TextStyle(color: mainColor),
               ),
@@ -393,7 +538,7 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
   String? _validateEmail(String? value) {
     if (value == null) {
       // The form is empty
-      return localizations.getLocalization("email_empty_error_text");
+      return localizations!.getLocalization("email_empty_error_text");
     }
     // This is just a regular expression for email addresses
     String p = "[a-zA-Z0-9\+\.\_\%\-\+]{1,256}" + "\\@" + "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" + "(" + "\\." + "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" + ")+";
@@ -405,14 +550,14 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
     }
 
     // The pattern of the email didn't match the regex above.
-    return localizations.getLocalization("email_invalid_error_text");
+    return localizations!.getLocalization("email_invalid_error_text");
   }
 }
 
 Widget setUpButtonChild(enable) {
   if (enable == true) {
     return new Text(
-      localizations.getLocalization("save_button"),
+      localizations!.getLocalization("save_button"),
       textScaleFactor: 1.0,
     );
   } else {

@@ -12,6 +12,7 @@ LessonResponse _$LessonResponseFromJson(Map<String, dynamic> json) {
     title: json['title'] as String,
     type: json['type'] as String,
     content: json['content'] as String,
+    materials: json['materials'] != null ?  (json['materials'] as List).map((e) => e == null ? null : Materials.fromJson(e as Map<String, dynamic>)).toList() : [],
     video: json['video'] as String,
     video_poster: json['video_poster'] as String,
     prev_lesson_type: json['prev_lesson_type'] as String,
@@ -35,6 +36,7 @@ Map<String, dynamic> _$LessonResponseToJson(LessonResponse instance) => <String,
       'title': instance.title,
       'type': instance.type,
       'content': instance.content,
+      'materials': instance.materials,
       'video': instance.video,
       'video_poster': instance.video_poster,
       'prev_lesson_type': instance.prev_lesson_type,
@@ -64,3 +66,20 @@ Map<String, dynamic> _$SectionBeanToJson(SectionBean instance) => <String, dynam
       'number': instance.number,
       'index': instance.index,
     };
+
+
+Materials _$MaterialsFromJson(Map<String, dynamic> json) {
+  return Materials(
+    label: json['label'] as String,
+    url: json['url'],
+    size: json['size'],
+    type: json['type'],
+  );
+}
+
+Map<String, dynamic> _$MaterialsToJson(Materials instance) => <String, dynamic>{
+  'label': instance.label,
+  'url': instance.url,
+  'size': instance.size,
+  'type': instance.type,
+};

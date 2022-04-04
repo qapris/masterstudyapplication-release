@@ -23,7 +23,7 @@ class WebCheckoutScreen extends StatelessWidget {
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          localizations.getLocalization("checkout_title"),
+          localizations!.getLocalization("checkout_title"),
           textScaleFactor: 1.0,
           style: TextStyle(color: Colors.white, fontSize: 18),
         ),

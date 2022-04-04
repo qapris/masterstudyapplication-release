@@ -12,9 +12,7 @@ import 'package:masterstudy_app/ui/widgets/loading_error_widget.dart';
 
 class SearchScreen extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return SearchScreenWidget();
-  }
+  Widget build(BuildContext context) => SearchScreenWidget();
 }
 
 class SearchScreenWidget extends StatefulWidget {
@@ -36,8 +34,9 @@ class SearchScreenWidgetState extends State<SearchScreenWidget> {
     return Scaffold(
         backgroundColor: HexColor.fromHex("#F3F5F9"),
         appBar: AppBar(
+          backgroundColor: mainColor,
           title: Text(
-            localizations.getLocalization("search_title"),
+            localizations!.getLocalization("search_title"),
             textScaleFactor: 1.0,
             style: TextStyle(color: Colors.white, fontSize: 18),
           ),
@@ -65,7 +64,7 @@ class SearchScreenWidgetState extends State<SearchScreenWidget> {
                               children: <Widget>[
                                 new Expanded(
                                     child: new Text(
-                                  localizations.getLocalization("search_bar_title"),
+                                  localizations!.getLocalization("search_bar_title"),
                                   textScaleFactor: 1.0,
                                   style: TextStyle(color: Colors.black.withOpacity(0.5)),
                                 )),
@@ -119,13 +118,14 @@ class SearchScreenWidgetState extends State<SearchScreenWidget> {
             visible: state.popularSearch.isNotEmpty,
             child: Padding(
                 padding: const EdgeInsets.only(top: 30.0, left: 30.0),
-                child: Text(localizations.getLocalization("popular_searchs"),
+                child: Text(localizations!.getLocalization("popular_searchs"),
                     textScaleFactor: 1.0, style: Theme.of(context).primaryTextTheme.headline5?.copyWith(color: dark, fontStyle: FontStyle.normal))),
           ),
           _buildChips(state),
           Padding(
               padding: const EdgeInsets.only(top: 30.0, left: 30.0),
-              child: Text(localizations.getLocalization("new_courses"), textScaleFactor: 1.0, style: Theme.of(context).primaryTextTheme.headline5?.copyWith(color: dark, fontStyle: FontStyle.normal))),
+              child:
+                  Text(localizations!.getLocalization("new_courses"), textScaleFactor: 1.0, style: Theme.of(context).primaryTextTheme.headline5?.copyWith(color: dark, fontStyle: FontStyle.normal))),
           _buildCourses(state)
         ],
       ),

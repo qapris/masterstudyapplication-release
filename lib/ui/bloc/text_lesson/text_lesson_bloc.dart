@@ -22,7 +22,6 @@ class TextLessonBloc extends Bloc<TextLessonEvent, TextLessonState> {
     if (event is FetchEvent) {
       try {
         var response = await repository.getLesson(event.courseId, event.lessonId);
-        print(response);
         emit(LoadedTextLessonState(response));
         if (response.fromCache && response.type == "slides") {
           emit(CacheWarningLessonState());
@@ -35,6 +34,7 @@ class TextLessonBloc extends Bloc<TextLessonEvent, TextLessonState> {
       try {
         var response = await repository.completeLesson(event.courseId, event.lessonId);
       } catch (e, s) {
+
         print(e);
         print(s);
       }

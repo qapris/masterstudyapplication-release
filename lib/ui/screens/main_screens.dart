@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -86,11 +88,11 @@ class MainScreenState extends State<MainScreenWidget> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: _buildIcon("assets/icons/ms_nav_home.svg", localizations.getLocalization("home_bottom_nav"), 0), label: SizedBox.shrink().toString()),
-          BottomNavigationBarItem(icon: _buildIcon("assets/icons/ms_nav_courses.svg", localizations.getLocalization("courses_bottom_nav"), 1), label: SizedBox.shrink().toString()),
-          BottomNavigationBarItem(icon: _buildIcon("assets/icons/ms_nav_search.svg", localizations.getLocalization("search_bottom_nav"), 2), label: SizedBox.shrink().toString()),
-          BottomNavigationBarItem(icon: _buildIcon("assets/icons/ms_nav_fav.svg", localizations.getLocalization("favorites_bottom_nav"), 3), label: SizedBox.shrink().toString()),
-          BottomNavigationBarItem(icon: _buildIcon("assets/icons/ms_nav_profile.svg", localizations.getLocalization("profile_bottom_nav"), 4), label: SizedBox.shrink().toString()),
+          BottomNavigationBarItem(icon: _buildIcon("assets/icons/ms_nav_home.svg", localizations!.getLocalization("home_bottom_nav"), 0), label: SizedBox.shrink().toString()),
+          BottomNavigationBarItem(icon: _buildIcon("assets/icons/ms_nav_courses.svg", localizations!.getLocalization("courses_bottom_nav"), 1), label: SizedBox.shrink().toString()),
+          BottomNavigationBarItem(icon: _buildIcon("assets/icons/ms_nav_search.svg", localizations!.getLocalization("search_bottom_nav"), 2), label: SizedBox.shrink().toString()),
+          BottomNavigationBarItem(icon: _buildIcon("assets/icons/ms_nav_fav.svg", localizations!.getLocalization("favorites_bottom_nav"), 3), label: SizedBox.shrink().toString()),
+          BottomNavigationBarItem(icon: _buildIcon("assets/icons/ms_nav_profile.svg", localizations!.getLocalization("profile_bottom_nav"), 4), label: SizedBox.shrink().toString()),
         ],
         elevation: 0.0,
         selectedFontSize: 0,
@@ -111,7 +113,7 @@ class MainScreenState extends State<MainScreenWidget> {
   Widget _getBody(int index) {
     switch (index) {
       case 0:
-        return (widget.optionsBean.app_view) ? HomeSimpleScreen() : HomeScreen();
+        return widget.optionsBean.app_view ? HomeSimpleScreen() : HomeScreen();
       case 1:
         return CoursesScreen(() {
           setState(() {

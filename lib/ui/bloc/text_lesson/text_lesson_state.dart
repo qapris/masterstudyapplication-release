@@ -5,6 +5,7 @@ import 'package:meta/meta.dart';
 abstract class TextLessonState {}
 
 class InitialTextLessonState extends TextLessonState {}
+
 class CacheWarningLessonState extends TextLessonState {}
 
 class LoadedTextLessonState extends TextLessonState {
@@ -12,4 +13,3 @@ class LoadedTextLessonState extends TextLessonState {
 
   LoadedTextLessonState(this.lessonResponse);
 }
-

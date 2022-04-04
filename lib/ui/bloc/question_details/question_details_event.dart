@@ -3,14 +3,12 @@ import 'package:meta/meta.dart';
 @immutable
 abstract class QuestionDetailsEvent {}
 
-class FetchEvent extends QuestionDetailsEvent {
-    FetchEvent();
-}
+class FetchEvent extends QuestionDetailsEvent {}
 
 class QuestionAddEvent extends QuestionDetailsEvent {
-    final int lessonId;
-    final String comment;
-    final int parent;
+  final int lessonId;
+  final String comment;
+  final int parent;
 
-        QuestionAddEvent(this.lessonId, this.comment, this.parent);
+  QuestionAddEvent(this.lessonId, this.comment, this.parent);
 }

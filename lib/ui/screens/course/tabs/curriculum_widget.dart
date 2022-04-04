@@ -8,7 +8,7 @@ import 'package:masterstudy_app/ui/screens/text_lesson/text_lesson_screen.dart';
 
 import '../../../../main.dart';
 
-class CurriculumWidget extends StatefulWidget{
+class CurriculumWidget extends StatefulWidget {
   final CourseDetailResponse response;
 
   CurriculumWidget(this.response) : super();
@@ -17,7 +17,7 @@ class CurriculumWidget extends StatefulWidget{
   _CurriculumWidgetState createState() => _CurriculumWidgetState();
 }
 
-class _CurriculumWidgetState extends State<CurriculumWidget> with AutomaticKeepAliveClientMixin{
+class _CurriculumWidgetState extends State<CurriculumWidget> with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -28,7 +28,7 @@ class _CurriculumWidgetState extends State<CurriculumWidget> with AutomaticKeepA
             return _buildSection(curriculumBean);
           } else if (curriculumBean.type == "lesson") {
             return _buildLesson(context, curriculumBean);
-          }else if( curriculumBean.type == "quiz"){
+          } else if (curriculumBean.type == "quiz") {
             return _buildQuiz(curriculumBean);
           }
           return Center();
@@ -51,10 +51,7 @@ class _CurriculumWidgetState extends State<CurriculumWidget> with AutomaticKeepA
           Text(
             curriculumBean.label,
             textScaleFactor: 1.0,
-            style: TextStyle(
-                color: HexColor.fromHex("#273044"),
-                fontSize: 18,
-                fontWeight: FontWeight.bold),
+            style: TextStyle(color: HexColor.fromHex("#273044"), fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -64,69 +61,30 @@ class _CurriculumWidgetState extends State<CurriculumWidget> with AutomaticKeepA
   _buildLesson(BuildContext context, CurriculumBean curriculumBean) {
     Widget icon = Center();
 
-    switch (curriculumBean.view){
+    switch (curriculumBean.view) {
       case 'video':
-        icon = SizedBox(
-            width: 24,
-            height: 24,
-            child: SvgPicture.asset(
-                "assets/icons/ico_play.svg",
-                color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)
-            ));
+        icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/ico_play.svg", color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
         break;
       case 'assignment':
         icon = SizedBox(
-            width: 24,
-            height: 24,
-            child: SvgPicture.asset(
-                "assets/icons/assignment_icon.svg",
-                color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)
-            ));
+            width: 24, height: 24, child: SvgPicture.asset("assets/icons/assignment_icon.svg", color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
         break;
       case 'slide':
-        icon = SizedBox(
-            width: 24,
-            height: 24,
-            child: SvgPicture.asset(
-                "assets/icons/slides_icon.svg",
-                color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)
-            ));
+        icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/slides_icon.svg", color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
         break;
       case 'stream':
-        icon = SizedBox(
-            width: 24,
-            height: 24,
-            child: SvgPicture.asset(
-                "assets/icons/video-camera.svg",
-                color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)
-            ));
+        icon =
+            SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/video-camera.svg", color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
         break;
       case 'quiz':
-        icon = SizedBox(
-            width: 24,
-            height: 24,
-            child: SvgPicture.asset(
-                "assets/icons/ico_question.svg",
-                color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)
-            ));
+        icon =
+            SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/ico_question.svg", color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
         break;
       case 'text':
-        icon = SizedBox(
-            width: 24,
-            height: 24,
-            child: SvgPicture.asset(
-                "assets/icons/ico_text.svg",
-                color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)
-            ));
+        icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/ico_text.svg", color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
         break;
       case '':
-        icon = SizedBox(
-            width: 24,
-            height: 24,
-            child: SvgPicture.asset(
-                "assets/icons/ico_text.svg",
-                color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)
-            ));
+        icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/ico_text.svg", color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
         break;
     }
 
@@ -135,18 +93,18 @@ class _CurriculumWidgetState extends State<CurriculumWidget> with AutomaticKeepA
       child: Container(
         decoration: BoxDecoration(color: HexColor.fromHex("#F3F5F9")),
         child: Padding(
-          padding:
-              const EdgeInsets.only(top: 16.0, bottom: 16, left: 20, right: 20),
+          padding: const EdgeInsets.only(top: 16.0, bottom: 16, left: 20, right: 20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               icon,
+
               ///Title Lesson
               Expanded(
                 flex: 6,
                 child: Padding(
-                  padding: const EdgeInsets.only(left:8.0,right: 8.0),
+                  padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                   child: Text(
                     curriculumBean.label,
                     textScaleFactor: 1.0,
@@ -156,48 +114,43 @@ class _CurriculumWidgetState extends State<CurriculumWidget> with AutomaticKeepA
                   ),
                 ),
               ),
-              (curriculumBean.has_preview || widget.response.trial) ?
-              Container(
-                constraints: BoxConstraints(minWidth: 110, maxWidth: 110),
-                height: 36,
-                child: MaterialButton(
-                  height: 36,
-                  minWidth: 110,
-                  padding: EdgeInsets.only(left: 0, right: 0),
-                  color: secondColor,
-                  onPressed: () {
-                    switch (curriculumBean.view) {
-                      case "video":
-                        Navigator.of(context).pushNamed(
-                          LessonVideoScreen.routeName,
-                          arguments: LessonVideoScreenArgs(widget.response.id, int
-                              .tryParse(curriculumBean.lesson_id)!, widget.response
-                              .author?.avatar_url, widget.response.author?.login,
-                              curriculumBean.has_preview, false),
-                        );
-                        break;
-                      default:
-                        Navigator.of(context).pushNamed(
-                          TextLessonScreen.routeName,
-                          arguments: TextLessonScreenArgs(widget.response.id, int
-                              .tryParse(curriculumBean.lesson_id)!, widget.response
-                              .author?.avatar_url, widget.response.author?.login,
-                              curriculumBean.has_preview, false),
-                        );
-                    }
-                  },
-                  child: Text(
-                      localizations.getLocalization("preview_button"),
-                      textScaleFactor: 1.0,
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      style: TextStyle(
-                        color: Colors.white,
-                        letterSpacing: 0.4,
-                      )
-                  ),
-                ),
-              ) : Center(),
+              (curriculumBean.has_preview || widget.response.trial)
+                  ? Container(
+                      constraints: BoxConstraints(minWidth: 110, maxWidth: 110),
+                      height: 36,
+                      child: MaterialButton(
+                        height: 36,
+                        minWidth: 110,
+                        padding: EdgeInsets.only(left: 0, right: 0),
+                        color: secondColor,
+                        onPressed: () {
+                          switch (curriculumBean.view) {
+                            case "video":
+                              Navigator.of(context).pushNamed(
+                                LessonVideoScreen.routeName,
+                                arguments: LessonVideoScreenArgs(
+                                    widget.response.id, int.tryParse(curriculumBean.lesson_id)!, widget.response.author?.avatar_url, widget.response.author?.login, curriculumBean.has_preview, false),
+                              );
+                              break;
+                            default:
+                              Navigator.of(context).pushNamed(
+                                TextLessonScreen.routeName,
+                                arguments: TextLessonScreenArgs(
+                                    widget.response.id, int.tryParse(curriculumBean.lesson_id)!, widget.response.author?.avatar_url, widget.response.author?.login, curriculumBean.has_preview, false),
+                              );
+                          }
+                        },
+                        child: Text(localizations!.getLocalization("preview_button"),
+                            textScaleFactor: 1.0,
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: Colors.white,
+                              letterSpacing: 0.4,
+                            )),
+                      ),
+                    )
+                  : Center(),
             ],
           ),
         ),
@@ -206,28 +159,21 @@ class _CurriculumWidgetState extends State<CurriculumWidget> with AutomaticKeepA
   }
 
   _buildQuiz(CurriculumBean curriculumBean) {
-    Widget icon = SizedBox(
-          width: 24,
-          height: 24,
-          child: SvgPicture.asset(
-              "assets/icons/ico_question.svg",
-              color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)
-          ));
+    Widget icon =
+        SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/ico_question.svg", color: (curriculumBean.has_preview) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 2.0),
       child: Container(
         decoration: BoxDecoration(color: HexColor.fromHex("#F3F5F9")),
         child: Padding(
-          padding:
-              const EdgeInsets.only(top: 16.0, bottom: 16, left: 20, right: 20),
+          padding: const EdgeInsets.only(top: 16.0, bottom: 16, left: 20, right: 20),
           child: Row(
-
             children: <Widget>[
               icon,
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.only(left:8.0,right: 8.0),
+                  padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                   child: Text(
                     curriculumBean.label,
                     textScaleFactor: 1.0,

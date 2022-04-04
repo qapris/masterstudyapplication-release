@@ -9,7 +9,7 @@ class Account {
   num id;
   String login;
   String avatar;
-  String avatar_url;
+  String? avatar_url;
   String email;
   String url;
   List<dynamic> roles;

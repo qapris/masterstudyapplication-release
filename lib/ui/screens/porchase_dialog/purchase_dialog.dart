@@ -56,8 +56,8 @@ class PurchaseDialogState extends State<PurchaseDialog> {
     List<Widget> list = [];
     list.add(_buildDefaultItem(
         (selectedId == -1),
-        localizations.getLocalization("one_time_payment"),
-        "${localizations.getLocalization("course_regular_price")} ${state.courseDetailResponse.price?.price}",
+        localizations!.getLocalization("one_time_payment"),
+        "${localizations!.getLocalization("course_regular_price")} ${state.courseDetailResponse.price?.price}",
         state.courseDetailResponse.price?.price, () {
       setState(() {
         selectedId = -1;
@@ -68,7 +68,7 @@ class PurchaseDialogState extends State<PurchaseDialog> {
       state.userPlans.forEach((value) {
         list.add(_buildPriceItem(
             (selectedId == int.parse(value.subscription_id)),
-            localizations.getLocalization("enroll_with_membership"),
+            localizations!.getLocalization("enroll_with_membership"),
             value.name,
             value.quotas_left, () {
           setState(() {
@@ -80,7 +80,7 @@ class PurchaseDialogState extends State<PurchaseDialog> {
       _bloc.availablePlans.forEach((value) {
         list.add(_buildPriceItem(
             (selectedId == int.parse(value.id)),
-            "${localizations.getLocalization("available_in_plan")} \"${value.name}\"",
+            "${localizations!.getLocalization("available_in_plan")} \"${value.name}\"",
             value.name,
             value.quotas_left, () {
           setState(() {
@@ -120,7 +120,7 @@ class PurchaseDialogState extends State<PurchaseDialog> {
             }
           },
           child: Text(
-            localizations.getLocalization("select_payment_button"),
+            localizations!.getLocalization("select_payment_button"),
             textScaleFactor: 1.0,
           ),
           textColor: Colors.white,
@@ -257,7 +257,7 @@ class PurchaseDialogState extends State<PurchaseDialog> {
                               color: secondColor),
                         ),
                         Text(
-                          localizations.getLocalization("plan_count_left"),
+                          localizations!.getLocalization("plan_count_left"),
                           textScaleFactor: 1.0,
                           style: TextStyle(fontSize: 9, color: secondColor),
                         )

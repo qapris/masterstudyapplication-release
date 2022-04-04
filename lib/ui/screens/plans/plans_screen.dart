@@ -51,7 +51,7 @@ class PlansScreenWidgetState extends State<PlansScreenWidget> {
           appBar: AppBar(
             centerTitle: true,
             title: Text(
-              localizations.getLocalization("membership_plans"),
+              localizations!.getLocalization("membership_plans"),
               textScaleFactor: 1.0,
               style: TextStyle(color: Colors.white, fontSize: 20),
             ),
@@ -137,7 +137,7 @@ class PlanWidget extends StatelessWidget {
                           child: Text(
                             "\$" +
                                 plansBean.billing_amount.toString() +
-                                " ${localizations.getLocalization("plan_per_month")}",
+                                " ${localizations!.getLocalization("plan_per_month")}",
                             textScaleFactor: 1.0,
                             style: TextStyle(
                                 color: HexColor.fromHex("2A3045")

@@ -17,7 +17,7 @@ class LoadingErrorWidget extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Text(
-            localizations.getLocalization("network_error"),
+            localizations!.getLocalization("network_error"),
             textScaleFactor: 1.0,
             style: TextStyle(color: HexColor.fromHex("#D7DAE2"), fontSize: 18),
           ),
@@ -29,7 +29,7 @@ class LoadingErrorWidget extends StatelessWidget {
               color: mainColor,
               onPressed: onRetry,
               child: Text(
-                localizations.getLocalization("error_button"),
+                localizations!.getLocalization("error_button"),
               ),
             ),
           )

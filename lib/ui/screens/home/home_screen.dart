@@ -1,6 +1,8 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inject/inject.dart';
+import 'package:masterstudy_app/main.dart';
 import 'package:masterstudy_app/ui/bloc/home/bloc.dart';
 import 'package:masterstudy_app/ui/widgets/loading_error_widget.dart';
 import 'items/items.dart';
@@ -27,7 +29,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(0),
-        child: AppBar(),
+        child: AppBar(
+          backgroundColor: mainColor,
+        ),
       ),
       body: SafeArea(
         child: BlocBuilder<HomeBloc, HomeState>(
@@ -46,14 +50,14 @@ class _HomeScreenState extends State<HomeScreen> {
           itemBuilder: (context, index) {
             var item = state.layout[index];
             switch (item?.id) {
-              case 3:
-                return TrendingWidget(true, item?.name, state.coursesTranding);
-              case 4:
-                return TopInstructorsWidget(item?.name, state.instructors);
               case 1:
                 return CategoriesWidget(item?.name, state.categoryList);
               case 2:
                 return NewCoursesWidget(item?.name, state.coursesNew);
+              case 3:
+                return TrendingWidget(true, item?.name, state.coursesTranding);
+              case 4:
+                return TopInstructorsWidget(item?.name, state.instructors);
               case 5:
                 return TrendingWidget(false, item?.name, state.coursesFree);
               default:
@@ -61,6 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
             }
           });
     }
+
     if (state is InitialHomeState) {
       return Center(
         child: CircularProgressIndicator(),

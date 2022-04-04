@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -100,13 +101,17 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
                 ? NestedScrollView(
                     controller: _scrollController,
                     headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-                      log(_bloc.account.toString());
                       var avatar = ClipRRect(
                         borderRadius: BorderRadius.circular(60.0),
-                        child: Image.network(
-                          (_bloc.account!.avatar_url == null) ? "" : _bloc.account!.avatar_url,
-                          fit: BoxFit.cover,
-                          height: 100.0,
+                        child: CachedNetworkImage(
+                          imageUrl: _bloc.account!.avatar_url!,
+                          placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                          errorWidget: (context, url, error) {
+                            return SizedBox(
+                              width: 100.0,
+                              child: Image.asset('assets/icons/logo.png'),
+                            );
+                          },
                           width: 100.0,
                         ),
                       );
@@ -116,6 +121,7 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
                           : _bloc.account!.login;
                       return <Widget>[
                         SliverAppBar(
+                          backgroundColor: mainColor,
                           title: Text(
                             title,
                             textScaleFactor: 1.0,
@@ -344,7 +350,7 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Text(
-                  localizations.getLocalization("empty_profile_text"),
+                  localizations!.getLocalization("empty_profile_text"),
                   textScaleFactor: 1.0,
                   style: TextStyle(color: HexColor.fromHex("#D7DAE2"), fontSize: 18),
                 ),
@@ -361,7 +367,7 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
                       );
                     },
                     child: Text(
-                      localizations.getLocalization("empty_profile_button"),
+                      localizations!.getLocalization("empty_profile_button"),
                     ),
                   ),
                 )
@@ -383,9 +389,9 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
       if (state.isTeacher) {
         tabs.addAll([
           Tab(
-            text: localizations.getLocalization("profile_bio_tab"),
+            text: localizations!.getLocalization("profile_bio_tab"),
           ),
-          Tab(text: localizations.getLocalization("profile_courses_tab")),
+          Tab(text: localizations!.getLocalization("profile_courses_tab")),
         ]);
       }
     }

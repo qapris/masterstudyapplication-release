@@ -15,16 +15,10 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
   EditProfileState get initialState => InitialEditProfileState();
 
   EditProfileBloc(this._repository) : super(InitialEditProfileState()) {
-    on<EditProfileEvent>((event, emit) async {
-      await _editProfile(event, emit);
-    });
-  }
-
-  Future<void> _editProfile(EditProfileEvent? event, Emitter<EditProfileState> emit) async {
-    if (event is SaveEvent) {
+    on<SaveEvent>((event, emit) async {
       try {
         emit(LoadingEditProfileState());
-        if(event.photo != null) {
+        if (event.photo != null) {
           await _repository.editProfile(
             event.firstName,
             event.lastName,
@@ -36,7 +30,7 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
             event.instagram,
             event.photo!,
           );
-        }else {
+        } else {
           await _repository.editProfile(
             event.firstName,
             event.lastName,
@@ -50,16 +44,17 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
         }
 
         await Future.delayed(Duration(milliseconds: 1000));
-        emit(CloseEditProfileState());
+        emit(UpdateEditProfileState());
       } catch (e, s) {
         print(e);
         print(s);
         emit(ErrorEditProfileState());
         emit(InitialEditProfileState());
       }
-    }
-    if (event is CloseScreenEvent) {
+    });
+
+    on<CloseScreenEvent>((event, emit) {
       emit(CloseEditProfileState());
-    }
+    });
   }
 }

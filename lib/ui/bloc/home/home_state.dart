@@ -16,6 +16,7 @@ class LoadedHomeState extends HomeState {
   final List<CoursesBean?> coursesFree;
   final List<InstructorBean?> instructors;
   final List<HomeLayoutBean?> layout;
+  final AppSettings appSettings;
 
   LoadedHomeState(
     this.categoryList,
@@ -24,6 +25,7 @@ class LoadedHomeState extends HomeState {
     this.coursesNew,
     this.coursesFree,
     this.instructors,
+      this.appSettings,
   );
 }
 

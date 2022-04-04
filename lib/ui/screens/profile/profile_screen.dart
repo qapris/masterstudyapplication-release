@@ -1,7 +1,14 @@
+import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:masterstudy_app/main.dart';
@@ -12,6 +19,7 @@ import 'package:masterstudy_app/ui/screens/orders/orders.dart';
 import 'package:masterstudy_app/ui/screens/profile_edit/profile_edit_screen.dart';
 import 'package:masterstudy_app/ui/screens/splash/splash_screen.dart';
 import 'package:package_info/package_info.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../data/utils.dart';
@@ -36,6 +44,9 @@ class ProfileScreenWidget extends StatefulWidget {
 
 class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
   late ProfileBloc _bloc;
+  ConnectivityResult _connectionStatus = ConnectivityResult.none;
+  final Connectivity _connectivity = Connectivity();
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
   String version = "";
 
@@ -47,6 +58,36 @@ class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
       setState(() {
         version = value.version;
       });
+    });
+    initConnectivity();
+
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+  }
+
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initConnectivity() async {
+    late ConnectivityResult result;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException catch (e) {
+      log(e.toString());
+      return;
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) {
+      return Future.value(null);
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    setState(() {
+      _connectionStatus = result;
     });
   }
 
@@ -64,7 +105,9 @@ class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
           return Scaffold(
               appBar: PreferredSize(
                 preferredSize: Size.fromHeight(0),
-                child: AppBar(),
+                child: AppBar(
+                  backgroundColor: mainColor,
+                ),
               ),
               body: SingleChildScrollView(
                 child: SafeArea(
@@ -87,7 +130,7 @@ class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
 
                     ///View my profile
                     _buildTile(
-                      localizations.getLocalization("view_my_profile"),
+                      localizations!.getLocalization("view_my_profile"),
                       "assets/icons/profile_icon.svg",
                       () {
                         if (state is LoadedProfileState)
@@ -101,7 +144,7 @@ class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
 
                     ///My orders
                     _buildTile(
-                      localizations.getLocalization("my_orders"),
+                      localizations!.getLocalization("my_orders"),
                       "assets/icons/orders_icon.svg",
                       () {
                         //if (state is LoadedProfileState)
@@ -113,7 +156,7 @@ class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
 
                     ///My courses
                     _buildTile(
-                      localizations.getLocalization("my_courses"),
+                      localizations!.getLocalization("my_courses"),
                       "assets/icons/ms_nav_courses.svg",
                       () {
                         this.widget.myCoursesCallback();
@@ -122,7 +165,7 @@ class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
 
                     ///Settings
                     _buildTile(
-                      localizations.getLocalization("settings"),
+                      localizations!.getLocalization("settings"),
                       "assets/icons/settings_icon.svg",
                       () async {
                         if (state is LoadedProfileState) {
@@ -137,7 +180,7 @@ class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
 
                     ///Logout
                     _buildTile(
-                      localizations.getLocalization("logout"),
+                      localizations!.getLocalization("logout"),
                       "assets/icons/logout_icon.svg",
                       () {
                         showLogoutDialog(context);
@@ -155,6 +198,14 @@ class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
 
   _buildHead(ProfileState state) {
     if (state is LoadedProfileState) {
+      String? img = '';
+
+      if (_connectionStatus == ConnectivityResult.wifi || _connectionStatus == ConnectivityResult.mobile) {
+        if (state.account.avatar_url != null) {
+          img = state.account.avatar_url;
+        }
+      }
+
       return InkWell(
         onTap: () {
           Navigator.pushNamed(
@@ -168,11 +219,16 @@ class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
           child: Row(
             children: <Widget>[
               ClipRRect(
-                borderRadius: BorderRadius.circular(60.0),
-                child: Image.network(
-                  state.account.avatar_url,
-                  fit: BoxFit.cover,
-                  height: 50.0,
+                borderRadius: BorderRadius.circular(60),
+                child: CachedNetworkImage(
+                  imageUrl: state.account.avatar_url!,
+                  placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) {
+                    return SizedBox(
+                      width: 50.0,
+                      child: Image.asset('assets/icons/logo.png'),
+                    );
+                  },
                   width: 50.0,
                 ),
               ),
@@ -182,7 +238,7 @@ class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      localizations.getLocalization("greeting_user"),
+                      localizations!.getLocalization("greeting_user"),
                       textScaleFactor: 1.0,
                       style: Theme.of(context).primaryTextTheme.subtitle2?.copyWith(color: HexColor.fromHex("#AAAAAA")),
                     ),
@@ -297,8 +353,11 @@ class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
     // set up the buttons
     Widget cancelButton = FlatButton(
       child: Text(
-        localizations.getLocalization("cancel_button"),
+        localizations!.getLocalization("cancel_button"),
         textScaleFactor: 1.0,
+        style: TextStyle(
+          color: mainColor,
+        ),
       ),
       onPressed: () {
         Navigator.of(context).pop();
@@ -306,8 +365,9 @@ class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
     );
     Widget continueButton = FlatButton(
       child: Text(
-        localizations.getLocalization("logout"),
+        localizations!.getLocalization("logout"),
         textScaleFactor: 1.0,
+        style: TextStyle(color: mainColor),
       ),
       onPressed: () {
         _bloc.add(LogoutProfileEvent());
@@ -316,9 +376,9 @@ class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
 
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      title: Text(localizations.getLocalization("logout"), textScaleFactor: 1.0, style: TextStyle(color: Colors.black, fontSize: 20.0)),
+      title: Text(localizations!.getLocalization("logout"), textScaleFactor: 1.0, style: TextStyle(color: Colors.black, fontSize: 20.0)),
       content: Text(
-        localizations.getLocalization("logout_message"),
+        localizations!.getLocalization("logout_message"),
         textScaleFactor: 1.0,
       ),
       actions: [
@@ -334,5 +394,11 @@ class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
         return alert;
       },
     );
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription.cancel();
+    super.dispose();
   }
 }

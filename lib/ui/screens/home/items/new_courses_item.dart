@@ -174,7 +174,7 @@ class NewCoursesWidget extends StatelessWidget {
       return Padding(
         padding: const EdgeInsets.only(left: 18.0),
         child: Text(
-          localizations.getLocalization("course_free_price"),
+          localizations!.getLocalization("course_free_price"),
           textScaleFactor: 1.0,
           style: Theme.of(context).primaryTextTheme.headline5?.copyWith(color: dark, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
         ),

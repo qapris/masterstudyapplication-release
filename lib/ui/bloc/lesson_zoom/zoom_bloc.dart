@@ -32,6 +32,7 @@ class LessonZoomBloc extends Bloc<LessonZoomEvent, LessonZoomState> {
 
         emit(LoadedLessonZoomState(response));
       } on DioError catch(e) {
+        log(e.response.toString());
       }
     } else if (event is CompleteLessonEvent) {
       try {

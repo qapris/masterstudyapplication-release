@@ -55,58 +55,84 @@ class _CategoryDetailScreenWidgetState extends State<_CategoryDetailScreenWidget
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<CategoryDetailBloc, CategoryDetailState>(
-        bloc: _bloc,
-        builder: (context, state) {
-          return Scaffold(
-              backgroundColor: HexColor.fromHex("#F3F5F9"),
-              appBar: AppBar(
-                  title: _buildTitleDropDown(state),
-                  bottom: PreferredSize(
-                      preferredSize: const Size.fromHeight(kToolbarHeight + 16),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0, left: 8, right: 2),
+      bloc: _bloc,
+      builder: (context, state) {
+        return Scaffold(
+            backgroundColor: HexColor.fromHex("#F3F5F9"),
+            appBar: AppBar(
+              title: _buildTitleDropDown(state),
+              backgroundColor: mainColor,
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(kToolbarHeight + 16),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0, left: 8, right: 2),
+                    ),
+                    //Search Field
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0, left: 2, right: 2),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.of(context).pushNamed(
+                            SearchDetailScreen.routeName,
+                            arguments: SearchDetailScreenArgs(
+                              "",
+                              categoryId: selCat.id,
+                            ),
+                          );
+                        },
+                        child: new Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(2.0),
                           ),
-                          Padding(
-                              padding: const EdgeInsets.only(bottom: 16.0, left: 2, right: 2),
-                              child: InkWell(
-                                  onTap: () {
-                                    Navigator.of(context).pushNamed(SearchDetailScreen.routeName, arguments: SearchDetailScreenArgs(""));
-                                  },
-                                  child: new Card(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(2.0),
+                          elevation: 4,
+                          color: Colors.white,
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: new Container(
+                              padding: EdgeInsets.all(8.0),
+                              child: new Column(
+                                children: <Widget>[
+                                  new Row(
+                                    children: <Widget>[
+                                      new Expanded(
+                                        child: new Text(
+                                          localizations!.getLocalization("search_bar_title"),
+                                          textScaleFactor: 1.0,
+                                          style: TextStyle(
+                                            color: Colors.black.withOpacity(0.5),
+                                          ),
+                                        ),
                                       ),
-                                      elevation: 4,
-                                      color: Colors.white,
-                                      child: Padding(
-                                          padding: const EdgeInsets.all(4.0),
-                                          child: new Container(
-                                              padding: EdgeInsets.all(8.0),
-                                              child: new Column(
-                                                children: <Widget>[
-                                                  new Row(children: <Widget>[
-                                                    new Expanded(
-                                                        child:
-                                                            new Text(localizations.getLocalization("search_bar_title"), textScaleFactor: 1.0, style: TextStyle(color: Colors.black.withOpacity(0.5)))),
-                                                    Icon(
-                                                      Icons.search,
-                                                      color: Colors.grey,
-                                                    ),
-                                                  ])
-                                                ],
-                                              ))))))
-                        ],
-                      ))),
-              body: SingleChildScrollView(child: _buildBody(state)));
-        });
+                                      Icon(
+                                        Icons.search,
+                                        color: Colors.grey,
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+            body: SingleChildScrollView(child: _buildBody(state)));
+      },
+    );
   }
 
+  ///Title in AppBar
   _buildTitleDropDown(CategoryDetailState state) {
     if (state is InitialCategoryDetailState) return Center();
+
     if (state is LoadedCategoryDetailState) {
       return Container(
         child: _buildDropDownCategory(state),
@@ -114,30 +140,36 @@ class _CategoryDetailScreenWidgetState extends State<_CategoryDetailScreenWidget
     }
   }
 
+  ///Body
   _buildBody(CategoryDetailState state) {
     if (state is ErrorCategoryDetailState)
-      return Center(
-        child: LoadingErrorWidget(() {
-          _bloc.add(FetchEvent(state.categoryId));
-        }),
-      );
+      return Center(child: LoadingErrorWidget(() {
+        _bloc.add(FetchEvent(state.categoryId));
+      }));
+
     if (state is InitialCategoryDetailState) return _buildLoading();
 
     if (state is LoadedCategoryDetailState) {
       return Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.max, children: <Widget>[
         Padding(
-            padding: const EdgeInsets.only(top: 30.0, left: 30.0, bottom: 5.0),
-            child: Text(unescape.convert(selCat.name), textScaleFactor: 1.0, style: Theme.of(context).primaryTextTheme.headline5?.copyWith(color: dark, fontStyle: FontStyle.normal))),
+          padding: const EdgeInsets.only(top: 30.0, left: 30.0, bottom: 5.0),
+          child: Text(
+            unescape.convert(selCat.name),
+            textScaleFactor: 1.0,
+            style: Theme.of(context).primaryTextTheme.headline5?.copyWith(color: dark, fontStyle: FontStyle.normal),
+          ),
+        ),
         _buildCourses(state)
       ]);
     }
   }
 
+  ///Courses
   _buildCourses(LoadedCategoryDetailState state) {
     return Padding(
-        padding: const EdgeInsets.only(left: 22.0, right: 22.0),
-        child: Container(
-            child: StaggeredGridView.countBuilder(
+      padding: const EdgeInsets.only(left: 22.0, right: 22.0),
+      child: Container(
+        child: StaggeredGridView.countBuilder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           crossAxisCount: 4,
@@ -154,34 +186,39 @@ class _CategoryDetailScreenWidgetState extends State<_CategoryDetailScreenWidget
               child: CourseGridItem(item),
             );
           },
-        )));
+        ),
+      ),
+    );
   }
 
+  ///DropdownCategory
   _buildDropDownCategory(LoadedCategoryDetailState state) {
     return DropdownButtonHideUnderline(
-        child: DropdownButton<Category>(
-      icon: Icon(Icons.arrow_drop_down),
-      iconSize: 18,
-      iconDisabledColor: Colors.white,
-      iconEnabledColor: Colors.white,
-      elevation: 16,
-      style: new TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
-      hint: Text(unescape.convert(selCat.name), textScaleFactor: 1.0, style: new TextStyle(color: Colors.white)),
-      onChanged: (Category? selectedCat) {
-        setState(() {
-          selCat = selectedCat!;
-        });
-        _bloc.add(FetchEvent(selectedCat!.id!));
-      },
-      items: state.categoryList.map((Category catList) {
-        return new DropdownMenuItem<Category>(
-          value: catList,
-          child: new Text(unescape.convert(catList.name), textScaleFactor: 1.0, style: new TextStyle(color: Colors.black)),
-        );
-      }).toList(),
-    ));
+      child: DropdownButton<Category>(
+        icon: Icon(Icons.arrow_drop_down),
+        iconSize: 18,
+        iconDisabledColor: Colors.white,
+        iconEnabledColor: Colors.white,
+        elevation: 16,
+        style: new TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
+        hint: Text(unescape.convert(selCat.name), textScaleFactor: 1.0, style: new TextStyle(color: Colors.white)),
+        onChanged: (Category? selectedCat) {
+          setState(() {
+            selCat = selectedCat!;
+          });
+          _bloc.add(FetchEvent(selectedCat!.id!));
+        },
+        items: state.categoryList.map((Category catList) {
+          return new DropdownMenuItem<Category>(
+            value: catList,
+            child: new Text(unescape.convert(catList.name), textScaleFactor: 1.0, style: new TextStyle(color: Colors.black)),
+          );
+        }).toList(),
+      ),
+    );
   }
 
+  ///Loading
   _buildLoading() {
     return Center(
       child: Padding(

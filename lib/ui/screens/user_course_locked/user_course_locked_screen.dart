@@ -193,7 +193,7 @@ class UserCourseLockedWidgetState extends State<UserCourseLockedWidget> {
                               color: secondColor,
                               onPressed: null,
                               child: Text(
-                                localizations.getLocalization("continue_button"),
+                                localizations!.getLocalization("continue_button"),
                                 textScaleFactor: 1.0,
                               ),
                               textColor: Colors.white,
@@ -233,7 +233,7 @@ class UserCourseLockedWidgetState extends State<UserCourseLockedWidget> {
             Padding(
               padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
               child: Text(
-                localizations.getLocalization("trial_version_is_over"),
+                localizations!.getLocalization("trial_version_is_over"),
                 textScaleFactor: 1.0,
                 style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w700),
               ),
@@ -241,7 +241,7 @@ class UserCourseLockedWidgetState extends State<UserCourseLockedWidget> {
             Padding(
               padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
               child: Text(
-                localizations.getLocalization("trial_version_is_over_description"),
+                localizations!.getLocalization("trial_version_is_over_description"),
                 textScaleFactor: 1.0,
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 15.0, color: HexColor.fromHex("#AAAAAA")),
@@ -299,7 +299,7 @@ class UserCourseLockedWidgetState extends State<UserCourseLockedWidget> {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Text(
-                localizations.getLocalization("course_free_price"),
+                localizations!.getLocalization("course_free_price"),
                 textScaleFactor: 1.0,
               ),
               Icon(Icons.arrow_drop_down)
@@ -307,7 +307,7 @@ class UserCourseLockedWidgetState extends State<UserCourseLockedWidget> {
           );
         } else {
           String? selectedPlan;
-          if (_bloc.selectedPaymetId == -1) selectedPlan = "${localizations.getLocalization("course_regular_price")} ${state.courseDetailResponse.price?.price}";
+          if (_bloc.selectedPaymetId == -1) selectedPlan = "${localizations!.getLocalization("course_regular_price")} ${state.courseDetailResponse.price?.price}";
           if (state.userPlans.isNotEmpty) {
             state.userPlans.forEach((value) {
               if (int.parse(value.id) == _bloc.selectedPaymetId) selectedPlan = value.name;
@@ -407,7 +407,7 @@ class UserCourseLockedWidgetState extends State<UserCourseLockedWidget> {
         }
       },
       child: Text(
-        localizations.getLocalization("start_course_button"),
+        localizations!.getLocalization("start_course_button"),
         textScaleFactor: 1.0,
         style: TextStyle(color: white),
       ),

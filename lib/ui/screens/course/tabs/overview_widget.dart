@@ -99,7 +99,7 @@ class _OverviewWidgetState extends State<OverviewWidget> with AutomaticKeepAlive
                   );
                 },
                 child: Text(
-                  localizations.getLocalization("write_review_button"),
+                  localizations!.getLocalization("write_review_button"),
                   textScaleFactor: 1.0,
                 ),
                 textColor: Colors.white,
@@ -161,11 +161,11 @@ class _OverviewWidgetState extends State<OverviewWidget> with AutomaticKeepAlive
             children: <Widget>[
               descTextShowFlag
                   ? Text(
-                      localizations.getLocalization("show_less_button"),
+                      localizations!.getLocalization("show_less_button"),
                       textScaleFactor: 1.0,
                       style: TextStyle(color: mainColor),
                     )
-                  : Text(localizations.getLocalization("show_more_button"), textScaleFactor: 1.0, style: TextStyle(color: mainColor))
+                  : Text(localizations!.getLocalization("show_more_button"), textScaleFactor: 1.0, style: TextStyle(color: mainColor))
             ],
           ),
         ),
@@ -214,11 +214,11 @@ class _OverviewWidgetState extends State<OverviewWidget> with AutomaticKeepAlive
                 children: <Widget>[
                   annoncementTextShowFlag
                       ? Text(
-                          localizations.getLocalization("show_less_button"),
+                          localizations!.getLocalization("show_less_button"),
                           textScaleFactor: 1.0,
                           style: TextStyle(color: mainColor),
                         )
-                      : Text(localizations.getLocalization("show_more_button"), textScaleFactor: 1.0, style: TextStyle(color: mainColor))
+                      : Text(localizations!.getLocalization("show_more_button"), textScaleFactor: 1.0, style: TextStyle(color: mainColor))
                 ],
               ),
             ),
@@ -247,7 +247,7 @@ class _OverviewWidgetState extends State<OverviewWidget> with AutomaticKeepAlive
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.only(top: 20.0, bottom: 20.0),
-              child: Text(localizations.getLocalization("annoncement_title"),
+              child: Text(localizations!.getLocalization("annoncement_title"),
                   textScaleFactor: 1.0, style: Theme.of(context).primaryTextTheme.headline6?.copyWith(color: dark, fontStyle: FontStyle.normal)),
             )
           ],
@@ -283,11 +283,11 @@ class _OverviewWidgetState extends State<OverviewWidget> with AutomaticKeepAlive
                 children: <Widget>[
                   annoncementTextShowFlag
                       ? Text(
-                          localizations.getLocalization("show_less_button"),
+                          localizations!.getLocalization("show_less_button"),
                           textScaleFactor: 1.0,
                           style: TextStyle(color: mainColor),
                         )
-                      : Text(localizations.getLocalization("show_more_button"), textScaleFactor: 1.0, style: TextStyle(color: mainColor))
+                      : Text(localizations!.getLocalization("show_more_button"), textScaleFactor: 1.0, style: TextStyle(color: mainColor))
                 ],
               ),
             ),
@@ -309,7 +309,7 @@ class _OverviewWidgetState extends State<OverviewWidget> with AutomaticKeepAlive
             Padding(
               padding: const EdgeInsets.only(top: 20.0, bottom: 20.0),
               child:
-                  Text(localizations.getLocalization("reviews_title"), textScaleFactor: 1.0, style: Theme.of(context).primaryTextTheme.headline6?.copyWith(color: dark, fontStyle: FontStyle.normal)),
+                  Text(localizations!.getLocalization("reviews_title"), textScaleFactor: 1.0, style: Theme.of(context).primaryTextTheme.headline6?.copyWith(color: dark, fontStyle: FontStyle.normal)),
             )
           ],
         ),
@@ -361,7 +361,7 @@ class _OverviewWidgetState extends State<OverviewWidget> with AutomaticKeepAlive
                         Padding(
                           padding: const EdgeInsets.only(top: 8.0),
                           child: Text(
-                            "(${rating.total} ${localizations.getLocalization("reviews_count")})",
+                            "(${rating.total} ${localizations!.getLocalization("reviews_count")})",
                             textScaleFactor: 1.0,
                             style: TextStyle(color: HexColor.fromHex("#AAAAAA")),
                           ),
@@ -382,7 +382,7 @@ class _OverviewWidgetState extends State<OverviewWidget> with AutomaticKeepAlive
       child: Row(
         children: <Widget>[
           Text(
-            "$stars ${localizations.getLocalization("stars_count")}",
+            "$stars ${localizations!.getLocalization("stars_count")}",
             textScaleFactor: 1.0,
             style: TextStyle(color: HexColor.fromHex("#777777"), fontWeight: FontWeight.bold, fontSize: 14),
           ),
@@ -439,11 +439,11 @@ class _OverviewWidgetState extends State<OverviewWidget> with AutomaticKeepAlive
                     children: <Widget>[
                       reviewsListShowItems != 1
                           ? Text(
-                              localizations.getLocalization("show_less_button"),
+                              localizations!.getLocalization("show_less_button"),
                               textScaleFactor: 1.0,
                               style: TextStyle(color: mainColor),
                             )
-                          : Text(localizations.getLocalization("show_more_button"), textScaleFactor: 1.0, style: TextStyle(color: mainColor))
+                          : Text(localizations!.getLocalization("show_more_button"), textScaleFactor: 1.0, style: TextStyle(color: mainColor))
                     ],
                   ),
                 ),
