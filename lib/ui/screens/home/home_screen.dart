@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inject/inject.dart';
@@ -33,12 +32,10 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: mainColor,
         ),
       ),
-      body: SafeArea(
-        child: BlocBuilder<HomeBloc, HomeState>(
-          builder: (context, state) {
-            return _buildBody(context, state);
-          },
-        ),
+      body: BlocBuilder<HomeBloc, HomeState>(
+        builder: (context, state) {
+          return _buildBody(context, state);
+        },
       ),
     );
   }
@@ -46,24 +43,25 @@ class _HomeScreenState extends State<HomeScreen> {
   _buildBody(context, state) {
     if (state is LoadedHomeState) {
       return ListView.builder(
-          itemCount: state.layout.length,
-          itemBuilder: (context, index) {
-            var item = state.layout[index];
-            switch (item?.id) {
-              case 1:
-                return CategoriesWidget(item?.name, state.categoryList);
-              case 2:
-                return NewCoursesWidget(item?.name, state.coursesNew);
-              case 3:
-                return TrendingWidget(true, item?.name, state.coursesTranding);
-              case 4:
-                return TopInstructorsWidget(item?.name, state.instructors);
-              case 5:
-                return TrendingWidget(false, item?.name, state.coursesFree);
-              default:
-                return NewCoursesWidget(item?.name, state.coursesNew);
-            }
-          });
+        itemCount: state.layout.length,
+        itemBuilder: (context, index) {
+          var item = state.layout[index];
+          switch (item?.id) {
+            case 1:
+              return CategoriesWidget(item?.name, state.categoryList);
+            case 2:
+              return NewCoursesWidget(item?.name, state.coursesNew);
+            case 3:
+              return TrendingWidget(true, item?.name, state.coursesTranding);
+            case 4:
+              return TopInstructorsWidget(item?.name, state.instructors);
+            case 5:
+              return TrendingWidget(false, item?.name, state.coursesFree);
+            default:
+              return NewCoursesWidget(item?.name, state.coursesNew);
+          }
+        },
+      );
     }
 
     if (state is InitialHomeState) {

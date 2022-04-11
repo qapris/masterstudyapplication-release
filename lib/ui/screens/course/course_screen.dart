@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -15,15 +16,17 @@ import 'package:masterstudy_app/ui/screens/category_detail/category_detail_scree
 import 'package:masterstudy_app/ui/screens/course/tabs/curriculum_widget.dart';
 import 'package:masterstudy_app/ui/screens/course/tabs/overview_widget.dart';
 import 'package:masterstudy_app/ui/screens/detail_profile/detail_profile_screen.dart';
-import 'package:masterstudy_app/ui/screens/porchase_dialog/purchase_dialog.dart';
 import 'package:masterstudy_app/ui/screens/search_detail/search_detail_screen.dart';
 import 'package:masterstudy_app/ui/screens/user_course/user_course.dart';
 import 'package:masterstudy_app/ui/screens/web_checkout/web_checkout_screen.dart';
 import 'package:masterstudy_app/ui/widgets/dialog_author.dart';
 import 'package:masterstudy_app/ui/widgets/loading_error_widget.dart';
+import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
+import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
 import 'package:share/share.dart';
 import 'package:transparent_image/transparent_image.dart';
 import '../../../main.dart';
+import '../purchase_dialog/purchase_dialog.dart';
 import 'tabs/faq_widget.dart';
 
 class CourseScreenArgs {
@@ -163,6 +166,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
         builder: (context, state) {
           var tabLength = 2;
 
+          //Set tabLength
           if (state is LoadedCourseState) {
             if (state.courseDetailResponse.faq != null && state.courseDetailResponse.faq!.isNotEmpty) tabLength = 3;
           }
@@ -392,7 +396,10 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
                     )
                   ];
                 },
-                body: AnimatedSwitcher(duration: Duration(milliseconds: 150), child: _buildBody(state)),
+                body: AnimatedSwitcher(
+                  duration: Duration(milliseconds: 150),
+                  child: _loading ? const CircularProgressIndicator() : _buildBody(state),
+                ),
               ),
               bottomNavigationBar: _buildBottom(state),
             ),
@@ -402,10 +409,10 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
     );
   }
 
+
   bool get _isAppBarExpanded {
     if (screenHeight == null) screenHeight = MediaQuery.of(context).size.height;
     if (_scrollController.offset > (screenHeight / kef - (kToolbarHeight * kef))) return _scrollController.hasClients && _scrollController.offset > (screenHeight / kef - (kToolbarHeight * kef));
-
     return false;
   }
 
@@ -440,14 +447,45 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
   }
 
   _buildBottom(CourseState state) {
+    ///Button is "Start Course" if has_access == true
     if (state is LoadedCourseState && state.courseDetailResponse.has_access) {
       return Container(
-          decoration: BoxDecoration(
-            color: HexColor.fromHex("#F6F6F6"),
+        decoration: BoxDecoration(
+          color: HexColor.fromHex("#F6F6F6"),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: MaterialButton(
+            height: 40,
+            color: secondColor,
+            onPressed: () {
+              Navigator.of(context).pushNamed(
+                UserCourseScreen.routeName,
+                arguments: UserCourseScreenArgs(
+                  state.courseDetailResponse.id.toString(),
+                  widget.coursesBean.title,
+                  widget.coursesBean.images?.small,
+                  state.courseDetailResponse.author?.avatar_url,
+                  state.courseDetailResponse.author?.login,
+                  "0",
+                  "1",
+                  "",
+                  "",
+                  isFirstStart: true,
+                ),
+              );
+            },
+            child: Text(
+              localizations!.getLocalization("start_course_button"),
+              textScaleFactor: 1.0,
+              style: TextStyle(color: white),
+            ),
           ),
-          child: Padding(padding: const EdgeInsets.all(20.0), child: _buildStartButton(state)));
+        ),
+      );
     }
 
+    ///If course not free
     return Container(
       decoration: BoxDecoration(
         color: HexColor.fromHex("#F6F6F6"),
@@ -463,23 +501,30 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
             MaterialButton(
               height: 40,
               color: mainColor,
-              onPressed: () {
+              onPressed: () async {
                 if (state is LoadedCourseState) {
+
+                  //IOS
                   if (Platform.isIOS) {
                     if (_products.isNotEmpty) {
                       PurchaseParam purchaseParam = PurchaseParam(productDetails: _products[0]);
-                      print('${_products[0].title}: ${_products[0].description} (cost is ${_products[0].price})');
-                      _connection.buyNonConsumable(purchaseParam: purchaseParam);
+                      _inAppPurchase.buyNonConsumable(purchaseParam: purchaseParam).catchError((error) {});
                     } else {
                       _showInAppNotFound();
                     }
-                  } else {
-                    if (!state.courseDetailResponse.has_access) {
-                      if (_bloc.selectedPaymetId == -1) {
-                        _bloc.add(AddToCart(state.courseDetailResponse.id));
+                  }
+
+                  //Android
+                  if (Platform.isAndroid) {
+                    if (_products.isNotEmpty) {
+                      PurchaseParam purchaseParam = PurchaseParam(productDetails: _products[0]);
+                      if (_products[0].id == 'consumable') {
+                        _inAppPurchase.buyConsumable(purchaseParam: purchaseParam);
                       } else {
-                        _bloc.add(UsePlan(state.courseDetailResponse.id));
+                        _inAppPurchase.buyNonConsumable(purchaseParam: purchaseParam);
                       }
+                    } else {
+                      _showInAppNotFound();
                     }
                   }
                 }
@@ -503,31 +548,47 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
                 localizations!.getLocalization("course_free_price"),
                 textScaleFactor: 1.0,
               ),
-              (!Platform.isIOS) ? Icon(Icons.arrow_drop_down) : Text("")
+              Platform.isAndroid ? Icon(Icons.arrow_drop_down) : Text("")
             ],
           );
         } else {
           String? selectedPlan;
-          if (_bloc.selectedPaymetId == -1) selectedPlan = "${localizations!.getLocalization("course_regular_price")} ${state.courseDetailResponse.price?.price}";
+
+          //Set price for course
+          if (_bloc.selectedPaymetId == -1) {
+            selectedPlan = "${localizations!.getLocalization("course_regular_price")} ${state.courseDetailResponse.price?.price}";
+          }
+
+          //If user have plans
           if (state.userPlans.isNotEmpty) {
             state.userPlans.forEach((value) {
-              if (int.parse(value.subscription_id) == _bloc.selectedPaymetId) selectedPlan = value.name;
+              if (int.parse(value.subscription_id) == _bloc.selectedPaymetId) {
+                selectedPlan = value.name;
+              }
             });
           }
-          if (_products.isNotEmpty) selectedPlan = "${localizations!.getLocalization("course_regular_price")} ${_products[0].price}";
+
+          //If products is not empty
+          if (_products.isNotEmpty) {
+            selectedPlan = "${localizations!.getLocalization("course_regular_price")} ${_products[0].price}";
+          }
+
           return GestureDetector(
             onTap: () async {
-              if (!Platform.isIOS) {
+              if (Platform.isAndroid) {
                 var dialog = showDialog(
-                    context: context,
-                    builder: (builder) {
-                      return BlocProvider.value(
-                        child: Dialog(
-                          child: PurchaseDialog(),
+                  context: context,
+                  builder: (builder) {
+                    return BlocProvider.value(
+                      child: Dialog(
+                        child: PurchaseDialog(
+                          detailsProduct: _products,
                         ),
-                        value: _bloc,
-                      );
-                    });
+                      ),
+                      value: _bloc,
+                    );
+                  },
+                );
 
                 dialog.then((value) {
                   if (value == "update") {
@@ -545,7 +606,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
                   selectedPlan!,
                   textScaleFactor: 1.0,
                 ),
-                (!Platform.isIOS) ? Icon(Icons.arrow_drop_down) : Text("")
+                Platform.isAndroid ? Icon(Icons.arrow_drop_down) : Text("")
               ],
             ),
           );
@@ -609,61 +670,38 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
     }
   }
 
-  _buildStartButton(LoadedCourseState state) {
-    return MaterialButton(
-      height: 40,
-      color: secondColor,
-      onPressed: () {
-        Navigator.of(context).pushNamed(
-          UserCourseScreen.routeName,
-          arguments: UserCourseScreenArgs(state.courseDetailResponse.id.toString(), widget.coursesBean.title, widget.coursesBean.images?.small, state.courseDetailResponse.author?.avatar_url,
-              state.courseDetailResponse.author?.login, "0", "1", "", "",
-              isFirstStart: true),
-        );
-      },
-      child: Text(
-        localizations!.getLocalization("start_course_button"),
-        textScaleFactor: 1.0,
-        style: TextStyle(color: white),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _subscription.cancel();
-    super.dispose();
-  }
-
-  //InApp
-  final InAppPurchase _connection = InAppPurchase.instance;
+  ///InAppPurchase methods and variables
+  final InAppPurchase _inAppPurchase = InAppPurchase.instance;
   late StreamSubscription<List<PurchaseDetails>> _subscription;
   List<String> _notFoundIds = [];
   List<ProductDetails> _products = [];
   List<PurchaseDetails> _purchases = [];
   List<String> _consumables = [];
-  bool _isAvailable = false;
+  bool isAvailable = false;
   bool _purchasePending = false;
-  bool _loading = true;
+  bool _loading = false;
   String? _queryProductError;
 
-  _initInApp() {
-    Stream purchaseUpdated = InAppPurchase.instance.purchaseStream;
-    _subscription = InAppPurchase.instance.purchaseStream.listen((purchaseDetailsList) {
+  _initInApp() async {
+    Stream<List<PurchaseDetails>> purchaseUpdated = _inAppPurchase.purchaseStream;
+    _subscription = purchaseUpdated.listen((purchaseDetailsList) {
       _listenToPurchaseUpdated(purchaseDetailsList);
     }, onDone: () {
       _subscription.cancel();
     }, onError: (error) {
-      // handle error here.
+      log(error.toString());
     });
+
     initStoreInfo();
   }
 
   Future<void> initStoreInfo() async {
-    final bool isAvailable = await _connection.isAvailable();
+    isAvailable = await _inAppPurchase.isAvailable();
+
+
     if (!isAvailable) {
       setState(() {
-        _isAvailable = isAvailable;
+        isAvailable = isAvailable;
         _products = [];
         _purchases = [];
         _notFoundIds = [];
@@ -674,13 +712,20 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
       return;
     }
 
+    if (Platform.isIOS) {
+      final InAppPurchaseStoreKitPlatformAddition iosPlatformAddition = _inAppPurchase.getPlatformAddition<InAppPurchaseStoreKitPlatformAddition>();
+      await iosPlatformAddition.setDelegate(ExamplePaymentQueueDelegate());
+    }
+
     var courseId = widget.coursesBean.id.toString();
-    ProductDetailsResponse productDetailResponse = await _connection.queryProductDetails({courseId});
+    ProductDetailsResponse productDetailResponse = await _inAppPurchase.queryProductDetails({courseId, '${courseId}_360photos'});
+
+    print('isAvailable: ${isAvailable}, product: ${productDetailResponse.productDetails}');
 
     if (productDetailResponse.error != null) {
       setState(() {
         _queryProductError = productDetailResponse.error?.message;
-        _isAvailable = isAvailable;
+        isAvailable = isAvailable;
         _products = productDetailResponse.productDetails;
         _purchases = [];
         _notFoundIds = productDetailResponse.notFoundIDs;
@@ -694,7 +739,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
     if (productDetailResponse.productDetails.isEmpty) {
       setState(() {
         _queryProductError = null;
-        _isAvailable = isAvailable;
+        isAvailable = isAvailable;
         _products = productDetailResponse.productDetails;
         _purchases = [];
         _notFoundIds = productDetailResponse.notFoundIDs;
@@ -705,19 +750,8 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
       return;
     }
 
-    // final QueryPurchaseDetailsResponse purchaseResponse =
-    //     await _connection.queryPastPurchases();
-//    if (purchaseResponse.error != null) {
-//      // handle query past purchase error..
-//    }
-//    final List<PurchaseDetails> verifiedPurchases = [];
-//    for (PurchaseDetails purchase in purchaseResponse.pastPurchases) {
-//      if (await _verifyPurchase(purchase)) {
-//        verifiedPurchases.add(purchase);
-//      }
-//    }
     setState(() {
-      _isAvailable = isAvailable;
+      isAvailable = isAvailable;
       _products = productDetailResponse.productDetails;
       //_purchases = verifiedPurchases;
       _notFoundIds = productDetailResponse.notFoundIDs;
@@ -726,24 +760,40 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
     });
   }
 
+  //ListenPurchaseUpdate (После нажатия на "get now" прослушивает статус покупки)
   void _listenToPurchaseUpdated(List<PurchaseDetails?> purchaseDetailsList) {
     purchaseDetailsList.forEach((PurchaseDetails? purchaseDetails) async {
       if (purchaseDetails?.status == PurchaseStatus.pending) {
+        showPendingUI();
       } else {
         if (purchaseDetails?.status == PurchaseStatus.error) {
-          handleError(purchaseDetails?.error);
+          handleError(purchaseDetails!.error);
+          setState(() {
+            _loading = false;
+          });
         } else if (purchaseDetails?.status == PurchaseStatus.purchased) {
-          _verifyPurchase(purchaseDetails!);
+          setState(() {
+            _loading = true;
+          });
+          _verifyPurchase(purchaseDetails);
         }
+
         if (purchaseDetails?.pendingCompletePurchase ?? false) {
-          await InAppPurchase.instance.completePurchase(purchaseDetails!);
+          setState(() {
+            _loading = false;
+          });
+          await _inAppPurchase.completePurchase(purchaseDetails!);
         }
       }
     });
   }
 
+  //Verify purchase (Если покупка прошла то отправляется запрос на сервер)
   Future<bool> _verifyPurchase(PurchaseDetails? purchaseDetails) async {
-    _bloc.add(VerifyInAppPurchase(purchaseDetails!.verificationData.serverVerificationData, _products[0].price, widget.coursesBean.id));
+    _bloc.add(
+      VerifyInAppPurchase(purchaseDetails!.verificationData.serverVerificationData, _products[0].price, widget.coursesBean.id),
+    );
+
     return Future<bool>.value(true);
   }
 
@@ -751,9 +801,37 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
     // handle invalid purchase here if  _verifyPurchase` failed.
   }
 
+  void showPendingUI() {
+    setState(() {
+      _purchasePending = true;
+    });
+  }
+
   void handleError(IAPError? error) {
     setState(() {
-      //_purchasePending = false;
+      _purchasePending = false;
     });
+  }
+
+  @override
+  void dispose() {
+    if (Platform.isIOS) {
+      final InAppPurchaseStoreKitPlatformAddition iosPlatformAddition = _inAppPurchase.getPlatformAddition<InAppPurchaseStoreKitPlatformAddition>();
+      iosPlatformAddition.setDelegate(null);
+    }
+    _subscription.cancel();
+    super.dispose();
+  }
+}
+
+class ExamplePaymentQueueDelegate implements SKPaymentQueueDelegateWrapper {
+  @override
+  bool shouldContinueTransaction(SKPaymentTransactionWrapper transaction, SKStorefrontWrapper storefront) {
+    return true;
+  }
+
+  @override
+  bool shouldShowPriceConsent() {
+    return false;
   }
 }

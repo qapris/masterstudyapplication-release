@@ -6,6 +6,7 @@ import 'dart:ui';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'models/AppSettings.dart';
@@ -17,15 +18,13 @@ extension QueryParameterAdd on Map {
     }
   }
 }
+
 List<dynamic> record = [];
 List<Map<String, int>> recordMap = [];
-
 
 var dio = Dio();
 
 late SharedPreferences preferences;
-
-late Connectivity connectivity;
 
 ///Timer
 late Timer timer;

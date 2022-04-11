@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
@@ -52,32 +51,6 @@ class _CoursesWidgetState extends State<_CoursesWidget> {
     _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
     _bloc = BlocProvider.of<UserCoursesBloc>(context)..add(FetchEvent());
     updateCompletedLesson();
-  }
-
-  void updateCompletedLesson() async {
-    ///Lessons Offline Mode
-    final myList = recordMap;
-    final jsonList = myList.map((item) => jsonEncode(item)).toList();
-    final uniqueJsonList = jsonList.toSet().toList();
-    final result = uniqueJsonList.map((item) => jsonDecode(item)).toList();
-
-    ///Lessons Offline Mode
-
-    if (_connectionStatus == ConnectivityResult.wifi || _connectionStatus == ConnectivityResult.mobile) {
-      try {
-        for (var el in result) {
-          Response response = await dio.put(
-            apiEndpoint + "course/lesson/complete",
-            data: {"course_id": el['course_id'], "item_id": el['lesson_id']},
-            options: Options(
-              headers: {"requirestoken": "true"},
-            ),
-          );
-        }
-      } catch (e) {
-        log(e.toString());
-      }
-    }
   }
 
   @override
@@ -180,6 +153,31 @@ class _CoursesWidgetState extends State<_CoursesWidget> {
   void dispose() {
     _connectivitySubscription.cancel();
     super.dispose();
+  }
+
+  void updateCompletedLesson() async {
+    ///Lessons Offline Mode
+    final myList = recordMap;
+    final jsonList = myList.map((item) => jsonEncode(item)).toList();
+    final uniqueJsonList = jsonList.toSet().toList();
+    final result = uniqueJsonList.map((item) => jsonDecode(item)).toList();
+
+    ///Lessons Offline Mode
+    if (_connectionStatus == ConnectivityResult.wifi || _connectionStatus == ConnectivityResult.mobile) {
+      try {
+        for (var el in result) {
+          Response response = await dio.put(
+            apiEndpoint + "course/lesson/complete",
+            data: {"course_id": el['course_id'], "item_id": el['lesson_id']},
+            options: Options(
+              headers: {"requirestoken": "true"},
+            ),
+          );
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
   }
 
   Future<void> initConnectivity() async {

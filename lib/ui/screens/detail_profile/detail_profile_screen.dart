@@ -88,12 +88,13 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
     return BlocBuilder<DetailProfileBloc, DetailProfileState>(
       builder: (context, state) {
         var isTeacher = false;
-
         var tabsCount = 0;
+
         if (state is LoadedDetailProfileState) {
           isTeacher = state.isTeacher;
           if (isTeacher) tabsCount = 2;
         }
+
         return DefaultTabController(
           length: tabsCount,
           child: Scaffold(
@@ -129,9 +130,7 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
                           ),
                           expandedHeight: MediaQuery.of(context).size.height / kef,
                           floating: false,
-                          // <--- this is required if you want the appbar to come back into view when you scroll up
                           pinned: true,
-                          // <--- this will make the appbar disappear on scrolling down
                           snap: false,
                           actions: <Widget>[
                             Visibility(
@@ -141,13 +140,14 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
                                 onPressed: () {},
                               ),
                             ),
-                            Visibility(
+                            //Favorite
+                            /*  Visibility(
                               visible: isTeacher,
                               child: IconButton(
                                 icon: Icon(Icons.favorite),
                                 onPressed: () {},
                               ),
-                            ),
+                            ),*/
                             IconButton(
                               icon: Icon(Icons.search),
                               onPressed: () {
@@ -213,7 +213,7 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
                                                 Padding(
                                                   padding: const EdgeInsets.only(left: 8.0),
                                                   child: Text(
-                                                    "${_bloc.account!.rating?.average.toDouble()} (${_bloc.account!.rating?.total_marks})",
+                                                    "${_bloc.account!.rating?.average.toDouble()} ${_bloc.account!.rating?.total_marks != '' ? '(${_bloc.account!.rating!.total_marks})' : ''}",
                                                     textScaleFactor: 1.0,
                                                     style: TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.5)),
                                                   ),
@@ -320,17 +320,18 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
                   reviews = item.rating?.total as int?;
                 }
                 return GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        CourseScreen.routeName,
-                        arguments: CourseScreenArgs.fromCourseBean(item),
-                      );
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
-                      child: _buildCard(context, item.images?.full, item.categories_object.first, "${item.title}", rating, reviews, item.price?.price, item.price?.old_price, item.price?.free),
-                    ));
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      CourseScreen.routeName,
+                      arguments: CourseScreenArgs.fromCourseBean(item),
+                    );
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
+                    child: _buildCard(context, item.images?.full, item.categories_object.first, "${item.title}", rating, reviews, item.price?.price, item.price?.old_price, item.price?.free),
+                  ),
+                );
               },
             ),
           ],
