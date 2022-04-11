@@ -1,16 +1,15 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:external_path/external_path.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_downloader/image_downloader.dart';
 import 'package:masterstudy_app/data/utils.dart';
 import 'package:masterstudy_app/theme/theme.dart';
@@ -26,8 +25,6 @@ import 'package:masterstudy_app/ui/widgets/warning_lessong_dialog.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:webview_flutter/platform_interface.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-
 import '../../../main.dart';
 
 class TextLessonScreenArgs {
@@ -83,16 +80,43 @@ class TextLessonWidget extends StatefulWidget {
 
 class TextLessonWidgetState extends State<TextLessonWidget> {
   late TextLessonBloc _bloc;
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+  ConnectivityResult _connectionStatus = ConnectivityResult.none;
+  final Connectivity _connectivity = Connectivity();
   bool completed = false;
 
   @override
   void initState() {
     super.initState();
+    initConnectivity();
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
     _bloc = BlocProvider.of<TextLessonBloc>(context)..add(FetchEvent(widget.courseId, widget.lessonId));
     ImageDownloader.callback(onProgressUpdate: (String? imageId, int progress) {
       setState(() {
         _progress = progress;
       });
+    });
+  }
+
+  Future<void> initConnectivity() async {
+    late ConnectivityResult result;
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException catch (e) {
+      log(e.toString());
+      return;
+    }
+
+    if (!mounted) {
+      return Future.value(null);
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    setState(() {
+      _connectionStatus = result;
     });
   }
 
@@ -191,7 +215,8 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
       return Column(
         children: [
           _buildWebView(state),
-          _buildLessonMaterials(state),
+            _connectionStatus == ConnectivityResult.wifi || _connectionStatus == ConnectivityResult.mobile ?
+            _buildLessonMaterials(state) : SizedBox(),
         ],
       );
     }
@@ -677,5 +702,11 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
         ],
       );
     }
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription.cancel();
+    super.dispose();
   }
 }

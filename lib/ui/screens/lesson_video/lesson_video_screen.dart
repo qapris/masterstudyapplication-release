@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
@@ -85,12 +86,22 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
   late VideoPlayerController _controller;
   late YoutubePlayerController _youtubePlayerController;
   late VoidCallback listener;
+  late WebViewController _descriptionWebViewController;
+
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+  final Connectivity _connectivity = Connectivity();
+  ConnectivityResult _connectionStatus = ConnectivityResult.none;
 
   bool completed = false;
   bool video = true;
   bool videoPlayed = false;
   bool videoLoaded = false;
+  bool isLoading = false;
   int _progress = 0;
+  double? descriptionHeight;
+  var progress = '';
+  Map<String, dynamic>? progressMap = {};
+  Widget? svgIcon;
 
   void _enableRotation() {
     SystemChrome.setPreferredOrientations([
@@ -103,6 +114,8 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
   void initState() {
     super.initState();
     _enableRotation();
+    initConnectivity();
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
     _bloc = BlocProvider.of<LessonVideoBloc>(context)..add(FetchEvent(widget.courseId, widget.lessonId));
     ImageDownloader.callback(onProgressUpdate: (String? imageId, int progress) {
       setState(() {
@@ -326,7 +339,7 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
           _buildWebContent(state.lessonResponse.content),
 
           //MaterialsContent
-          _buildMaterialsContent(state),
+          _connectionStatus == ConnectivityResult.wifi || _connectionStatus == ConnectivityResult.mobile ? _buildMaterialsContent(state) : SizedBox(),
         ],
       );
     }
@@ -337,9 +350,6 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
       );
     }
   }
-
-  late WebViewController _descriptionWebViewController;
-  double? descriptionHeight;
 
   ///Web Content
   _buildWebContent(String content) {
@@ -377,13 +387,7 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
         ));
   }
 
-  var progress = '';
-  bool isLoading = false;
-  Map<String, dynamic>? progressMap = {};
-  Widget? svgIcon;
-
   ///Materials Content
-  // TODO: Добавить размер файла и формат
   _buildMaterialsContent(state) {
     return Column(
       children: [
@@ -458,7 +462,7 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
                 case 'zip':
                   svgIcon = SvgPicture.asset('assets/icons/zip.svg');
                   break;
-                default :
+                default:
                   svgIcon = SvgPicture.asset('assets/icons/txt.svg');
               }
               return Container(
@@ -471,7 +475,7 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    SizedBox(width: 50,height: 30, child: svgIcon!),
+                    SizedBox(width: 50, height: 30, child: svgIcon!),
                     //Materials Label
                     Expanded(
                       child: Text(
@@ -605,7 +609,6 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
   }
 
   ///Bottom Button
-  //Bottom button "Complete Lesson" and "arrow"
   _buildBottom(LessonVideoState state) {
     if (state is InitialLessonVideoState) {
       return Center(
@@ -833,7 +836,25 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
     }
   }
 
-  _launchURL(String url) async {
-    await launch(url);
+  Future<void> initConnectivity() async {
+    late ConnectivityResult result;
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException catch (e) {
+      log(e.toString());
+      return;
+    }
+
+    if (!mounted) {
+      return Future.value(null);
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    setState(() {
+      _connectionStatus = result;
+    });
   }
 }

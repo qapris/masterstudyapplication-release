@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -32,6 +33,7 @@ class _OverviewWidgetState extends State<OverviewWidget> with AutomaticKeepAlive
   int reviewsListShowItems = 1;
 
   @override
+  // ignore: must_call_super
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Padding(
@@ -126,25 +128,29 @@ class _OverviewWidgetState extends State<OverviewWidget> with AutomaticKeepAlive
     }
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-      Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-        ConstrainedBox(
-          constraints: BoxConstraints(maxHeight: double.parse(webContainerHeight.toString())),
-          child: WebView(
-            javascriptMode: JavascriptMode.unrestricted,
-            initialUrl: 'data:text/html;base64,${base64Encode(const Utf8Encoder().convert(widget.response.description!))}',
-            onPageFinished: (some) async {
-              dynamic height = await _descriptionWebViewController!.evaluateJavascript("document.documentElement.scrollHeight;");
-              setState(() {
-                descriptionHeight = height!;
-              });
-            },
-            onWebViewCreated: (controller) async {
-              controller.clearCache();
-              this._descriptionWebViewController = controller;
-            },
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: double.parse(webContainerHeight.toString())),
+            child: WebView(
+              javascriptMode: JavascriptMode.unrestricted,
+              initialUrl: 'data:text/html;base64,${base64Encode(const Utf8Encoder().convert(widget.response.description!))}',
+              onPageFinished: (some) async {
+                dynamic height = await _descriptionWebViewController!.evaluateJavascript("document.documentElement.scrollHeight;");
+                setState(() {
+                  descriptionHeight = height!;
+                });
+              },
+              onWebViewCreated: (controller) async {
+                controller.clearCache();
+                this._descriptionWebViewController = controller;
+                _descriptionWebViewController?.loadUrl(Uri.dataFromString(widget.response.description!, mimeType: 'text/html', encoding: Encoding.getByName('utf-8')).toString());
+              },
+            ),
           ),
-        ),
-      ]),
+        ],
+      ),
       Padding(
         padding: const EdgeInsets.only(top: 8.0),
         child: InkWell(

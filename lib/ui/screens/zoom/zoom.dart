@@ -1,16 +1,19 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:external_path/external_path.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_downloader/image_downloader.dart';
 import 'package:masterstudy_app/data/utils.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../main.dart';
@@ -70,13 +73,41 @@ class LessonZoomScreenWidget extends StatefulWidget {
 class _LessonZoomScreenWidgetState extends State<LessonZoomScreenWidget> {
   late LessonZoomBloc _bloc;
   late WebViewController _webViewController;
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+  ConnectivityResult _connectionStatus = ConnectivityResult.none;
+  final Connectivity _connectivity = Connectivity();
+  final Completer<WebViewController> _controller = Completer<WebViewController>();
   double? descriptionHeight;
   bool showLoadingWebview = true;
 
   @override
   void initState() {
+    initConnectivity();
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
     _bloc = BlocProvider.of<LessonZoomBloc>(context)..add(FetchEvent(widget.courseId, widget.lessonId));
     super.initState();
+  }
+
+  Future<void> initConnectivity() async {
+    late ConnectivityResult result;
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException catch (e) {
+      log(e.toString());
+      return;
+    }
+
+    if (!mounted) {
+      return Future.value(null);
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    setState(() {
+      _connectionStatus = result;
+    });
   }
 
   @override
@@ -161,7 +192,7 @@ class _LessonZoomScreenWidgetState extends State<LessonZoomScreenWidget> {
                           color: Colors.white,
                         )),
                   ),
-                )
+                ),
         ],
       );
     }
@@ -179,254 +210,251 @@ class _LessonZoomScreenWidgetState extends State<LessonZoomScreenWidget> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Visibility(
-            visible: false,
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
-          ),
           _buildWebView(item),
-          ListView.builder(
-              shrinkWrap: true,
-              itemCount: state.lessonResponse.materials.length,
-              itemBuilder: (BuildContext ctx, int index) {
-                return Container(
-                  padding: EdgeInsets.symmetric(horizontal: 25),
-                  margin: EdgeInsets.only(bottom: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      //Text 'Materials'
-                      state.lessonResponse.materials.isNotEmpty
-                          ? Text(
-                              'Materials:',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 30,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            )
-                          : const SizedBox(),
-
-                      //Materials
-                      ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: state.lessonResponse.materials.length,
-                        itemBuilder: (BuildContext ctx, int index) {
-                          var item = state.lessonResponse.materials[index];
-                          switch (item!.type) {
-                            case 'audio':
-                              svgIcon = SvgPicture.asset('assets/icons/audio.svg');
-                              break;
-                            case 'avi':
-                              svgIcon = SvgPicture.asset('assets/icons/avi.svg');
-                              break;
-                            case 'doc':
-                              svgIcon = SvgPicture.asset('assets/icons/doc.svg');
-                              break;
-                            case 'docx':
-                              svgIcon = SvgPicture.asset('assets/icons/docx.svg');
-                              break;
-                            case 'gif':
-                              svgIcon = SvgPicture.asset('assets/icons/gif.svg');
-                              break;
-                            case 'jpeg':
-                              svgIcon = SvgPicture.asset('assets/icons/jpeg.svg');
-                              break;
-                            case 'jpg':
-                              svgIcon = SvgPicture.asset('assets/icons/jpg.svg');
-                              break;
-                            case 'mov':
-                              svgIcon = SvgPicture.asset('assets/icons/mov.svg');
-                              break;
-                            case 'mp3':
-                              svgIcon = SvgPicture.asset('assets/icons/mp3.svg');
-                              break;
-                            case 'mp4':
-                              svgIcon = SvgPicture.asset('assets/icons/mp4.svg');
-                              break;
-                            case 'pdf':
-                              svgIcon = SvgPicture.asset('assets/icons/pdf.svg');
-                              break;
-                            case 'png':
-                              svgIcon = SvgPicture.asset('assets/icons/png.svg');
-                              break;
-                            case 'ppt':
-                              svgIcon = SvgPicture.asset('assets/icons/ppt.svg');
-                              break;
-                            case 'pptx':
-                              svgIcon = SvgPicture.asset('assets/icons/pptx.svg');
-                              break;
-                            case 'psd':
-                              svgIcon = SvgPicture.asset('assets/icons/psd.svg');
-                              break;
-                            case 'txt':
-                              svgIcon = SvgPicture.asset('assets/icons/txt.svg');
-                              break;
-                            case 'xls':
-                              svgIcon = SvgPicture.asset('assets/icons/xls.svg');
-                              break;
-                            case 'xlsx':
-                              svgIcon = SvgPicture.asset('assets/icons/xlsx.svg');
-                              break;
-                            case 'zip':
-                              svgIcon = SvgPicture.asset('assets/icons/zip.svg');
-                              break;
-                            default :
-                              svgIcon = SvgPicture.asset('assets/icons/txt.svg');
-                          }
-                          return Container(
-                            margin: EdgeInsets.only(top: 20),
-                            padding: EdgeInsets.all(10.0),
-                            decoration: BoxDecoration(
-                              color: mainColor,
-                              borderRadius: BorderRadius.all(Radius.circular(20)),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                SizedBox(width: 50,height: 30, child: svgIcon!),
-                                //Materials Label
-                                Expanded(
-                                  child: Text(
-                                    '${item.label}.${item.type} (${item.size})',
-                                    style: TextStyle(
-                                      color: HexColor.fromHex("#FFFFFF"),
-                                    ),
+          const SizedBox(height: 20),
+          _connectionStatus == ConnectivityResult.wifi || _connectionStatus == ConnectivityResult.mobile
+              ? ListView.builder(
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: state.lessonResponse.materials.length,
+                  itemBuilder: (BuildContext ctx, int index) {
+                    return Container(
+                      padding: EdgeInsets.symmetric(horizontal: 25),
+                      margin: EdgeInsets.only(bottom: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          //Text 'Materials'
+                          state.lessonResponse.materials.isNotEmpty
+                              ? Text(
+                                  'Materials:',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.w600,
                                   ),
+                                )
+                              : const SizedBox(),
+                          //Materials
+                          ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: state.lessonResponse.materials.length,
+                            itemBuilder: (BuildContext ctx, int index) {
+                              var item = state.lessonResponse.materials[index];
+                              switch (item!.type) {
+                                case 'audio':
+                                  svgIcon = SvgPicture.asset('assets/icons/audio.svg');
+                                  break;
+                                case 'avi':
+                                  svgIcon = SvgPicture.asset('assets/icons/avi.svg');
+                                  break;
+                                case 'doc':
+                                  svgIcon = SvgPicture.asset('assets/icons/doc.svg');
+                                  break;
+                                case 'docx':
+                                  svgIcon = SvgPicture.asset('assets/icons/docx.svg');
+                                  break;
+                                case 'gif':
+                                  svgIcon = SvgPicture.asset('assets/icons/gif.svg');
+                                  break;
+                                case 'jpeg':
+                                  svgIcon = SvgPicture.asset('assets/icons/jpeg.svg');
+                                  break;
+                                case 'jpg':
+                                  svgIcon = SvgPicture.asset('assets/icons/jpg.svg');
+                                  break;
+                                case 'mov':
+                                  svgIcon = SvgPicture.asset('assets/icons/mov.svg');
+                                  break;
+                                case 'mp3':
+                                  svgIcon = SvgPicture.asset('assets/icons/mp3.svg');
+                                  break;
+                                case 'mp4':
+                                  svgIcon = SvgPicture.asset('assets/icons/mp4.svg');
+                                  break;
+                                case 'pdf':
+                                  svgIcon = SvgPicture.asset('assets/icons/pdf.svg');
+                                  break;
+                                case 'png':
+                                  svgIcon = SvgPicture.asset('assets/icons/png.svg');
+                                  break;
+                                case 'ppt':
+                                  svgIcon = SvgPicture.asset('assets/icons/ppt.svg');
+                                  break;
+                                case 'pptx':
+                                  svgIcon = SvgPicture.asset('assets/icons/pptx.svg');
+                                  break;
+                                case 'psd':
+                                  svgIcon = SvgPicture.asset('assets/icons/psd.svg');
+                                  break;
+                                case 'txt':
+                                  svgIcon = SvgPicture.asset('assets/icons/txt.svg');
+                                  break;
+                                case 'xls':
+                                  svgIcon = SvgPicture.asset('assets/icons/xls.svg');
+                                  break;
+                                case 'xlsx':
+                                  svgIcon = SvgPicture.asset('assets/icons/xlsx.svg');
+                                  break;
+                                case 'zip':
+                                  svgIcon = SvgPicture.asset('assets/icons/zip.svg');
+                                  break;
+                                default:
+                                  svgIcon = SvgPicture.asset('assets/icons/txt.svg');
+                              }
+                              return Container(
+                                margin: EdgeInsets.only(top: 20),
+                                padding: EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                  color: mainColor,
+                                  borderRadius: BorderRadius.all(Radius.circular(20)),
                                 ),
-
-                                item.url == progressMap!['itemUrl']
-                                    ? Text(
-                                        progress,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    SizedBox(width: 50, height: 30, child: svgIcon!),
+                                    //Materials Label
+                                    Expanded(
+                                      child: Text(
+                                        '${item.label}.${item.type} (${item.size})',
                                         style: TextStyle(
-                                          color: Colors.white,
+                                          color: HexColor.fromHex("#FFFFFF"),
                                         ),
-                                      )
-                                    : const SizedBox(),
-                                //Icon download
-                                IconButton(
-                                  onPressed: () async {
-                                    String? dir;
-                                    if (Platform.isAndroid) {
-                                      dir = (await ExternalPath.getExternalStoragePublicDirectory(ExternalPath.DIRECTORY_DOWNLOADS));
-                                    } else if (Platform.isIOS) {
-                                      dir = (await getApplicationDocumentsDirectory()).path;
-                                    }
-                                    var cyrillicSymbols = RegExp('[а-яёА-ЯЁ]');
+                                      ),
+                                    ),
 
-                                    bool isSymbols = cyrillicSymbols.hasMatch(item.url);
+                                    item.url == progressMap!['itemUrl']
+                                        ? Text(
+                                            progress,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                        : const SizedBox(),
+                                    //Icon download
+                                    IconButton(
+                                      onPressed: () async {
+                                        String? dir;
+                                        if (Platform.isAndroid) {
+                                          dir = (await ExternalPath.getExternalStoragePublicDirectory(ExternalPath.DIRECTORY_DOWNLOADS));
+                                        } else if (Platform.isIOS) {
+                                          dir = (await getApplicationDocumentsDirectory()).path;
+                                        }
+                                        var cyrillicSymbols = RegExp('[а-яёА-ЯЁ]');
 
-                                    ///If file is jpeg/png/jpg
-                                    if (item.url.toString().contains('jpeg') || item.url.toString().contains('png') || item.url.toString().contains('jpg')) {
-                                      if (Platform.isIOS && isSymbols) {
-                                        AlertDialog alert = AlertDialog(
-                                          title: Text('Error image', textScaleFactor: 1.0, style: TextStyle(color: Colors.black, fontSize: 20.0)),
-                                          content: Text(
-                                            "Photo format error",
-                                            textScaleFactor: 1.0,
-                                          ),
-                                          actions: [
-                                            ElevatedButton(
-                                              child: Text(
-                                                'Ok',
+                                        bool isSymbols = cyrillicSymbols.hasMatch(item.url);
+
+                                        ///If file is jpeg/png/jpg
+                                        if (item.url.toString().contains('jpeg') || item.url.toString().contains('png') || item.url.toString().contains('jpg')) {
+                                          if (Platform.isIOS && isSymbols) {
+                                            AlertDialog alert = AlertDialog(
+                                              title: Text('Error image', textScaleFactor: 1.0, style: TextStyle(color: Colors.black, fontSize: 20.0)),
+                                              content: Text(
+                                                "Photo format error",
                                                 textScaleFactor: 1.0,
-                                                style: TextStyle(
-                                                  color: Colors.black,
-                                                ),
                                               ),
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
+                                              actions: [
+                                                ElevatedButton(
+                                                  child: Text(
+                                                    'Ok',
+                                                    textScaleFactor: 1.0,
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  style: ElevatedButton.styleFrom(
+                                                    primary: Colors.white,
+                                                  ),
+                                                )
+                                              ],
+                                            );
+
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return alert;
                                               },
-                                              style: ElevatedButton.styleFrom(
-                                                primary: Colors.white,
+                                            );
+                                          } else {
+                                            var imageId = await ImageDownloader.downloadImage(item.url);
+
+                                            if (imageId == null) {
+                                              return print('Error');
+                                            }
+
+                                            //When image downloaded
+                                            final snackBar = SnackBar(
+                                              content: Text(
+                                                'Image downloaded',
+                                                textScaleFactor: 1.0,
                                               ),
-                                            )
-                                          ],
-                                        );
+                                              duration: const Duration(seconds: 1),
+                                            );
 
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return alert;
-                                          },
-                                        );
-                                      } else {
-                                        var imageId = await ImageDownloader.downloadImage(item.url);
+                                            if (_progress == 100) {
+                                              WidgetsBinding.instance?.addPostFrameCallback((_) {
+                                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                                _progress = 0;
+                                              });
+                                            }
+                                          }
+                                        } else {
+                                          String fileName = item.url.substring(item.url.lastIndexOf("/") + 1);
 
-                                        if (imageId == null) {
-                                          return print('Error');
-                                        }
+                                          String fullPath = dir! + '/$fileName';
 
-                                        //When image downloaded
-                                        final snackBar = SnackBar(
-                                          content: Text(
-                                            'Image downloaded',
-                                            textScaleFactor: 1.0,
-                                          ),
-                                          duration: const Duration(seconds: 1),
-                                        );
-
-                                        if (_progress == 100) {
-                                          WidgetsBinding.instance?.addPostFrameCallback((_) {
-                                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                                            _progress = 0;
-                                          });
-                                        }
-                                      }
-                                    } else {
-                                      String fileName = item.url.substring(item.url.lastIndexOf("/") + 1);
-
-                                      String fullPath = dir! + '/$fileName';
-
-                                      setState(() {
-                                        isLoading = true;
-                                      });
-                                      Response response = await dio.get(
-                                        item.url,
-                                        onReceiveProgress: (received, total) {
                                           setState(() {
-                                            progress = ((received / total * 100).toStringAsFixed(0) + '%');
+                                            isLoading = true;
                                           });
-                                          progressMap!.addParam('itemUrl', item.url);
-                                          progressMap!.addParam('progress', progress);
-                                        },
+                                          Response response = await dio.get(
+                                            item.url,
+                                            onReceiveProgress: (received, total) {
+                                              setState(() {
+                                                progress = ((received / total * 100).toStringAsFixed(0) + '%');
+                                              });
+                                              progressMap!.addParam('itemUrl', item.url);
+                                              progressMap!.addParam('progress', progress);
+                                            },
 
-                                        //Received data with List<int>
-                                        options: Options(
-                                          responseType: ResponseType.bytes,
-                                          followRedirects: false,
-                                        ),
-                                      );
+                                            //Received data with List<int>
+                                            options: Options(
+                                              responseType: ResponseType.bytes,
+                                              followRedirects: false,
+                                            ),
+                                          );
 
-                                      File file = File(fullPath);
-                                      var raf = file.openSync(mode: FileMode.write);
-                                      raf.writeFromSync(response.data);
-                                      await raf.close();
+                                          File file = File(fullPath);
+                                          var raf = file.openSync(mode: FileMode.write);
+                                          raf.writeFromSync(response.data);
+                                          await raf.close();
 
-                                      if (mounted) {
-                                        setState(() {
-                                          isLoading = false;
-                                        });
-                                      }
-                                    }
-                                  },
-                                  icon: isLoading && item.url == progressMap!['itemUrl'] && progress == 0
-                                      ? CircularProgressIndicator()
-                                      : Icon(
-                                          item.url == progressMap!['itemUrl'] && progressMap!['progress'] == '${100}%' ? Icons.check : Icons.download,
-                                          color: Colors.white,
-                                        ),
+                                          if (mounted) {
+                                            setState(() {
+                                              isLoading = false;
+                                            });
+                                          }
+                                        }
+                                      },
+                                      icon: isLoading && item.url == progressMap!['itemUrl'] && progress == 0
+                                          ? CircularProgressIndicator()
+                                          : Icon(
+                                              item.url == progressMap!['itemUrl'] && progressMap!['progress'] == '${100}%' ? Icons.check : Icons.download,
+                                              color: Colors.white,
+                                            ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          );
-                        },
-                      )
-                    ],
-                  ),
-                );
-              })
+                              );
+                            },
+                          )
+                        ],
+                      ),
+                    );
+                  })
+              : const SizedBox(),
         ],
       );
     }
@@ -439,35 +467,73 @@ class _LessonZoomScreenWidgetState extends State<LessonZoomScreenWidget> {
   }
 
   _buildWebView(item) {
-    if (Platform.isAndroid || Platform.isIOS /*&& (androidInfo?.version.sdkInt == 30 || androidInfo?.version.sdkInt == 31)*/) {
+    /*  if ( Platform.isIOS) {
       return Html(
         data: item.content,
+        style: {
+          "body": Style(
+            margin: EdgeInsets.all(20),
+            fontSize: FontSize(18.0),
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+          '.btn.stm-join-btn.join_in_menu': Style(
+            color: Colors.red,
+          ),
+        },
       );
-    }
+    }*/
+
     double webContainerHeight;
     if (descriptionHeight != null) {
       webContainerHeight = descriptionHeight!;
     } else {
-      webContainerHeight = 160;
+      webContainerHeight = 200;
     }
-    ConstrainedBox(
+    return ConstrainedBox(
         constraints: BoxConstraints(maxHeight: webContainerHeight),
         child: WebView(
           javascriptMode: JavascriptMode.unrestricted,
           gestureNavigationEnabled: true,
-          initialUrl: 'data:/text/html;base64, ${base64Encode(const Utf8Encoder().convert(item.content))}',
-          onPageFinished: (some) async {
+          backgroundColor: HexColor.fromHex("#151A25"),
+          initialUrl: item.content,
+          onPageFinished: (_) async {
             double height = double.parse(await _webViewController.runJavascriptReturningResult("document.documentElement.scrollHeight;"));
             setState(() {
               descriptionHeight = height;
               showLoadingWebview = false;
-              print("webview $height");
             });
           },
           onWebViewCreated: (controller) async {
             controller.clearCache();
             this._webViewController = controller;
+            _webViewController.loadUrl(Uri.dataFromString(
+              item.content,
+              mimeType: 'text/html',
+              encoding: Encoding.getByName('utf-8'),
+            ).toString());
+          },
+          navigationDelegate: (NavigationRequest request) async {
+            if (request.url.contains('data:text/html')) {
+              return NavigationDecision.navigate;
+            } else {
+              _launchURL(request.url);
+              return NavigationDecision.prevent;
+            }
           },
         ));
+  }
+
+  _launchURL(url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

@@ -85,7 +85,6 @@ class UserApiProvider {
   }
 
   //addCourse
-  // TODO: Проверить ссылку на добавление курсов
   Future addFavoriteCourse(int courseId) async {
     Response response = await dio.put(
       apiEndpoint + "favorite",
@@ -182,7 +181,8 @@ class UserApiProvider {
         queryParameters: {"id": id},
         options: Options(
           headers: {"requirestoken": "true"},
-        ));
+        ),);
+
     return CourseDetailResponse.fromJson(response.data);
   }
 

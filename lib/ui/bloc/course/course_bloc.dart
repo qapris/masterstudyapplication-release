@@ -24,30 +24,28 @@ class CourseBloc extends Bloc<CourseEvent, CourseState> {
   CourseState get initialState => InitialCourseState();
 
   CourseBloc(this._coursesRepository, this._reviewRepository, this._purchaseRepository) : super(InitialCourseState()) {
-    on<CourseEvent>((event, emit) async {
-      await _getCourse(event, emit);
+    //FetchEvent
+    on<FetchEvent>((event, emit) async {
+     _fetchCourse(event.courseId);
     });
-  }
 
-  Future<void> _getCourse(CourseEvent event, Emitter<CourseState> emit) async {
-    if (event is FetchEvent) {
+    //DeleteFromFavorite
+    on<DeleteFromFavorite>((event, emit) {
       _fetchCourse(event.courseId);
-    }
+    });
 
-    if (event is DeleteFromFavorite) {
-      _fetchCourse(event.courseId);
-    }
-
-    if (event is AddToFavorite) {
+    //AddToFavorite
+    on<AddToFavorite>((event, emit) async {
       try {
         await _coursesRepository.addFavoriteCourse(event.courseId);
         _fetchCourse(event.courseId);
       } catch (error) {
         print(error);
       }
-    }
+    });
 
-    if (event is VerifyInAppPurchase) {
+    //VerifyInAppPurchase
+    on<VerifyInAppPurchase>((event, emit) async {
       emit(InitialCourseState());
       try {
         await _coursesRepository.verifyInApp(event.serverVerificationData!, event.price!);
@@ -56,24 +54,27 @@ class CourseBloc extends Bloc<CourseEvent, CourseState> {
       } finally {
         _fetchCourse(event.courseId);
       }
-    }
+    });
 
-    if (event is PaymentSelectedEvent) {
+    //PaymentSelectedEvent
+    on<PaymentSelectedEvent>((event, emit) {
       selectedPaymetId = event.selectedPaymentId;
       _fetchCourse(event.courseId);
-    }
+    });
 
-    if (event is UsePlan) {
+    //UsePlan
+    on<UsePlan>((event, emit) async {
       emit(InitialCourseState());
       await _purchaseRepository.usePlan(event.courseId, selectedPaymetId);
 
       _fetchCourse(event.courseId);
-    }
+    });
 
-    if (event is AddToCart) {
+    //AddToCard
+    on<AddToCart>((event, emit) async {
       var response = await _purchaseRepository.addToCart(event.courseId);
       emit(OpenPurchaseState(response.cart_url));
-    }
+    });
   }
 
   Future<CourseState> _fetchCourse(courseId) async {
@@ -81,13 +82,13 @@ class CourseBloc extends Bloc<CourseEvent, CourseState> {
     try {
       courseDetailResponse = await _coursesRepository.getCourse(courseId);
       var reviews = await _reviewRepository.getReviews(courseId);
-      // var plans = await _purchaseRepository.getUserPlans();
+      var plans = await _purchaseRepository.getUserPlans();
       availablePlans = await _purchaseRepository.getPlans();
-      emit(LoadedCourseState(courseDetailResponse!, reviews, [] /*plans*/));
+      emit(LoadedCourseState(courseDetailResponse!, reviews, []));
     } catch (e, s) {
       print(e);
       print(s);
-      // emit(ErrorCourseState());
+      emit(ErrorCourseState());
     }
     return ErrorCourseState();
   }

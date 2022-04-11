@@ -77,7 +77,6 @@ import 'package:overlay_support/overlay_support.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'data/models/AppSettings.dart';
 import 'data/push/push_manager.dart';
 import 'data/utils.dart';
@@ -120,7 +119,6 @@ Future<dynamic>? myBackgroundMessageHandler(Map<String, dynamic> message) {
 
 void main() async {
   //System style AppBar
-
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarBrightness: Brightness.light,
     statusBarColor: Colors.grey.withOpacity(0.4), //top bar color
@@ -129,15 +127,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Hive.initFlutter();
-
-  //Register adapters for hive
-  // Hive.registerAdapter(HomeLayoutBeanAdapter());
-  // Hive.registerAdapter(AddonsBeanAdapter());
-  // Hive.registerAdapter(AppSettingsAdapter());
-  // Hive.registerAdapter(OptionsBeanAdapter());
-
-
-  // db = await Hive.openBox('db');
 
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
 
@@ -274,6 +263,73 @@ class MyAppState extends State<MyApp> {
   /// Past purchases
   List<PurchaseDetails> _purchases = [];
 
+  @override
+  void initState() {
+    _initialize();
+    super.initState();
+  }
+
+  void _buyProduct(ProductDetails prod) {
+    final PurchaseParam purchaseParam = PurchaseParam(productDetails: prod);
+    _iap.buyConsumable(purchaseParam: purchaseParam, autoConsume: false);
+  }
+
+  void _initialize() async {
+    // Check availability of In App Purchases
+    _available = await _iap.isAvailable();
+
+    _subscription = _iap.purchaseStream.listen((data) => setState(() {
+          _purchases.addAll(data);
+          _verifyPurchase(data[0].productID);
+        }));
+
+    if (_available) {
+      await _getProducts();
+      // await _getPastPurchases();
+      // Verify and deliver a purchase with your own business logic
+      // _verifyPurchase();
+    }
+  }
+
+  /// Get all products available for sale
+  Future<void> _getProducts() async {
+    Set<String> ids = Set.from(['874']);
+    ProductDetailsResponse response = await _iap.queryProductDetails(ids);
+
+    setState(() {
+      _products = response.productDetails;
+    });
+  }
+
+  /// Gets past purchases
+  /*Future<void> _getPastPurchases() async {
+    QueryPurchaseDetailsResponse response = await _iap.queryPastPurchases();
+
+    for (PurchaseDetails purchase in response.pastPurchases) {
+      if (Platform.isIOS) {
+        InAppPurchaseConnection.instance.completePurchase(purchase);
+      }
+    }
+
+    setState(() {
+      _purchases = response.pastPurchases;
+    });
+  }*/
+
+  /// Returns purchase of specific product ID
+  PurchaseDetails _hasPurchased(String productID) {
+    return _purchases.firstWhere((purchase) => purchase.productID == productID);
+  }
+
+  /// Your own business logic to setup a consumable
+  void _verifyPurchase(String productID) {
+    PurchaseDetails purchase = _hasPurchased(productID);
+
+    // TODO serverside verification & record consumable in the database
+
+    if (purchase != null && purchase.status == PurchaseStatus.purchased) {}
+  }
+
   ///Theme for App
   ThemeData _buildShrineTheme() {
     final ThemeData base = ThemeData.light();
@@ -302,77 +358,6 @@ class MyAppState extends State<MyApp> {
       errorColor: Colors.red[400],
       colorScheme: ColorScheme.fromSwatch().copyWith(secondary: mainColor),
     );
-  }
-
-  @override
-  void initState() {
-    _initialize();
-
-    super.initState();
-  }
-
-  void _buyProduct(ProductDetails prod) {
-    final PurchaseParam purchaseParam = PurchaseParam(productDetails: prod);
-    // _iap.buyNonConsumable(purchaseParam: purchaseParam);
-    _iap.buyConsumable(purchaseParam: purchaseParam, autoConsume: false);
-  }
-
-  void _initialize() async {
-    // Check availability of In App Purchases
-    _available = await _iap.isAvailable();
-
-    _subscription = _iap.purchaseStream.listen((data) => setState(() {
-          print('NEW PURCHASE');
-          _purchases.addAll(data);
-          //_verifyPurchase(data);
-        }));
-
-    if (_available) {
-      await _getProducts();
-      // await _getPastPurchases();
-
-      // Verify and deliver a purchase with your own business logic
-      // _verifyPurchase();
-    }
-  }
-
-  /// Get all products available for sale
-  Future<void> _getProducts() async {
-    Set<String> ids = Set.from(['test_a']);
-    ProductDetailsResponse response = await _iap.queryProductDetails(ids);
-
-    setState(() {
-      _products = response.productDetails;
-    });
-  }
-
-  /* /// Gets past purchases
-  Future<void> _getPastPurchases() async {
-    QueryPurchaseDetailsResponse response = await _iap.queryPastPurchases();
-
-    for (PurchaseDetails purchase in response.pastPurchases) {
-      if (Platform.isIOS) {
-        InAppPurchase.instance.completePurchase(purchase);
-      }
-    }
-
-    setState(() {
-      _purchases = response.pastPurchases;
-    });
-  }*/
-
-  /// Returns purchase of specific product ID
-  PurchaseDetails _hasPurchased(String productID) {
-    return _purchases.firstWhere((purchase) => purchase.productID == productID);
-  }
-
-  /// Your own business logic to setup a consumable
-  void _verifyPurchase(String productID) {
-    PurchaseDetails purchase = _hasPurchased(productID);
-
-    // TODO serverside verification & record consumable in the database
-
-    if (purchase != null && purchase.status == PurchaseStatus.purchased) {}
   }
 
   @override

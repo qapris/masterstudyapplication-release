@@ -6,11 +6,12 @@ import 'package:masterstudy_app/main.dart';
 import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/bloc/course/course_bloc.dart';
 import 'package:masterstudy_app/ui/screens/lesson_video/lesson_video_screen.dart';
-import 'package:masterstudy_app/ui/screens/porchase_dialog/purchase_dialog.dart';
 import 'package:masterstudy_app/ui/screens/text_lesson/text_lesson_screen.dart';
 import 'package:masterstudy_app/ui/widgets/dialog_author.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:masterstudy_app/ui/bloc/course/bloc.dart';
+
+import '../purchase_dialog/purchase_dialog.dart';
 
 class UserCourseLockedScreenArgs {
   final int courseId;
