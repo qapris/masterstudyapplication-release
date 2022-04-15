@@ -129,7 +129,6 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
 
     _bloc = BlocProvider.of<CourseBloc>(context)..add(FetchEvent(widget.coursesBean.id!));
 
-    _initInApp();
   }
 
   @override
@@ -398,7 +397,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
                 },
                 body: AnimatedSwitcher(
                   duration: Duration(milliseconds: 150),
-                  child: _loading ? const CircularProgressIndicator() : _buildBody(state),
+                  child: _buildBody(state),
                 ),
               ),
               bottomNavigationBar: _buildBottom(state),
@@ -408,7 +407,6 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
       ),
     );
   }
-
 
   bool get _isAppBarExpanded {
     if (screenHeight == null) screenHeight = MediaQuery.of(context).size.height;
@@ -502,32 +500,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
               height: 40,
               color: mainColor,
               onPressed: () async {
-                if (state is LoadedCourseState) {
-
-                  //IOS
-                  if (Platform.isIOS) {
-                    if (_products.isNotEmpty) {
-                      PurchaseParam purchaseParam = PurchaseParam(productDetails: _products[0]);
-                      _inAppPurchase.buyNonConsumable(purchaseParam: purchaseParam).catchError((error) {});
-                    } else {
-                      _showInAppNotFound();
-                    }
-                  }
-
-                  //Android
-                  if (Platform.isAndroid) {
-                    if (_products.isNotEmpty) {
-                      PurchaseParam purchaseParam = PurchaseParam(productDetails: _products[0]);
-                      if (_products[0].id == 'consumable') {
-                        _inAppPurchase.buyConsumable(purchaseParam: purchaseParam);
-                      } else {
-                        _inAppPurchase.buyNonConsumable(purchaseParam: purchaseParam);
-                      }
-                    } else {
-                      _showInAppNotFound();
-                    }
-                  }
-                }
+                if (state is LoadedCourseState) {}
               },
               child: setUpButtonChild(state),
             )
@@ -568,35 +541,29 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
             });
           }
 
-          //If products is not empty
-          if (_products.isNotEmpty) {
-            selectedPlan = "${localizations!.getLocalization("course_regular_price")} ${_products[0].price}";
-          }
 
           return GestureDetector(
             onTap: () async {
               if (Platform.isAndroid) {
-                var dialog = showDialog(
-                  context: context,
-                  builder: (builder) {
-                    return BlocProvider.value(
-                      child: Dialog(
-                        child: PurchaseDialog(
-                          detailsProduct: _products,
+                  var dialog = showDialog(
+                    context: context,
+                    builder: (builder) {
+                      return BlocProvider.value(
+                        child: Dialog(
+                          child: PurchaseDialog(),
                         ),
-                      ),
-                      value: _bloc,
-                    );
-                  },
-                );
+                        value: _bloc,
+                      );
+                    },
+                  );
 
-                dialog.then((value) {
-                  if (value == "update") {
-                    _bloc.add(FetchEvent(widget.coursesBean.id!));
-                  } else {
-                    setState(() {});
-                  }
-                });
+                  dialog.then((value) {
+                    if (value == "update") {
+                      _bloc.add(FetchEvent(widget.coursesBean.id!));
+                    } else {
+                      setState(() {});
+                    }
+                  });
               }
             },
             child: Row(
@@ -621,30 +588,6 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
     return Text("");
   }
 
-  _showInAppNotFound() {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text(localizations!.getLocalization("error_dialog_title"), textScaleFactor: 1.0, style: TextStyle(color: Colors.black, fontSize: 20.0)),
-            content: Text(localizations!.getLocalization("in_app_not_found")),
-            actions: <Widget>[
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  primary: mainColor,
-                ),
-                child: Text(
-                  localizations!.getLocalization("ok_dialog_button"),
-                  textScaleFactor: 1.0,
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        });
-  }
 
   Widget setUpButtonChild(CourseState state) {
     String buttonText = '';
@@ -670,168 +613,9 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
     }
   }
 
-  ///InAppPurchase methods and variables
-  final InAppPurchase _inAppPurchase = InAppPurchase.instance;
-  late StreamSubscription<List<PurchaseDetails>> _subscription;
-  List<String> _notFoundIds = [];
-  List<ProductDetails> _products = [];
-  List<PurchaseDetails> _purchases = [];
-  List<String> _consumables = [];
-  bool isAvailable = false;
-  bool _purchasePending = false;
-  bool _loading = false;
-  String? _queryProductError;
-
-  _initInApp() async {
-    Stream<List<PurchaseDetails>> purchaseUpdated = _inAppPurchase.purchaseStream;
-    _subscription = purchaseUpdated.listen((purchaseDetailsList) {
-      _listenToPurchaseUpdated(purchaseDetailsList);
-    }, onDone: () {
-      _subscription.cancel();
-    }, onError: (error) {
-      log(error.toString());
-    });
-
-    initStoreInfo();
-  }
-
-  Future<void> initStoreInfo() async {
-    isAvailable = await _inAppPurchase.isAvailable();
-
-
-    if (!isAvailable) {
-      setState(() {
-        isAvailable = isAvailable;
-        _products = [];
-        _purchases = [];
-        _notFoundIds = [];
-        _consumables = [];
-        _purchasePending = false;
-        _loading = false;
-      });
-      return;
-    }
-
-    if (Platform.isIOS) {
-      final InAppPurchaseStoreKitPlatformAddition iosPlatformAddition = _inAppPurchase.getPlatformAddition<InAppPurchaseStoreKitPlatformAddition>();
-      await iosPlatformAddition.setDelegate(ExamplePaymentQueueDelegate());
-    }
-
-    var courseId = widget.coursesBean.id.toString();
-    ProductDetailsResponse productDetailResponse = await _inAppPurchase.queryProductDetails({courseId, '${courseId}_360photos'});
-
-    print('isAvailable: ${isAvailable}, product: ${productDetailResponse.productDetails}');
-
-    if (productDetailResponse.error != null) {
-      setState(() {
-        _queryProductError = productDetailResponse.error?.message;
-        isAvailable = isAvailable;
-        _products = productDetailResponse.productDetails;
-        _purchases = [];
-        _notFoundIds = productDetailResponse.notFoundIDs;
-        _consumables = [];
-        _purchasePending = false;
-        _loading = false;
-      });
-      return;
-    }
-
-    if (productDetailResponse.productDetails.isEmpty) {
-      setState(() {
-        _queryProductError = null;
-        isAvailable = isAvailable;
-        _products = productDetailResponse.productDetails;
-        _purchases = [];
-        _notFoundIds = productDetailResponse.notFoundIDs;
-        _consumables = [];
-        _purchasePending = false;
-        _loading = false;
-      });
-      return;
-    }
-
-    setState(() {
-      isAvailable = isAvailable;
-      _products = productDetailResponse.productDetails;
-      //_purchases = verifiedPurchases;
-      _notFoundIds = productDetailResponse.notFoundIDs;
-      _purchasePending = false;
-      _loading = false;
-    });
-  }
-
-  //ListenPurchaseUpdate (После нажатия на "get now" прослушивает статус покупки)
-  void _listenToPurchaseUpdated(List<PurchaseDetails?> purchaseDetailsList) {
-    purchaseDetailsList.forEach((PurchaseDetails? purchaseDetails) async {
-      if (purchaseDetails?.status == PurchaseStatus.pending) {
-        showPendingUI();
-      } else {
-        if (purchaseDetails?.status == PurchaseStatus.error) {
-          handleError(purchaseDetails!.error);
-          setState(() {
-            _loading = false;
-          });
-        } else if (purchaseDetails?.status == PurchaseStatus.purchased) {
-          setState(() {
-            _loading = true;
-          });
-          _verifyPurchase(purchaseDetails);
-        }
-
-        if (purchaseDetails?.pendingCompletePurchase ?? false) {
-          setState(() {
-            _loading = false;
-          });
-          await _inAppPurchase.completePurchase(purchaseDetails!);
-        }
-      }
-    });
-  }
-
-  //Verify purchase (Если покупка прошла то отправляется запрос на сервер)
-  Future<bool> _verifyPurchase(PurchaseDetails? purchaseDetails) async {
-    _bloc.add(
-      VerifyInAppPurchase(purchaseDetails!.verificationData.serverVerificationData, _products[0].price, widget.coursesBean.id),
-    );
-
-    return Future<bool>.value(true);
-  }
-
-  void _handleInvalidPurchase(PurchaseDetails purchaseDetails) {
-    // handle invalid purchase here if  _verifyPurchase` failed.
-  }
-
-  void showPendingUI() {
-    setState(() {
-      _purchasePending = true;
-    });
-  }
-
-  void handleError(IAPError? error) {
-    setState(() {
-      _purchasePending = false;
-    });
-  }
-
   @override
   void dispose() {
-    if (Platform.isIOS) {
-      final InAppPurchaseStoreKitPlatformAddition iosPlatformAddition = _inAppPurchase.getPlatformAddition<InAppPurchaseStoreKitPlatformAddition>();
-      iosPlatformAddition.setDelegate(null);
-    }
-    _subscription.cancel();
     super.dispose();
   }
 }
 
-class ExamplePaymentQueueDelegate implements SKPaymentQueueDelegateWrapper {
-  @override
-  bool shouldContinueTransaction(SKPaymentTransactionWrapper transaction, SKStorefrontWrapper storefront) {
-    return true;
-  }
-
-  @override
-  bool shouldShowPriceConsent() {
-    return false;
-  }
-}

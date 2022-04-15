@@ -13,6 +13,7 @@ import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/bloc/edit_profile_bloc/bloc.dart';
 import 'package:masterstudy_app/ui/bloc/profile/profile_bloc.dart';
 import 'package:masterstudy_app/ui/bloc/profile/profile_event.dart';
+import 'package:masterstudy_app/ui/screens/change_password/change_password_screen.dart';
 
 class ProfileEditScreenArgs {
   final Account? account;
@@ -510,6 +511,22 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
                 }
               },
               child: setUpButtonChild(enableInputs),
+              textColor: Colors.white,
+            ),
+          ),
+          //Button Restore Password
+          Padding(
+            padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
+            child: new MaterialButton(
+              minWidth: double.infinity,
+              color: mainColor,
+              onPressed: () {
+                Navigator.of(context).pushNamed(ChangePasswordScreen.routeName);
+              },
+              child: Text(
+                "CHANGE PASSWORD",
+                textScaleFactor: 1.0,
+              ),
               textColor: Colors.white,
             ),
           ),

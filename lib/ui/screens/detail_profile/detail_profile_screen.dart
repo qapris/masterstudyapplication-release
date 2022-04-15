@@ -235,7 +235,11 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
                                                     child: GestureDetector(
                                                       onTap: () async {
                                                         try {
-                                                          await launch(_bloc.account!.meta!.facebook!);
+                                                          if (await canLaunch(_bloc.account!.meta!.facebook!)) {
+                                                            await launch(_bloc.account!.meta!.facebook!);
+                                                          } else {
+                                                            launch("https://www.facebook.com/");
+                                                          }
                                                         } catch (e) {
                                                           await launch("https://www.facebook.com/");
                                                         }
@@ -249,7 +253,11 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
                                                     child: GestureDetector(
                                                       onTap: () async {
                                                         try {
-                                                          await launch(_bloc.account!.meta!.twitter);
+                                                          if (await canLaunch(_bloc.account!.meta!.twitter)) {
+                                                            await launch(_bloc.account!.meta!.twitter);
+                                                          } else {
+                                                            launch("https://www.twitter.com/");
+                                                          }
                                                         } catch (e) {
                                                           await launch("https://twitter.com/");
                                                         }
@@ -263,7 +271,11 @@ class _DetailProfileWidgetState extends State<DetailProfileWidget> {
                                                     child: GestureDetector(
                                                       onTap: () async {
                                                         try {
-                                                          await launch(_bloc.account!.meta!.instagram);
+                                                          if (await canLaunch(_bloc.account!.meta!.instagram)) {
+                                                            await launch(_bloc.account!.meta!.instagram);
+                                                          } else {
+                                                            launch("https://www.instagram.com/");
+                                                          }
                                                         } catch (e) {
                                                           await launch("https://www.instagram.com/");
                                                         }

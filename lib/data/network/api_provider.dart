@@ -111,8 +111,6 @@ class UserApiProvider {
   //getInstructors
   Future<InstructorsResponse> getInstructors(Map<String, dynamic> params) async {
     Response response = await _dio.get(apiEndpoint + "instructors", queryParameters: params);
-    log(response.toString());
-    log(response.realUri.toString());
     return InstructorsResponse.fromJson(response.data);
   }
 
@@ -177,11 +175,13 @@ class UserApiProvider {
 
   //getCourse
   Future<CourseDetailResponse> getCourse(int id) async {
-    Response response = await dio.get(apiEndpoint + "course",
-        queryParameters: {"id": id},
-        options: Options(
-          headers: {"requirestoken": "true"},
-        ),);
+    Response response = await dio.get(
+      apiEndpoint + "course",
+      queryParameters: {"id": id},
+      options: Options(
+        headers: {"requirestoken": "true"},
+      ),
+    );
 
     return CourseDetailResponse.fromJson(response.data);
   }
@@ -354,7 +354,7 @@ class UserApiProvider {
       'parent': parent,
     };
 
-     response = await dio.put(
+    response = await dio.put(
       apiEndpoint + "lesson/questions",
       data: data,
       options: Options(
@@ -362,9 +362,8 @@ class UserApiProvider {
       ),
     );
 
-     log(response.toString());
-      return QuestionAddResponse.fromJson(response.data);
-
+    log(response.toString());
+    return QuestionAddResponse.fromJson(response.data);
   }
 
   //popularSearches
@@ -451,6 +450,20 @@ class UserApiProvider {
   //restorePassword
   Future<Response> restorePassword(String email) async {
     Response response = await _dio.post(apiEndpoint + "account/restore_password", data: {"email": email});
+    return response;
+  }
+
+  //restorePassword
+  Future<Response> changePassword(String oldPassword,String newPassword) async {
+
+    var queryParams = {
+      'old_password': oldPassword,
+      'new_password': newPassword,
+    };
+
+    Response response = await dio.post(apiEndpoint + "account/edit_profile",queryParameters: queryParams);
+
+
     return response;
   }
 

@@ -25,6 +25,7 @@ class PushNotificationsManager {
 
       _initialized = true;
     }
+
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       print("onMessage: $message");
       //_showItemDialog(message);

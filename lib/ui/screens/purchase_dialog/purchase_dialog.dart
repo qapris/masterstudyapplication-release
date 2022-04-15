@@ -1,22 +1,15 @@
-import 'dart:developer';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:masterstudy_app/data/models/purchase/UserPlansResponse.dart';
 import 'package:masterstudy_app/main.dart';
-import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/bloc/course/course_bloc.dart';
 import 'package:masterstudy_app/ui/bloc/course/course_event.dart';
 import 'package:masterstudy_app/ui/bloc/course/course_state.dart';
-import 'package:masterstudy_app/ui/screens/plans/plans_screen.dart';
+
+import '../plans/plans_screen.dart';
 
 class PurchaseDialog extends StatefulWidget {
-   final dynamic detailsProduct;
-
-
-   PurchaseDialog( {this.detailsProduct});
   @override
   State<StatefulWidget> createState() => PurchaseDialogState();
 }
@@ -61,14 +54,11 @@ class PurchaseDialogState extends State<PurchaseDialog> {
     List<Widget> list = [];
 
     list.add(_buildDefaultItem((selectedId == -1), localizations!.getLocalization("one_time_payment"),
-        "${localizations!.getLocalization("course_regular_price")} ${state.courseDetailResponse.price?.price}", state.courseDetailResponse.price?.price, () {
+        "${localizations!.getLocalization("course_regular_price")} ${state.courseDetailResponse.price!.price}", state.courseDetailResponse.price!.price, () {
       setState(() {
         selectedId = -1;
       });
     }));
-
-
-
 
     if (state.userPlans.isNotEmpty && _haveValidPlan(state.userPlans)) {
       state.userPlans.forEach((value) {
@@ -80,7 +70,7 @@ class PurchaseDialogState extends State<PurchaseDialog> {
       });
     } else if (_bloc.availablePlans.isNotEmpty) {
       _bloc.availablePlans.forEach((value) {
-        list.add(_buildPriceItem((selectedId == -1), "${localizations!.getLocalization("available_in_plan")} \"${value.name}\"", value.name, value.quotas_left, () {
+        list.add(_buildPriceItem((selectedId == int.parse(value.id)), "${localizations!.getLocalization("available_in_plan")} \"${value.name}\"", value.name, value.quotas_left, () {
           setState(() {
             selectedId = int.parse(value.id);
           });
@@ -261,79 +251,4 @@ class PurchaseDialogState extends State<PurchaseDialog> {
       ),
     );
   }
-
-  _buildIAPItem(selected, title, subtitle, value, onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          SizedBox(
-            height: 50,
-            child: Stack(
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Icon(
-                      selected ? Icons.check_circle : Icons.panorama_fish_eye,
-                      color: selected ? secondColor : Colors.grey,
-                      size: 40,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Expanded(
-                            child: Text(
-                              "$title",
-                              textScaleFactor: 1.0,
-                              style: TextStyle(fontSize: 18),
-                            ),
-                          ),
-                          Text(
-                            "$subtitle ",
-                            textScaleFactor: 1.0,
-                            style: TextStyle(fontSize: 12),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-                Visibility(
-                  visible: value != null,
-                  child: Positioned(
-                    right: 0,
-                    top: 0,
-                    bottom: 0,
-                    child: Center(
-                        child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Text(
-                          "$value",
-                          textScaleFactor: 1.0,
-                          style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: secondColor),
-                        ),
-                        Text(
-                          localizations!.getLocalization("plan_count_left"),
-                          textScaleFactor: 1.0,
-                          style: TextStyle(fontSize: 9, color: secondColor),
-                        )
-                      ],
-                    )),
-                  ),
-                )
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  _buildMembershipItem(selected, title, subtitle) {}
 }

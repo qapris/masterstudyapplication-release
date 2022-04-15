@@ -12,3 +12,15 @@ class AuthResponse {
 
   Map<String, dynamic> toJson() => _$AuthResponseToJson(this);
 }
+
+
+class ChangePasswordResponse {
+  dynamic modified;
+  dynamic values;
+
+  ChangePasswordResponse(this.modified,this.values);
+
+  factory ChangePasswordResponse.fromJson(Map<String, dynamic> json) => _$ChangePasswordResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ChangePasswordResponseToJson(this);
+}
