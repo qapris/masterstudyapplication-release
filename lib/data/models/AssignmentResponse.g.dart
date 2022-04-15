@@ -21,7 +21,7 @@ AssignmentResponse _$AssignmentResponseFromJson(Map<String, dynamic> json) {
     next_lesson: json['next_lesson'] as String,
     label: json['label'] as String,
     comment: json['comment'] as String,
-    files: (json['files'] as List).map((e) => e == null ? null : FilesBean.fromJson(e as Map<String, dynamic>)).toList(),
+    files: json['files'] == null ? [] : (json['files'] as List).map((e) => e == null ? null : FilesBean.fromJson(e as Map<String, dynamic>)).toList(),
   );
 }
 

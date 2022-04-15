@@ -1,4 +1,3 @@
-import '../ui/bloc/lesson_zoom/zoom_bloc.dart';
 import 'app_injector.dart' as _i1;
 import 'modules.dart' as _i2;
 import 'package:dio/src/dio.dart' as _i3;
@@ -59,6 +58,7 @@ import '../data/cache/localization_local.dart' as _i57;
 import '../data/cache/progress_course_local.dart' as _i58;
 import '../data/cache/course_curriculum_local.dart' as _i59;
 import '../data/cache/account_local.dart' as _i60;
+import '../ui/bloc/change_password/change_password_bloc.dart' as _i61;
 
 class AppInjector$Injector implements _i1.AppInjector {
   AppInjector$Injector._(this._appModule);
@@ -122,6 +122,7 @@ class AppInjector$Injector implements _i1.AppInjector {
         _createOrdersBloc,
         _createRestorePasswordBloc,
         _createLessonZoomBloc,
+        _createChangePasswordBloc,
       );
 
   _i17.AuthScreen _createAuthScreen() => _i17.AuthScreen(_createAuthBloc());
@@ -207,6 +208,8 @@ class AppInjector$Injector implements _i1.AppInjector {
   _i41.TextLessonBloc _createTextLessonBloc() => _i41.TextLessonBloc(_createLessonRepository(), _createCacheManager());
 
   _i55.LessonZoomBloc _createLessonZoomBloc() => _i55.LessonZoomBloc(_createLessonRepository());
+
+  _i61.ChangePasswordBloc _createChangePasswordBloc() => _i61.ChangePasswordBloc(_createAuthRepository());
 
   _i42.QuizLessonBloc _createQuizLessonBloc() => _i42.QuizLessonBloc(_createLessonRepository(), _createCacheManager());
 

@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/adapter.dart';
-import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -38,6 +37,7 @@ import 'package:masterstudy_app/ui/bloc/questions/bloc.dart';
 import 'package:masterstudy_app/ui/bloc/quiz_lesson/quiz_lesson_bloc.dart';
 import 'package:masterstudy_app/ui/bloc/quiz_screen/quiz_screen_bloc.dart';
 import 'package:masterstudy_app/ui/bloc/restore_password/restore_password_bloc.dart';
+import 'package:masterstudy_app/ui/bloc/change_password/change_password_bloc.dart';
 import 'package:masterstudy_app/ui/bloc/review_write/bloc.dart';
 import 'package:masterstudy_app/ui/bloc/search/bloc.dart';
 import 'package:masterstudy_app/ui/bloc/search_detail/bloc.dart';
@@ -63,6 +63,7 @@ import 'package:masterstudy_app/ui/screens/questions/questions_screen.dart';
 import 'package:masterstudy_app/ui/screens/quiz_lesson/quiz_lesson_screen.dart';
 import 'package:masterstudy_app/ui/screens/quiz_screen/quiz_screen.dart';
 import 'package:masterstudy_app/ui/screens/restore_password/restore_password_screen.dart';
+import 'package:masterstudy_app/ui/screens/change_password/change_password_screen.dart';
 import 'package:masterstudy_app/ui/screens/review_write/review_write_screen.dart';
 import 'package:masterstudy_app/ui/screens/search_detail/search_detail_screen.dart';
 import 'package:masterstudy_app/ui/screens/splash/splash_screen.dart';
@@ -77,7 +78,6 @@ import 'package:overlay_support/overlay_support.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'data/models/AppSettings.dart';
 import 'data/push/push_manager.dart';
 import 'data/utils.dart';
 import 'di/app_injector.dart';
@@ -91,7 +91,7 @@ final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
 LocalizationRepository? localizations;
 Color? mainColor, mainColorA, secondColor;
 
-StreamController pushStreamController = StreamController<Map<String, dynamic>>();
+StreamController pushStreamController = StreamController<RemoteMessage>();
 Stream pushStream = pushStreamController.stream.asBroadcastStream();
 
 bool dripContentEnabled = false;
@@ -138,7 +138,6 @@ void main() async {
   FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
   PushNotificationsManager().init();
-  //Firebase
 
   //Localizations
   localizations = LocalizationRepositoryImpl(await getDefaultLocalization());
@@ -149,6 +148,7 @@ void main() async {
   if (Platform.isAndroid) androidInfo = await deviceInfo.androidInfo;
   if (Platform.isIOS) iosDeviceInfo = await deviceInfo.iosInfo;
 
+  //Http certificate
   (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (HttpClient client) {
     client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
     return client;
@@ -195,6 +195,7 @@ class MyApp extends StatefulWidget {
   final Provider<OrdersBloc> ordersBloc;
   final Provider<RestorePasswordBloc> restorePasswordBloc;
   final Provider<LessonZoomBloc> lessonZoomBloc;
+  final Provider<ChangePasswordBloc> changePasswordBloc;
 
   const MyApp(
     this.authScreen,
@@ -229,6 +230,7 @@ class MyApp extends StatefulWidget {
     this.ordersBloc,
     this.restorePasswordBloc,
     this.lessonZoomBloc,
+    this.changePasswordBloc,
   ) : super();
 
   _getProvidedMainScreen() {
@@ -249,88 +251,11 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
-  late StreamSubscription<List<PurchaseDetails>> _subscription;
-
-  /// Is the API available on the device
-  bool _available = true;
-
-  /// The In App Purchase plugin
-  InAppPurchase _iap = InAppPurchase.instance;
-
-  /// Products for sale
-  List<ProductDetails> _products = [];
-
-  /// Past purchases
-  List<PurchaseDetails> _purchases = [];
-
   @override
   void initState() {
-    _initialize();
     super.initState();
   }
 
-  void _buyProduct(ProductDetails prod) {
-    final PurchaseParam purchaseParam = PurchaseParam(productDetails: prod);
-    _iap.buyConsumable(purchaseParam: purchaseParam, autoConsume: false);
-  }
-
-  void _initialize() async {
-    // Check availability of In App Purchases
-    _available = await _iap.isAvailable();
-
-    _subscription = _iap.purchaseStream.listen((data) => setState(() {
-          _purchases.addAll(data);
-          _verifyPurchase(data[0].productID);
-        }));
-
-    if (_available) {
-      await _getProducts();
-      // await _getPastPurchases();
-      // Verify and deliver a purchase with your own business logic
-      // _verifyPurchase();
-    }
-  }
-
-  /// Get all products available for sale
-  Future<void> _getProducts() async {
-    Set<String> ids = Set.from(['874']);
-    ProductDetailsResponse response = await _iap.queryProductDetails(ids);
-
-    setState(() {
-      _products = response.productDetails;
-    });
-  }
-
-  /// Gets past purchases
-  /*Future<void> _getPastPurchases() async {
-    QueryPurchaseDetailsResponse response = await _iap.queryPastPurchases();
-
-    for (PurchaseDetails purchase in response.pastPurchases) {
-      if (Platform.isIOS) {
-        InAppPurchaseConnection.instance.completePurchase(purchase);
-      }
-    }
-
-    setState(() {
-      _purchases = response.pastPurchases;
-    });
-  }*/
-
-  /// Returns purchase of specific product ID
-  PurchaseDetails _hasPurchased(String productID) {
-    return _purchases.firstWhere((purchase) => purchase.productID == productID);
-  }
-
-  /// Your own business logic to setup a consumable
-  void _verifyPurchase(String productID) {
-    PurchaseDetails purchase = _hasPurchased(productID);
-
-    // TODO serverside verification & record consumable in the database
-
-    if (purchase != null && purchase.status == PurchaseStatus.purchased) {}
-  }
-
-  ///Theme for App
   ThemeData _buildShrineTheme() {
     final ThemeData base = ThemeData.light();
     return base.copyWith(
@@ -353,17 +278,9 @@ class MyAppState extends State<MyApp> {
         bodyColor: mainColor,
         displayColor: mainColor,
       ),
-      // accentTextTheme: textTheme,
-      // textSelectionColor: mainColor?.withOpacity(0.4),
       errorColor: Colors.red[400],
       colorScheme: ColorScheme.fromSwatch().copyWith(secondary: mainColor),
     );
-  }
-
-  @override
-  void dispose() {
-    _subscription.cancel();
-    super.dispose();
   }
 
   @override
@@ -446,6 +363,8 @@ class MyAppState extends State<MyApp> {
                 return MaterialPageRoute(builder: (context) => UserCourseLockedScreen(widget.courseBloc()), settings: routeSettings);
               case RestorePasswordScreen.routeName:
                 return MaterialPageRoute(builder: (context) => RestorePasswordScreen(widget.restorePasswordBloc()), settings: routeSettings);
+              case ChangePasswordScreen.routeName:
+                return MaterialPageRoute(builder: (context) => ChangePasswordScreen(widget.changePasswordBloc()), settings: routeSettings);
               case LessonZoomScreen.routeName:
                 return MaterialPageRoute(builder: (context) => LessonZoomScreen(widget.lessonZoomBloc()), settings: routeSettings);
 
@@ -456,5 +375,10 @@ class MyAppState extends State<MyApp> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

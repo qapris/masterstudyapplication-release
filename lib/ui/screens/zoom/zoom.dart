@@ -85,29 +85,18 @@ class _LessonZoomScreenWidgetState extends State<LessonZoomScreenWidget> {
     initConnectivity();
     _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
     _bloc = BlocProvider.of<LessonZoomBloc>(context)..add(FetchEvent(widget.courseId, widget.lessonId));
-    super.initState();
-  }
+    ImageDownloader.callback(onProgressUpdate: (String? imageId, int progress) {
+      setState(() {
+        _progressImg = progress;
+      });
 
-  Future<void> initConnectivity() async {
-    late ConnectivityResult result;
-    try {
-      result = await _connectivity.checkConnectivity();
-    } on PlatformException catch (e) {
-      log(e.toString());
-      return;
-    }
-
-    if (!mounted) {
-      return Future.value(null);
-    }
-
-    return _updateConnectionStatus(result);
-  }
-
-  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
-    setState(() {
-      _connectionStatus = result;
+      if (progress == 100) {
+        setState(() {
+          isLoadingImg = false;
+        });
+      }
     });
+    super.initState();
   }
 
   @override
@@ -199,9 +188,11 @@ class _LessonZoomScreenWidgetState extends State<LessonZoomScreenWidget> {
   }
 
   var progress = '';
-  int _progress = 0;
+  int _progressImg = 0;
   bool isLoading = false;
+  bool isLoadingImg = false;
   Map<String, dynamic>? progressMap = {};
+  Map<String, dynamic>? progressMapImg = {};
   Widget? svgIcon;
 
   _buildBody(state) {
@@ -333,115 +324,114 @@ class _LessonZoomScreenWidgetState extends State<LessonZoomScreenWidget> {
                                         : const SizedBox(),
                                     //Icon download
                                     IconButton(
-                                      onPressed: () async {
-                                        String? dir;
-                                        if (Platform.isAndroid) {
-                                          dir = (await ExternalPath.getExternalStoragePublicDirectory(ExternalPath.DIRECTORY_DOWNLOADS));
-                                        } else if (Platform.isIOS) {
-                                          dir = (await getApplicationDocumentsDirectory()).path;
-                                        }
-                                        var cyrillicSymbols = RegExp('[а-яёА-ЯЁ]');
+                                      onPressed: isLoading || isLoadingImg
+                                          ? null
+                                          : () async {
+                                              String? dir;
+                                              if (Platform.isAndroid) {
+                                                dir = (await ExternalPath.getExternalStoragePublicDirectory(ExternalPath.DIRECTORY_DOWNLOADS));
+                                              } else if (Platform.isIOS) {
+                                                dir = (await getApplicationDocumentsDirectory()).path;
+                                              }
+                                              var cyrillicSymbols = RegExp('[а-яёА-ЯЁ]');
 
-                                        bool isSymbols = cyrillicSymbols.hasMatch(item.url);
+                                              bool isSymbols = cyrillicSymbols.hasMatch(item.url);
 
-                                        ///If file is jpeg/png/jpg
-                                        if (item.url.toString().contains('jpeg') || item.url.toString().contains('png') || item.url.toString().contains('jpg')) {
-                                          if (Platform.isIOS && isSymbols) {
-                                            AlertDialog alert = AlertDialog(
-                                              title: Text('Error image', textScaleFactor: 1.0, style: TextStyle(color: Colors.black, fontSize: 20.0)),
-                                              content: Text(
-                                                "Photo format error",
-                                                textScaleFactor: 1.0,
-                                              ),
-                                              actions: [
-                                                ElevatedButton(
-                                                  child: Text(
-                                                    'Ok',
-                                                    textScaleFactor: 1.0,
-                                                    style: TextStyle(
-                                                      color: Colors.black,
+                                              //If file is jpeg/png/jpg
+                                              if (item.url.toString().contains('jpeg') || item.url.toString().contains('png') || item.url.toString().contains('jpg')) {
+                                                setState(() {
+                                                  isLoadingImg = true;
+                                                });
+
+                                                if (Platform.isIOS && isSymbols) {
+                                                  //If file container cyrillic symbols
+                                                  AlertDialog alert = AlertDialog(
+                                                    title: Text('Error image', textScaleFactor: 1.0, style: TextStyle(color: Colors.black, fontSize: 20.0)),
+                                                    content: Text(
+                                                      "Photo format error",
+                                                      textScaleFactor: 1.0,
                                                     ),
-                                                  ),
-                                                  onPressed: () {
-                                                    Navigator.of(context).pop();
+                                                    actions: [
+                                                      ElevatedButton(
+                                                        child: Text(
+                                                          'Ok',
+                                                          textScaleFactor: 1.0,
+                                                          style: TextStyle(
+                                                            color: Colors.black,
+                                                          ),
+                                                        ),
+                                                        onPressed: () {
+                                                          Navigator.of(context).pop();
+                                                        },
+                                                        style: ElevatedButton.styleFrom(
+                                                          primary: Colors.white,
+                                                        ),
+                                                      )
+                                                    ],
+                                                  );
+                                                  showDialog(
+                                                    context: context,
+                                                    builder: (BuildContext context) {
+                                                      return alert;
+                                                    },
+                                                  );
+                                                } else {
+                                                  setState(() {
+                                                    isLoadingImg = true;
+                                                    progressMapImg!['item_url'] = item.url;
+                                                  });
+
+                                                  var imageId = await ImageDownloader.downloadImage(item.url);
+
+                                                  if (imageId == null) {
+                                                    return print('Error');
+                                                  }
+                                                }
+                                              } else {
+                                                setState(() {
+                                                  isLoading = true;
+                                                  progressMap!['item_url'] = item.url;
+                                                });
+
+                                                String fileName = item.url.substring(item.url.lastIndexOf("/") + 1);
+
+                                                String fullPath = dir! + '/$fileName';
+
+                                                Response response = await dio.get(
+                                                  item.url,
+                                                  onReceiveProgress: (received, total) {
+                                                    setState(() {
+                                                      progress = ((received / total * 100).toStringAsFixed(0) + '%');
+                                                    });
+                                                    progressMap!.addParam('progress', progress);
                                                   },
-                                                  style: ElevatedButton.styleFrom(
-                                                    primary: Colors.white,
+
+                                                  //Received data with List<int>
+                                                  options: Options(
+                                                    responseType: ResponseType.bytes,
+                                                    followRedirects: false,
                                                   ),
-                                                )
-                                              ],
-                                            );
+                                                );
 
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return alert;
-                                              },
-                                            );
-                                          } else {
-                                            var imageId = await ImageDownloader.downloadImage(item.url);
-
-                                            if (imageId == null) {
-                                              return print('Error');
-                                            }
-
-                                            //When image downloaded
-                                            final snackBar = SnackBar(
-                                              content: Text(
-                                                'Image downloaded',
-                                                textScaleFactor: 1.0,
-                                              ),
-                                              duration: const Duration(seconds: 1),
-                                            );
-
-                                            if (_progress == 100) {
-                                              WidgetsBinding.instance?.addPostFrameCallback((_) {
-                                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                                                _progress = 0;
-                                              });
-                                            }
-                                          }
-                                        } else {
-                                          String fileName = item.url.substring(item.url.lastIndexOf("/") + 1);
-
-                                          String fullPath = dir! + '/$fileName';
-
-                                          setState(() {
-                                            isLoading = true;
-                                          });
-                                          Response response = await dio.get(
-                                            item.url,
-                                            onReceiveProgress: (received, total) {
-                                              setState(() {
-                                                progress = ((received / total * 100).toStringAsFixed(0) + '%');
-                                              });
-                                              progressMap!.addParam('itemUrl', item.url);
-                                              progressMap!.addParam('progress', progress);
+                                                if (mounted) {
+                                                  setState(() {
+                                                    isLoading = false;
+                                                  });
+                                                }
+                                              }
                                             },
-
-                                            //Received data with List<int>
-                                            options: Options(
-                                              responseType: ResponseType.bytes,
-                                              followRedirects: false,
-                                            ),
-                                          );
-
-                                          File file = File(fullPath);
-                                          var raf = file.openSync(mode: FileMode.write);
-                                          raf.writeFromSync(response.data);
-                                          await raf.close();
-
-                                          if (mounted) {
-                                            setState(() {
-                                              isLoading = false;
-                                            });
-                                          }
-                                        }
-                                      },
-                                      icon: isLoading && item.url == progressMap!['itemUrl'] && progress == 0
-                                          ? CircularProgressIndicator()
+                                      icon: isLoadingImg && item.url == progressMapImg!['item_url'] || isLoading && item.url == progressMap!['item_url']
+                                          ? SizedBox(
+                                              width: 25,
+                                              height: 25,
+                                              child: CircularProgressIndicator(
+                                                valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
+                                              ),
+                                            )
                                           : Icon(
-                                              item.url == progressMap!['itemUrl'] && progressMap!['progress'] == '${100}%' ? Icons.check : Icons.download,
+                                              _progressImg == 100 && item.url == progressMapImg!['item_url'] || progress == '${100}%' && item.url == progressMap!['item_url']
+                                                  ? Icons.check
+                                                  : Icons.download,
                                               color: Colors.white,
                                             ),
                                     ),
@@ -530,6 +520,28 @@ class _LessonZoomScreenWidgetState extends State<LessonZoomScreenWidget> {
     } else {
       throw 'Could not launch $url';
     }
+  }
+
+  Future<void> initConnectivity() async {
+    late ConnectivityResult result;
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException catch (e) {
+      log(e.toString());
+      return;
+    }
+
+    if (!mounted) {
+      return Future.value(null);
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    setState(() {
+      _connectionStatus = result;
+    });
   }
 
   @override

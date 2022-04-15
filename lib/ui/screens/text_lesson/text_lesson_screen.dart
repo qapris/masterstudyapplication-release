@@ -93,8 +93,14 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
     _bloc = BlocProvider.of<TextLessonBloc>(context)..add(FetchEvent(widget.courseId, widget.lessonId));
     ImageDownloader.callback(onProgressUpdate: (String? imageId, int progress) {
       setState(() {
-        _progress = progress;
+        _progressImg = progress;
       });
+
+      if (progress == 100) {
+        setState(() {
+          isLoadingImg = false;
+        });
+      }
     });
   }
 
@@ -132,6 +138,20 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
       child: BlocBuilder<TextLessonBloc, TextLessonState>(
         bloc: _bloc,
         builder: (BuildContext context, TextLessonState state) {
+          /*     //When image downloaded
+          final snackBar = SnackBar(
+            content: Text(
+              'Image downloaded',
+              textScaleFactor: 1.0,
+            ),
+            duration: const Duration(seconds: 1),
+          );
+
+          if (_progress == 100) {
+            WidgetsBinding.instance?.addPostFrameCallback((_) {
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            });
+          }*/
           return Scaffold(
             appBar: AppBar(
               backgroundColor: HexColor.fromHex("#273044"),
@@ -215,8 +235,7 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
       return Column(
         children: [
           _buildWebView(state),
-            _connectionStatus == ConnectivityResult.wifi || _connectionStatus == ConnectivityResult.mobile ?
-            _buildLessonMaterials(state) : SizedBox(),
+          _connectionStatus == ConnectivityResult.wifi || _connectionStatus == ConnectivityResult.mobile ? _buildLessonMaterials(state) : SizedBox(),
         ],
       );
     }
@@ -245,9 +264,11 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
   }
 
   var progress = '';
-  int _progress = 0;
+  int _progressImg = 0;
   bool isLoading = false;
+  bool isLoadingImg = false;
   Map<String, dynamic>? progressMap = {};
+  Map<String, dynamic>? progressMapImg = {};
   Widget? svgIcon;
 
   _buildLessonMaterials(LoadedTextLessonState state) {
@@ -277,64 +298,64 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
               var item = state.lessonResponse.materials[index];
               switch (item!.type) {
                 case 'audio':
-                  svgIcon = SvgPicture.asset('assets/icons/audio.svg');
+                  svgIcon = SvgPicture.asset('assets/icons/audio.svg', color: Colors.white);
                   break;
                 case 'avi':
-                  svgIcon = SvgPicture.asset('assets/icons/avi.svg');
+                  svgIcon = SvgPicture.asset('assets/icons/avi.svg', color: Colors.white);
                   break;
                 case 'doc':
-                  svgIcon = SvgPicture.asset('assets/icons/doc.svg');
+                  svgIcon = SvgPicture.asset('assets/icons/doc.svg', color: Colors.white);
                   break;
                 case 'docx':
-                  svgIcon = SvgPicture.asset('assets/icons/docx.svg');
+                  svgIcon = SvgPicture.asset('assets/icons/docx.svg', color: Colors.white);
                   break;
                 case 'gif':
-                  svgIcon = SvgPicture.asset('assets/icons/gif.svg');
+                  svgIcon = SvgPicture.asset('assets/icons/gif.svg', color: Colors.white);
                   break;
                 case 'jpeg':
-                  svgIcon = SvgPicture.asset('assets/icons/jpeg.svg');
+                  svgIcon = SvgPicture.asset('assets/icons/jpeg.svg', color: Colors.white);
                   break;
                 case 'jpg':
-                  svgIcon = SvgPicture.asset('assets/icons/jpg.svg');
+                  svgIcon = SvgPicture.asset('assets/icons/jpg.svg', color: Colors.white);
                   break;
                 case 'mov':
-                  svgIcon = SvgPicture.asset('assets/icons/mov.svg');
+                  svgIcon = SvgPicture.asset('assets/icons/mov.svg', color: Colors.white);
                   break;
                 case 'mp3':
-                  svgIcon = SvgPicture.asset('assets/icons/mp3.svg');
+                  svgIcon = SvgPicture.asset('assets/icons/mp3.svg', color: Colors.white);
                   break;
                 case 'mp4':
-                  svgIcon = SvgPicture.asset('assets/icons/mp4.svg');
+                  svgIcon = SvgPicture.asset('assets/icons/mp4.svg', color: Colors.white);
                   break;
                 case 'pdf':
-                  svgIcon = SvgPicture.asset('assets/icons/pdf.svg');
+                  svgIcon = SvgPicture.asset('assets/icons/pdf.svg', color: Colors.white);
                   break;
                 case 'png':
-                  svgIcon = SvgPicture.asset('assets/icons/png.svg');
+                  svgIcon = SvgPicture.asset('assets/icons/png.svg', color: Colors.white);
                   break;
                 case 'ppt':
-                  svgIcon = SvgPicture.asset('assets/icons/ppt.svg');
+                  svgIcon = SvgPicture.asset('assets/icons/ppt.svg', color: Colors.white);
                   break;
                 case 'pptx':
-                  svgIcon = SvgPicture.asset('assets/icons/pptx.svg');
+                  svgIcon = SvgPicture.asset('assets/icons/pptx.svg', color: Colors.white);
                   break;
                 case 'psd':
-                  svgIcon = SvgPicture.asset('assets/icons/psd.svg');
+                  svgIcon = SvgPicture.asset('assets/icons/psd.svg', color: Colors.white);
                   break;
                 case 'txt':
-                  svgIcon = SvgPicture.asset('assets/icons/txt.svg');
+                  svgIcon = SvgPicture.asset('assets/icons/txt.svg', color: Colors.white);
                   break;
                 case 'xls':
-                  svgIcon = SvgPicture.asset('assets/icons/xls.svg');
+                  svgIcon = SvgPicture.asset('assets/icons/xls.svg', color: Colors.white);
                   break;
                 case 'xlsx':
-                  svgIcon = SvgPicture.asset('assets/icons/xlsx.svg');
+                  svgIcon = SvgPicture.asset('assets/icons/xlsx.svg', color: Colors.white);
                   break;
                 case 'zip':
-                  svgIcon = SvgPicture.asset('assets/icons/zip.svg');
+                  svgIcon = SvgPicture.asset('assets/icons/zip.svg', color: Colors.white);
                   break;
-                default :
-                  svgIcon = SvgPicture.asset('assets/icons/txt.svg');
+                default:
+                  svgIcon = SvgPicture.asset('assets/icons/txt.svg', color: Colors.white);
               }
               return Container(
                 margin: EdgeInsets.only(top: 20),
@@ -346,7 +367,7 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    SizedBox(width: 50,height: 30, child: svgIcon!),
+                    SizedBox(width: 30, height: 30, child: svgIcon!),
                     const SizedBox(width: 10),
                     //Materials Label
                     Expanded(
@@ -354,10 +375,11 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
                         '${item.label}.${item.type} (${item.size})',
                         style: TextStyle(
                           color: HexColor.fromHex("#FFFFFF"),
+                          fontSize: 14,
                         ),
                       ),
                     ),
-                    item.url == progressMap!['itemUrl']
+                    item.url == progressMap!['item_url']
                         ? Text(
                             progress,
                             style: TextStyle(
@@ -367,116 +389,112 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
                         : const SizedBox(),
                     //Icon download
                     IconButton(
-                      onPressed: () async {
-                        String? dir;
-                        if (Platform.isAndroid) {
-                          dir = (await ExternalPath.getExternalStoragePublicDirectory(ExternalPath.DIRECTORY_DOWNLOADS));
-                        } else if (Platform.isIOS) {
-                          dir = (await getApplicationDocumentsDirectory()).path;
-                        }
+                      onPressed: isLoading || isLoadingImg
+                          ? null
+                          : () async {
+                              var cyrillicSymbols = RegExp('[а-яёА-ЯЁ]');
+                              bool isSymbols = cyrillicSymbols.hasMatch(item.url);
 
-                        var cyrillicSymbols = RegExp('[а-яёА-ЯЁ]');
+                              String? dir;
+                              if (Platform.isAndroid) {
+                                dir = (await ExternalPath.getExternalStoragePublicDirectory(ExternalPath.DIRECTORY_DOWNLOADS));
+                              } else if (Platform.isIOS) {
+                                dir = (await getApplicationDocumentsDirectory()).path;
+                              }
 
-                        bool isSymbols = cyrillicSymbols.hasMatch(item.url);
+                              //If file is jpeg/png/jpg
+                              if (item.url.toString().contains('jpeg') || item.url.toString().contains('png') || item.url.toString().contains('jpg')) {
+                                setState(() {
+                                  isLoadingImg = true;
+                                });
 
-                        ///If file is jpeg/png/jpg
-                        if (item.url.toString().contains('jpeg') || item.url.toString().contains('png') || item.url.toString().contains('jpg')) {
-                          if (Platform.isIOS && isSymbols) {
-                            AlertDialog alert = AlertDialog(
-                              title: Text('Error image', textScaleFactor: 1.0, style: TextStyle(color: Colors.black, fontSize: 20.0)),
-                              content: Text(
-                                "Photo format error",
-                                textScaleFactor: 1.0,
-                              ),
-                              actions: [
-                                ElevatedButton(
-                                  child: Text(
-                                    'Ok',
-                                    textScaleFactor: 1.0,
-                                    style: TextStyle(
-                                      color: Colors.black,
+                                if (Platform.isIOS && isSymbols) {
+                                  //If file container cyrillic symbols
+                                  AlertDialog alert = AlertDialog(
+                                    title: Text('Error image', textScaleFactor: 1.0, style: TextStyle(color: Colors.black, fontSize: 20.0)),
+                                    content: Text(
+                                      "Photo format error",
+                                      textScaleFactor: 1.0,
                                     ),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
+                                    actions: [
+                                      ElevatedButton(
+                                        child: Text(
+                                          'Ok',
+                                          textScaleFactor: 1.0,
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          primary: Colors.white,
+                                        ),
+                                      )
+                                    ],
+                                  );
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return alert;
+                                    },
+                                  );
+                                } else {
+                                  setState(() {
+                                    isLoadingImg = true;
+                                    progressMapImg!['item_url'] = item.url;
+                                  });
+
+                                  var imageId = await ImageDownloader.downloadImage(item.url);
+
+                                  if (imageId == null) {
+                                    return print('Error');
+                                  }
+                                }
+                              } else {
+                                setState(() {
+                                  isLoading = true;
+                                  progressMap!['item_url'] = item.url;
+                                });
+
+                                String fileName = item.url.substring(item.url.lastIndexOf("/") + 1);
+
+                                String fullPath = dir! + '/$fileName';
+
+                                Response response = await dio.get(
+                                  item.url,
+                                  onReceiveProgress: (received, total) {
+                                    setState(() {
+                                      progress = ((received / total * 100).toStringAsFixed(0) + '%');
+                                    });
+                                    progressMap!.addParam('progress', progress);
                                   },
-                                  style: ElevatedButton.styleFrom(
-                                    primary: Colors.white,
+
+                                  //Received data with List<int>
+                                  options: Options(
+                                    responseType: ResponseType.bytes,
+                                    followRedirects: false,
                                   ),
-                                )
-                              ],
-                            );
+                                );
 
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return alert;
-                              },
-                            );
-                          } else {
-                            var imageId = await ImageDownloader.downloadImage(item.url);
-
-                            if (imageId == null) {
-                              return print('Error');
-                            }
-
-                            //When image downloaded
-                            final snackBar = SnackBar(
-                              content: Text(
-                                'Image downloaded',
-                                textScaleFactor: 1.0,
-                              ),
-                              duration: const Duration(seconds: 1),
-                            );
-
-                            if (_progress == 100) {
-                              WidgetsBinding.instance?.addPostFrameCallback((_) {
-                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                                _progress = 0;
-                              });
-                            }
-                          }
-                        } else {
-                          String fileName = item.url.substring(item.url.lastIndexOf("/") + 1);
-
-                          String fullPath = dir! + '/$fileName';
-
-                          setState(() {
-                            isLoading = true;
-                          });
-                          Response response = await dio.get(
-                            item.url,
-                            onReceiveProgress: (received, total) {
-                              setState(() {
-                                progress = ((received / total * 100).toStringAsFixed(0) + '%');
-                              });
-                              progressMap!.addParam('itemUrl', item.url);
-                              progressMap!.addParam('progress', progress);
+                                if (mounted) {
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                }
+                              }
                             },
-
-                            //Received data with List<int>
-                            options: Options(
-                              responseType: ResponseType.bytes,
-                              followRedirects: false,
-                            ),
-                          );
-
-                          File file = File(fullPath);
-                          // var raf = file.openSync(mode: FileMode.write);
-                          // raf.writeFromSync(response.data);
-                          // await raf.close();
-
-                          if (mounted) {
-                            setState(() {
-                              isLoading = false;
-                            });
-                          }
-                        }
-                      },
-                      icon: isLoading && item.url == progressMap!['itemUrl'] && progress == 0
-                          ? CircularProgressIndicator()
+                      icon: isLoadingImg && item.url == progressMapImg!['item_url'] || isLoading && item.url == progressMap!['item_url']
+                          ? SizedBox(
+                              width: 25,
+                              height: 25,
+                              child: CircularProgressIndicator(
+                                valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
                           : Icon(
-                              item.url == progressMap!['itemUrl'] && progressMap!['progress'] == '${100}%' ? Icons.check : Icons.download,
+                              _progressImg == 100 && item.url == progressMapImg!['item_url'] || progress == '${100}%' && item.url == progressMap!['item_url'] ? Icons.check : Icons.download,
                               color: Colors.white,
                             ),
                     ),

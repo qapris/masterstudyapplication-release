@@ -16,6 +16,8 @@ abstract class AuthRepository {
 
   Future restorePassword(String email);
 
+  Future<Response> changePassword(String oldPassword, String newPassword);
+
   Future demoAuth();
 
   Future<String> getToken();
@@ -73,5 +75,9 @@ class AuthRepositoryImpl extends AuthRepository {
 
   Future restorePassword(String email) async {
     await provider.restorePassword(email);
+  }
+
+  Future<Response> changePassword(String oldPassword, String newPassword) async {
+    return await provider.changePassword(oldPassword,newPassword);
   }
 }

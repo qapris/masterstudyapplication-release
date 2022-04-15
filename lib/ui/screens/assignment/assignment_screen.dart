@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -37,13 +39,14 @@ class AssignmentScreen extends StatelessWidget {
     final AssignmentScreenArgs args = ModalRoute.of(context)?.settings.arguments as AssignmentScreenArgs;
 
     return BlocProvider<AssignmentBloc>(
-        create: (c) => _bloc,
-        child: _AssignmentScreenWidget(
-          args.courseId,
-          args.assignmentId,
-          args.authorAva,
-          args.authorName,
-        ));
+      create: (c) => _bloc,
+      child: _AssignmentScreenWidget(
+        args.courseId,
+        args.assignmentId,
+        args.authorAva,
+        args.authorName,
+      ),
+    );
   }
 }
 
@@ -83,6 +86,7 @@ class _AssignmentScreenWidgetState extends State<_AssignmentScreenWidget> {
       child: BlocBuilder<AssignmentBloc, AssignmentState>(builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
+            backgroundColor: mainColor,
               title: Text(
                 localizations!.getLocalization("assignment_screen_title"),
                 textScaleFactor: 1.0,
@@ -114,10 +118,15 @@ class _AssignmentScreenWidgetState extends State<_AssignmentScreenWidget> {
                   ),
                 )
               ]),
-          body: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(10.0),
-              child: _buildContent(state),
+          body: GestureDetector(
+            onTap: () {
+              FocusScope.of(context).requestFocus(FocusNode());
+            },
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.all(10.0),
+                child: _buildContent(state),
+              ),
             ),
           ),
           bottomNavigationBar: _buildBottom(state),
@@ -228,6 +237,7 @@ class _AssignmentScreenWidgetState extends State<_AssignmentScreenWidget> {
               onPressed: () {
                 _bloc.add(StartAssignmentEvent(widget.courseId, widget.assignmentId));
               },
+              // ignore: unnecessary_type_check
               child: setUpButtonChild((state is LoadedAssignmentState) ? state.assignmentResponse.button : "", state is LoadedAssignmentState),
             ),
             SizedBox(
