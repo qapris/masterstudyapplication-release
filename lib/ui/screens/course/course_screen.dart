@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,6 +11,7 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:masterstudy_app/data/models/OrdersResponse.dart';
 import 'package:masterstudy_app/data/models/category.dart';
 import 'package:masterstudy_app/data/models/course/CourcesResponse.dart';
+import 'package:masterstudy_app/data/utils.dart';
 import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/bloc/course/bloc.dart';
 import 'package:masterstudy_app/ui/screens/category_detail/category_detail_screen.dart';
@@ -25,6 +27,7 @@ import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
 import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
 import 'package:share/share.dart';
 import 'package:transparent_image/transparent_image.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../main.dart';
 import '../purchase_dialog/purchase_dialog.dart';
 import 'tabs/faq_widget.dart';
@@ -90,6 +93,7 @@ class _CourseScreenWidget extends StatefulWidget {
 class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerProviderStateMixin {
   late ScrollController _scrollController;
   late AnimationController animation;
+  late AnimationController animationBottom;
   late Animation<double> _fadeInFadeOut;
   late CourseBloc _bloc;
   late bool _isFav;
@@ -98,10 +102,13 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
   String title = "";
   bool hasTrial = true;
   num kef = 2;
+  String? selectedPlan = '';
 
   @override
   void initState() {
     super.initState();
+    animationBottom = BottomSheet.createAnimationController(this);
+    animationBottom.duration = Duration(seconds: 1);
     animation = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 700),
@@ -127,8 +134,17 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
         }
       });
 
-    _bloc = BlocProvider.of<CourseBloc>(context)..add(FetchEvent(widget.coursesBean.id!));
+    getToken();
 
+    _bloc = BlocProvider.of<CourseBloc>(context)..add(FetchEvent(widget.coursesBean.id!));
+  }
+
+  String courseToken = '';
+
+  Future getToken() async {
+    Response response = await dio.post(apiEndpoint + 'get_auth_token_to_course', data: {'course_id': widget.coursesBean.id});
+
+    courseToken = response.data['token_auth'];
   }
 
   @override
@@ -444,6 +460,8 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
     );
   }
 
+  bool isLoading = false;
+
   _buildBottom(CourseState state) {
     ///Button is "Start Course" if has_access == true
     if (state is LoadedCourseState && state.courseDetailResponse.has_access) {
@@ -500,9 +518,113 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
               height: 40,
               color: mainColor,
               onPressed: () async {
-                if (state is LoadedCourseState) {}
+                if (state is LoadedCourseState) {
+                  if (_bloc.selectedPaymetId == -1) {
+                    setState(() {
+                      isLoading = true;
+                    });
+
+                    //GetTokenToBuyCourse
+                    Response response = await dio.post(apiEndpoint + 'get_auth_token_to_course', data: {'course_id': widget.coursesBean.id});
+
+                    setState(() {
+                      isLoading = false;
+                    });
+                    showModalBottomSheet<void>(
+                      context: context,
+                      isScrollControlled: true,
+                      barrierColor: Colors.black.withAlpha(1),
+                      backgroundColor: Colors.transparent,
+                      builder: (BuildContext context) {
+                        return Container(
+                          height: double.infinity,
+                          margin: const EdgeInsets.only(top: 26),
+                          child: Stack(
+                            /*mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,*/
+                            children: <Widget>[
+                              Container(
+                                height: double.infinity,
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.8),
+                                      offset: Offset(0, 3), // changes position of shadow
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Align(
+                                alignment: Alignment.topLeft,
+                                child: IconButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  icon: Icon(
+                                    Icons.close,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(left: 25, right: 25),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Material(
+                                      color: Colors.transparent,
+                                      child: Center(
+                                        child: Text(
+                                          "This app doesn't support the In App Purchase\nPlease visit the website to continue",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 30),
+                                    Material(
+                                      color: Colors.transparent,
+                                      child: SizedBox(
+                                        height: 45,
+                                        width: double.infinity,
+                                        child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            primary: mainColor,
+                                          ),
+                                          onPressed: () async {
+                                            _bloc.add(FetchEvent(widget.coursesBean.id!));
+                                            await launch('${response.data['token_auth']}&payment=pay').then((value) {
+                                              Navigator.of(context).pop();
+                                            });
+                                          },
+                                          child: Text(
+                                            'Continue',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  } else {
+                    _bloc.add(UsePlan(state.courseDetailResponse.id));
+                  }
+                }
               },
-              child: setUpButtonChild(state),
+              child: setUpButtonChild(state, isLoading),
             )
           ],
         ),
@@ -512,6 +634,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
 
   _buildPrice(CourseState state) {
     if (state is LoadedCourseState) {
+      var userSubscriptions = state.userPlans.subscriptions;
       if (!state.courseDetailResponse.has_access) {
         if (state.courseDetailResponse.price?.free ?? false) {
           return Row(
@@ -521,59 +644,63 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
                 localizations!.getLocalization("course_free_price"),
                 textScaleFactor: 1.0,
               ),
-              Platform.isAndroid ? Icon(Icons.arrow_drop_down) : Text("")
+              Icon(Icons.arrow_drop_down),
             ],
           );
         } else {
-          String? selectedPlan;
-
           //Set price for course
           if (_bloc.selectedPaymetId == -1) {
             selectedPlan = "${localizations!.getLocalization("course_regular_price")} ${state.courseDetailResponse.price?.price}";
           }
 
           //If user have plans
-          if (state.userPlans.isNotEmpty) {
-            state.userPlans.forEach((value) {
-              if (int.parse(value.subscription_id) == _bloc.selectedPaymetId) {
+          if (userSubscriptions.isNotEmpty) {
+            userSubscriptions.forEach((value) {
+              if (int.parse(value!.subscription_id) == _bloc.selectedPaymetId) {
                 selectedPlan = value.name;
               }
             });
           }
 
+          var dialog;
 
           return GestureDetector(
             onTap: () async {
-              if (Platform.isAndroid) {
-                  var dialog = showDialog(
-                    context: context,
-                    builder: (builder) {
+
+              dialog = showDialog(
+                context: context,
+                builder: (builder) {
+                  return StatefulBuilder(
+                    builder: (context, setState) {
                       return BlocProvider.value(
                         child: Dialog(
-                          child: PurchaseDialog(),
+                          child: PurchaseDialog(courseToken: courseToken),
                         ),
                         value: _bloc,
                       );
                     },
                   );
+                },
+              );
 
-                  dialog.then((value) {
-                    if (value == "update") {
-                      _bloc.add(FetchEvent(widget.coursesBean.id!));
-                    } else {
-                      setState(() {});
-                    }
+              dialog.then((value) {
+                if (value == "update") {
+                  _bloc.add(FetchEvent(widget.coursesBean.id!));
+                } else {
+                  setState(() {
+                    selectedPlan = value;
                   });
-              }
+                }
+              });
             },
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Text(
-                  selectedPlan!,
+                  '${selectedPlan!}',
                   textScaleFactor: 1.0,
                 ),
-                Platform.isAndroid ? Icon(Icons.arrow_drop_down) : Text("")
+                Icon(Icons.arrow_drop_down),
               ],
             ),
           );
@@ -588,13 +715,28 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
     return Text("");
   }
 
-
-  Widget setUpButtonChild(CourseState state) {
+  Widget setUpButtonChild(CourseState state, isLoading) {
     String buttonText = '';
     bool enable = state is LoadedCourseState;
 
     if (state is LoadedCourseState) {
       buttonText = state.courseDetailResponse.purchase_label!;
+    }
+
+    //For purchase get now (show alert)
+    if (isLoading == true) {
+      return SizedBox(
+        width: 20,
+        height: 20,
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation(Colors.white),
+        ),
+      );
+    } else {
+      Text(
+        buttonText.toUpperCase(),
+        textScaleFactor: 1.0,
+      );
     }
 
     if (enable == true) {
@@ -618,4 +760,3 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
     super.dispose();
   }
 }
-

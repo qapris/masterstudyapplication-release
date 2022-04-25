@@ -27,6 +27,7 @@ class CourseDetailResponse {
   String? first_lesson_type;
   bool has_access;
   List<Category?> categories_object;
+  dynamic token_auth;
 
   CourseDetailResponse({
     required this.id,
@@ -51,6 +52,7 @@ class CourseDetailResponse {
     required this.first_lesson_type,
     required this.has_access,
     required this.categories_object,
+    this.token_auth,
   });
 
   factory CourseDetailResponse.fromJson(Map<String, dynamic> json) => _$CourseDetailResponseFromJson(json);
@@ -239,4 +241,15 @@ class ImagesBean {
   factory ImagesBean.fromJson(Map<String, dynamic> json) => _$ImagesBeanFromJson(json);
 
   Map<String, dynamic> toJson() => _$ImagesBeanToJson(this);
+}
+
+@JsonSerializable()
+class TokenAuthToCourse {
+  dynamic token_auth;
+
+  TokenAuthToCourse({this.token_auth});
+
+  factory TokenAuthToCourse.fromJson(Map<String, dynamic> json) => _$TokenAuthToCourseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$TokenAuthToCourseToJson(this);
 }

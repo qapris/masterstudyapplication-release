@@ -2,14 +2,19 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'UserPlansResponse.g.dart';
 
+//UserPlansModel
 class UserPlansResponse {
-  final List<UserPlansBean> plans;
+  final List<UserPlansBean?> subscriptions;
+  final bool other_subscriptions;
 
-  UserPlansResponse(
-    this.plans,
-  );
+  UserPlansResponse({
+    required this.subscriptions,
+    required this.other_subscriptions,
+  });
 
-  UserPlansResponse.fromJsonArray(List json) : plans = json.map((i) => new UserPlansBean.fromJson(i)).toList();
+  factory UserPlansResponse.fromJson(Map<String, dynamic> json) => _$UserPlansResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$UserPlansResponseToJson(this);
 }
 
 @JsonSerializable()
@@ -79,3 +84,5 @@ class ButtonBean {
 
   Map<String, dynamic> toJson() => _$ButtonBeanToJson(this);
 }
+
+
