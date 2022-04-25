@@ -1,14 +1,17 @@
+import 'dart:developer';
 import 'package:masterstudy_app/data/models/AddToCartResponse.dart';
 import 'package:masterstudy_app/data/models/OrdersResponse.dart';
 import 'package:masterstudy_app/data/models/purchase/UserPlansResponse.dart';
 import 'package:masterstudy_app/data/network/api_provider.dart';
 
+import '../models/purchase/AllPlansResponse.dart';
+
 abstract class PurchaseRepository {
-  Future<List<UserPlansBean>> getUserPlans();
+  Future<UserPlansResponse> getUserPlans(int courseId);
 
-  Future<List<UserPlansBean>> getPlans();
+  Future<List<AllPlansBean>> getPlans({int courseId});
 
-  Future<List<OrderBean>> getOrders();
+  Future<OrdersResponse> getOrders();
 
   Future<AddToCartResponse> addToCart(int courseId);
 
@@ -21,21 +24,19 @@ class PurchaseRepositoryImpl extends PurchaseRepository {
   PurchaseRepositoryImpl(this._apiProvider);
 
   @override
-  Future<List<UserPlansBean>> getUserPlans() async {
-    var response = await _apiProvider.getUserPlans();
+  Future<UserPlansResponse> getUserPlans(int courseId) {
+    return _apiProvider.getUserPlans(courseId);
+  }
+
+  @override
+  Future<List<AllPlansBean>> getPlans({dynamic courseId}) async {
+    var response = await _apiProvider.getPlans(courseId);
     return response.plans;
   }
 
   @override
-  Future<List<UserPlansBean>> getPlans() async {
-    var response = await _apiProvider.getPlans();
-    return response.plans;
-  }
-
-  @override
-  Future<List<OrderBean>> getOrders() async {
-    var response = await _apiProvider.getOrders();
-    return response.orders;
+  Future<OrdersResponse> getOrders() {
+    return _apiProvider.getOrders();
   }
 
   @override

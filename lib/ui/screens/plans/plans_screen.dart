@@ -13,6 +13,8 @@ import 'package:webview_flutter/platform_interface.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
+import '../../../data/models/purchase/AllPlansResponse.dart';
+
 class PlansScreen extends StatelessWidget {
   static const routeName = "plansScreen";
   final PlansBloc bloc;
@@ -69,7 +71,7 @@ class PlansScreenWidgetState extends State<PlansScreenWidget> {
     );
   }
 
-  _buildList(List<UserPlansBean> plans) {
+  _buildList(List<AllPlansBean> plans) {
     return ListView.builder(
         itemCount: plans.length,
         itemBuilder: (context, index) {
@@ -80,12 +82,12 @@ class PlansScreenWidgetState extends State<PlansScreenWidget> {
         });
   }
 
-  _openCheckoutScreen(UserPlansBean plansBean){
+  _openCheckoutScreen(AllPlansBean allPlansBean){
     var future =  Navigator.pushNamed(
       context,
       WebCheckoutScreen.routeName,
       arguments:
-      WebCheckoutScreenArgs(plansBean.button?.url),
+      WebCheckoutScreenArgs(allPlansBean.button?.url),
     );
     future.then((value){
       Navigator.pop(context);
@@ -94,10 +96,10 @@ class PlansScreenWidgetState extends State<PlansScreenWidget> {
 }
 
 class PlanWidget extends StatelessWidget {
-  final UserPlansBean plansBean;
+  final AllPlansBean allPlansBean;
   final VoidCallback onTap;
 
-  const PlanWidget(this.plansBean,{required this.onTap}) : super();
+  const PlanWidget(this.allPlansBean,{required this.onTap}) : super();
 
   @override
   Widget build(BuildContext context) {
@@ -119,24 +121,24 @@ class PlanWidget extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       Text(
-                        plansBean.name,
+                        allPlansBean.name,
                         textScaleFactor: 1.0,
                         style: TextStyle(
                             fontSize: 20,
                             color: HexColor.fromHex("2A3045").withOpacity(0.8)),
                       ),
                       Text(
-                        "\$" + plansBean.initial_payment.toString(),
+                        "\$" + allPlansBean.initial_payment.toString(),
                         textScaleFactor: 1.0,
                         style: TextStyle(
                           fontSize: 40,
                         ),
                       ),
                       Visibility(
-                          visible: plansBean.billing_amount != 0,
+                          visible: allPlansBean.billing_amount != 0,
                           child: Text(
                             "\$" +
-                                plansBean.billing_amount.toString() +
+                                allPlansBean.billing_amount.toString() +
                                 " ${localizations!.getLocalization("plan_per_month")}",
                             textScaleFactor: 1.0,
                             style: TextStyle(
@@ -151,7 +153,7 @@ class PlanWidget extends StatelessWidget {
                             minWidth: double.infinity,
                             color: secondColor,
                             onPressed: onTap,
-                            child: Text(plansBean.button?.text ?? "GET NOW",
+                            child: Text(allPlansBean.button?.text ?? "GET NOW",
                               textScaleFactor: 1.0,),
                             textColor: Colors.white,
                           ),
@@ -161,7 +163,7 @@ class PlanWidget extends StatelessWidget {
                   ),
                 ),
                 Flexible(
-                  child: _buildWebView(plansBean.features),
+                  child: _buildWebView(allPlansBean.features),
                   flex: 1,
                 )
               ],

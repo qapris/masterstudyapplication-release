@@ -57,6 +57,7 @@ class TopInstructorsWidget extends StatelessWidget {
                   item?.meta?.position,
                   item?.rating?.average,
                   item?.rating?.marks_num,
+                  item?.login,
                 ),
               );
             },
@@ -68,7 +69,7 @@ class TopInstructorsWidget extends StatelessWidget {
     );
   }
 
-  _buildCard(context, id, avatar, firstName, lastName, position, stars, reviewsCount) {
+  _buildCard(context, id, avatar, firstName, lastName, position, stars, reviewsCount, login) {
     return SizedBox(
       width: 160,
       child: InkWell(
@@ -102,12 +103,19 @@ class TopInstructorsWidget extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0, left: 8, right: 8),
-                  child: Text(
-                    "$firstName" + " $lastName",
-                    textScaleFactor: 1.0,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).primaryTextTheme.headline5?.copyWith(color: dark, fontSize: 18),
-                  ),
+                  child: firstName != '' && lastName != ''
+                      ? Text(
+                          "$firstName" + " $lastName",
+                          textScaleFactor: 1.0,
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).primaryTextTheme.headline5?.copyWith(color: dark, fontSize: 18),
+                        )
+                      : Text(
+                          "$login",
+                          textScaleFactor: 1.0,
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).primaryTextTheme.headline5?.copyWith(color: dark, fontSize: 18),
+                        ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 4.0, left: 8, right: 8),

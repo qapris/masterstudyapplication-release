@@ -23,6 +23,8 @@ abstract class CoursesRepository {
   Future<PopularSearchesResponse> getPopularSearches();
 
   Future<bool> verifyInApp(String serverVerificationData, String price);
+
+  Future<TokenAuthToCourse> getTokenToCourse(int courseId);
 }
 
 @provide
@@ -87,6 +89,7 @@ class CoursesRepositoryImpl extends CoursesRepository {
 
   @override
   Future<CourseDetailResponse> getCourse(int courseId) {
+    log(_apiProvider.getCourse(courseId).toString());
     return _apiProvider.getCourse(courseId);
   }
 
@@ -98,5 +101,10 @@ class CoursesRepositoryImpl extends CoursesRepository {
   @override
   Future<bool> verifyInApp(String serverVerificationData, String price) {
     return _apiProvider.verifyInApp(serverVerificationData, price);
+  }
+
+  @override
+  Future<TokenAuthToCourse> getTokenToCourse(int courseId) {
+    return _apiProvider.getTokenToCourse(courseId);
   }
 }

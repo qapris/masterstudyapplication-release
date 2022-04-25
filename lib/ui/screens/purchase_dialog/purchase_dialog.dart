@@ -1,29 +1,42 @@
+import 'dart:developer';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:masterstudy_app/data/models/purchase/UserPlansResponse.dart';
+import 'package:masterstudy_app/data/utils.dart';
 import 'package:masterstudy_app/main.dart';
 import 'package:masterstudy_app/ui/bloc/course/course_bloc.dart';
 import 'package:masterstudy_app/ui/bloc/course/course_event.dart';
 import 'package:masterstudy_app/ui/bloc/course/course_state.dart';
-
-import '../plans/plans_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PurchaseDialog extends StatefulWidget {
+  final dynamic courseToken;
+
+  const PurchaseDialog({Key? key, this.courseToken}) : super(key: key);
+
+
   @override
   State<StatefulWidget> createState() => PurchaseDialogState();
 }
 
 class PurchaseDialogState extends State<PurchaseDialog> {
   late CourseBloc _bloc;
+  String courseToken = '';
 
   int selectedId = -1;
+
+
 
   @override
   void initState() {
     super.initState();
     _bloc = BlocProvider.of<CourseBloc>(context);
     selectedId = _bloc.selectedPaymetId;
+
+    courseToken = widget.courseToken;
   }
 
   @override
@@ -39,10 +52,10 @@ class PurchaseDialogState extends State<PurchaseDialog> {
     );
   }
 
-  bool _haveValidPlan(List<UserPlansBean> plans) {
+  bool _haveValidPlan(UserPlansResponse plans) {
     bool have = false;
-    plans.forEach((element) {
-      if (element.quotas_left > 0) {
+    plans.subscriptions.forEach((element) {
+      if (element!.quotas_left > 0) {
         have = true;
         return;
       }
@@ -51,18 +64,21 @@ class PurchaseDialogState extends State<PurchaseDialog> {
   }
 
   _buildPrices(LoadedCourseState state) {
+
     List<Widget> list = [];
 
-    list.add(_buildDefaultItem((selectedId == -1), localizations!.getLocalization("one_time_payment"),
-        "${localizations!.getLocalization("course_regular_price")} ${state.courseDetailResponse.price!.price}", state.courseDetailResponse.price!.price, () {
-      setState(() {
-        selectedId = -1;
-      });
-    }));
+    list.add(
+      _buildDefaultItem((selectedId == -1), localizations!.getLocalization("one_time_payment"), "${localizations!.getLocalization("course_regular_price")} ${state.courseDetailResponse.price!.price}",
+          state.courseDetailResponse.price!.price, () {
+        setState(() {
+          selectedId = -1;
+        });
+      }),
+    );
 
-    if (state.userPlans.isNotEmpty && _haveValidPlan(state.userPlans)) {
-      state.userPlans.forEach((value) {
-        list.add(_buildPriceItem((selectedId == int.parse(value.subscription_id)), localizations!.getLocalization("enroll_with_membership"), value.name, value.quotas_left, () {
+    if (state.userPlans.subscriptions.isNotEmpty && _haveValidPlan(state.userPlans)) {
+      state.userPlans.subscriptions.forEach((value) {
+        list.add(_buildPriceItem((selectedId == int.parse(value!.subscription_id)), localizations!.getLocalization("enroll_with_membership"), value.name, value.quotas_left, () {
           setState(() {
             selectedId = int.parse(value.subscription_id);
           });
@@ -77,31 +93,29 @@ class PurchaseDialogState extends State<PurchaseDialog> {
         }));
       });
     }
+
     list.add(
       Padding(
         padding: const EdgeInsets.only(top: 20.0),
         child: MaterialButton(
           minWidth: double.infinity,
           color: mainColor,
-          onPressed: () {
-            if (state is LoadedCourseState && state.userPlans.isNotEmpty) {
+          onPressed: () async {
+            if (state is LoadedCourseState && state.userPlans.subscriptions.isNotEmpty) {
               _bloc.add(PaymentSelectedEvent(selectedId, state.courseDetailResponse.id));
-              Navigator.pop(
-                context,
-              );
+              Navigator.pop(context);
             } else {
               if (selectedId != -1) {
-                var future = Navigator.of(context).pushNamed(
-                  PlansScreen.routeName,
-                );
-                future.then((value) {
-                  Navigator.pop(context, "update");
-                });
+                if(state.userPlans.other_subscriptions) {
+                  _warningDialog();
+                }else {
+                  await launch('${courseToken}&payment=$selectedId').then((value) {
+                    Navigator.of(context).pop();
+                  });
+                }
               } else {
                 _bloc.add(PaymentSelectedEvent(selectedId, state.courseDetailResponse.id));
-                Navigator.pop(
-                  context,
-                );
+                Navigator.pop(context);
               }
             }
           },
@@ -250,5 +264,34 @@ class PurchaseDialogState extends State<PurchaseDialog> {
         ],
       ),
     );
+  }
+
+  _warningDialog() {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(localizations!.getLocalization("warning"), textScaleFactor: 1.0, style: TextStyle(color: Colors.black, fontSize: 20.0)),
+            content: Text(localizations!.getLocalization("new_plan_over_the_old")),
+            actions: <Widget>[
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: mainColor,
+                ),
+                // TODO: Добавить перевод
+                child: Text(
+                  'GET NOW',
+                  textScaleFactor: 1.0,
+                ),
+                onPressed: () async {
+                  await launch('${courseToken}&payment=$selectedId').then((value) {
+                    Navigator.of(context).pop();
+                  });
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
   }
 }

@@ -43,6 +43,7 @@ dependencies:
   device_info_plus: ^3.2.2
   overlay_support: ^1.2.1
   image_downloader: ^0.31.0
+  intl: ^0.17.0
 
 
 

@@ -309,9 +309,9 @@ class UserCourseLockedWidgetState extends State<UserCourseLockedWidget> {
         } else {
           String? selectedPlan;
           if (_bloc.selectedPaymetId == -1) selectedPlan = "${localizations!.getLocalization("course_regular_price")} ${state.courseDetailResponse.price?.price}";
-          if (state.userPlans.isNotEmpty) {
-            state.userPlans.forEach((value) {
-              if (int.parse(value.id) == _bloc.selectedPaymetId) selectedPlan = value.name;
+          if (state.userPlans.subscriptions.isNotEmpty) {
+            state.userPlans.subscriptions.forEach((value) {
+              if (int.parse(value!.id) == _bloc.selectedPaymetId) selectedPlan = value.name;
             });
           }
           return GestureDetector(

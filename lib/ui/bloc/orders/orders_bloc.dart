@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:developer';
 
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/repository/purchase_repository.dart';
+import 'package:masterstudy_app/ui/bloc/orders/orders_event.dart';
 
-import './bloc.dart';
+import 'orders_state.dart';
 
 @provide
 class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
@@ -13,21 +15,26 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
   OrdersState get initialState => InitialOrdersState();
 
   OrdersBloc(this._repository) : super(InitialOrdersState()) {
-    on<OrdersEvent>((event, emit) async => await _ordersBloc(event, emit));
-  }
-
-  Future<void> _ordersBloc(OrdersEvent event, Emitter<OrdersState> emit) async {
-    if (event is FetchEvent) {
+    on<FetchEvent>((event, emit) async {
       try {
         var orders = await _repository.getOrders();
-        if (orders != null && orders.isNotEmpty) {
-          emit(LoadedOrdersState(orders));
-        } else
+
+        if (orders.posts.isEmpty && orders.memberships.isEmpty) {
           emit(EmptyOrdersState());
+          emit(EmptyMembershipsState());
+        } else if (orders.posts.isNotEmpty && orders.memberships.isEmpty) {
+          emit(EmptyMembershipsState());
+          emit(LoadedOrdersState(orders));
+        } else if (orders.posts.isEmpty && orders.memberships.isNotEmpty) {
+          emit(EmptyOrdersState());
+          emit(LoadedOrdersState(orders));
+        } else {
+          emit(LoadedOrdersState(orders));
+        }
       } catch (e, s) {
         print(e);
         print(s);
       }
-    }
+    });
   }
 }

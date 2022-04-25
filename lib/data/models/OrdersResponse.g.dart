@@ -6,6 +6,19 @@ part of 'OrdersResponse.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+OrdersResponse _$OrdersResponseFromJson(Map<String, dynamic> json) {
+  return OrdersResponse(
+    posts: (json['posts'] as List).map((e) => e == null ? null : OrderBean.fromJson(e as Map<String, dynamic>)).toList(),
+    memberships: (json['memberships'] as List).map((e) => e == null ? null : MembershipBean.fromJson(e as Map<String, dynamic>)).toList(),
+  );
+}
+
+//OneTimePayment
+Map<String, dynamic> _$OrdersResponseToJson(OrdersResponse instance) => <String, dynamic>{
+      'orders': instance.posts,
+      'memberships': instance.memberships,
+    };
+
 OrderBean _$OrderBeanFromJson(Map<String, dynamic> json) {
   return OrderBean(
     user_id: json['user_id'] as String,
@@ -68,7 +81,7 @@ Cart_itemsBean _$Cart_itemsBeanFromJson(Map<String, dynamic> json) {
     title: json['title'] as String,
     image: json['image'] as String,
     status: json['status'] as String,
-    price: json['price'] as String,
+    price: json['price'],
     terms: (json['terms'] as List).map((e) => e as String).toList(),
     price_formatted: json['price_formatted'] as String,
     image_url: json['image_url'] as String,
@@ -133,4 +146,73 @@ ItemsBean _$ItemsBeanFromJson(Map<String, dynamic> json) {
 Map<String, dynamic> _$ItemsBeanToJson(ItemsBean instance) => <String, dynamic>{
       'item_id': instance.item_id,
       'price': instance.price,
+    };
+
+//Memberships
+MembershipBean _$MembershipBeanFromJson(Map<String, dynamic> json) {
+  return MembershipBean(
+    ID: json['ID'] as String,
+    id: json['id'] as String,
+    subscription_id: json['subscription_id'] as String,
+    name: json['name'] as String,
+    description: json['description'] as String,
+    confirmation: json['confirmation'] as String,
+    expiration_number: json['expiration_number'] as String,
+    expiration_period: json['expiration_period'] as String,
+    initial_payment: json['initial_payment'] as num,
+    billing_amount: json['billing_amount'] as num,
+    cycle_number: json['cycle_number'] as String,
+    cycle_period: json['cycle_period'] as String,
+    billing_limit: json['billing_limit'] as String,
+    trial_amount: json['trial_amount'] as num,
+    trial_limit: json['trial_limit'] as String,
+    code_id: json['code_id'] as String,
+    startdate: json['startdate'] as String,
+    enddate: json['enddate'] as String,
+    course_number: json['course_number'] as String,
+    used_quotas: json['used_quotas'] as num,
+    quotas_left: json['quotas_left'] as num,
+    button: json['button'] == null ? null : ButtonBean.fromJson(json['button'] as Map<String, dynamic>),
+    features: json['features'] as String,
+    status: json['status'] as String,
+  );
+}
+
+Map<String, dynamic> _$MembershipBeanToJson(MembershipBean instance) => <String, dynamic>{
+      'ID': instance.ID,
+      'id': instance.id,
+      'subscription_id': instance.subscription_id,
+      'name': instance.name,
+      'description': instance.description,
+      'confirmation': instance.confirmation,
+      'expiration_number': instance.expiration_number,
+      'expiration_period': instance.expiration_period,
+      'initial_payment': instance.initial_payment,
+      'billing_amount': instance.billing_amount,
+      'cycle_number': instance.cycle_number,
+      'cycle_period': instance.cycle_period,
+      'billing_limit': instance.billing_limit,
+      'trial_amount': instance.trial_amount,
+      'trial_limit': instance.trial_limit,
+      'code_id': instance.code_id,
+      'startdate': instance.startdate,
+      'enddate': instance.enddate,
+      'course_number': instance.course_number,
+      'features': instance.features,
+      'used_quotas': instance.used_quotas,
+      'quotas_left': instance.quotas_left,
+      'button': instance.button,
+      'status': instance.status,
+    };
+
+ButtonBean _$ButtonBeanFromJson(Map<String, dynamic> json) {
+  return ButtonBean(
+    text: json['text'] as String,
+    url: json['url'] as String,
+  );
+}
+
+Map<String, dynamic> _$ButtonBeanToJson(ButtonBean instance) => <String, dynamic>{
+      'text': instance.text,
+      'url': instance.url,
     };

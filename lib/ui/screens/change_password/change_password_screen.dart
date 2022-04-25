@@ -101,9 +101,8 @@ class _ChangePasswordWidgetState extends State<ChangePasswordWidget> {
               },
               obscureText: obscureText,
               decoration: InputDecoration(
-                // TODO: Добавить в переводы слово old_password и enter your old password
-                labelText: "Old password",
-                helperText: "Enter your old password",
+                labelText: localizations!.getLocalization('current_password'),
+                helperText: localizations!.getLocalization('current_password_helper'),
                 filled: true,
                 suffixIcon: IconButton(
                     icon: Icon(
@@ -148,9 +147,8 @@ class _ChangePasswordWidgetState extends State<ChangePasswordWidget> {
                 }
               },
               decoration: InputDecoration(
-                // TODO: Добавить в переводы слово old_password и enter your old password
-                labelText: "New password",
-                helperText: localizations!.getLocalization("password_registration_helper_text"),
+                labelText: localizations!.getLocalization('new_password'),
+                helperText: localizations!.getLocalization('password_registration_helper_text'),
                 filled: true,
                 labelStyle: TextStyle(
                   color: myFocusNode.hasFocus ? Colors.black : Colors.black,
@@ -195,9 +193,8 @@ class _ChangePasswordWidgetState extends State<ChangePasswordWidget> {
               },
               obscureText: obscureText2,
               decoration: InputDecoration(
-                // TODO: Добавить в переводы слово confirm_password и enter your confirm password
-                labelText: "Confirm password",
-                helperText: "Confirm your new password",
+                labelText: localizations!.getLocalization('confirm_password'),
+                helperText: localizations!.getLocalization('confirm_password_helper'),
                 filled: true,
                 suffixIcon: IconButton(
                     icon: Icon(
@@ -246,9 +243,8 @@ class _ChangePasswordWidgetState extends State<ChangePasswordWidget> {
 
   Widget setUpButtonChild(enable) {
     if (enable == true) {
-      // TODO: Добавить слово change password в translations
       return new Text(
-        'CHANGE PASSWORD',
+        localizations!.getLocalization('change_password'),
         textScaleFactor: 1.0,
       );
     } else {

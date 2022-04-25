@@ -1,25 +1,7 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
+part of 'AllPlansResponse.dart';
 
-part of 'UserPlansResponse.dart';
-
-// **************************************************************************
-// JsonSerializableGenerator
-// **************************************************************************
-
-UserPlansResponse _$UserPlansResponseFromJson(Map<String, dynamic> json) {
-  return UserPlansResponse(
-    subscriptions: json['subscriptions'] == null ? [] : (json['subscriptions'] as List).map((e) => e == null ? null : UserPlansBean.fromJson(e as Map<String, dynamic>)).toList(),
-    other_subscriptions: json['other_subscriptions'],
-  );
-}
-
-Map<String, dynamic> _$UserPlansResponseToJson(UserPlansResponse instance) => <String, dynamic>{
-      'subscriptions': instance.subscriptions,
-      'other_subscriptions': instance.other_subscriptions,
-    };
-
-UserPlansBean _$UserPlansBeanFromJson(Map<String, dynamic> json) {
-  return UserPlansBean(
+AllPlansBean _$AllPlansBeanFromJson(Map<String, dynamic> json) {
+  return AllPlansBean(
     ID: json['ID'] as String,
     id: json['id'] as String,
     subscription_id: json['subscription_id'] as String,
@@ -46,7 +28,7 @@ UserPlansBean _$UserPlansBeanFromJson(Map<String, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _$UserPlansBeanToJson(UserPlansBean instance) => <String, dynamic>{
+Map<String, dynamic> _$AllPlansBeanToJson(AllPlansBean instance) => <String, dynamic>{
       'ID': instance.ID,
       'id': instance.id,
       'subscription_id': instance.subscription_id,

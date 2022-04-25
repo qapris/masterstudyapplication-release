@@ -17,9 +17,15 @@ class OpenPurchaseState extends CourseState {
 class LoadedCourseState extends CourseState {
   final CourseDetailResponse courseDetailResponse;
   final ReviewResponse reviewResponse;
-  final List<UserPlansBean> userPlans;
+  final UserPlansResponse userPlans;
 
   LoadedCourseState(this.courseDetailResponse, this.reviewResponse, this.userPlans);
+}
+
+class OpenPurchaseDialogState extends CourseState {
+  final TokenAuthToCourse tokenAuthToCourse;
+
+  OpenPurchaseDialogState(this.tokenAuthToCourse);
 }
 
 class ErrorCourseState extends CourseState {}

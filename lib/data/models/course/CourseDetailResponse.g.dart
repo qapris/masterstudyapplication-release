@@ -27,6 +27,7 @@ CourseDetailResponse _$CourseDetailResponseFromJson(Map<String, dynamic> json) {
     faq: json['faq'] as List == null ? json['faq'] : (json['faq'] as List).map((e) => FaqBean.fromJson(e as Map<String, dynamic>)).toList(),
     is_favorite: json['is_favorite'] as bool,
     trial: json['trial'] as bool,
+    token_auth: json['token_auth'],
     first_lesson: json['first_lesson'] as num,
     first_lesson_type: json['first_lesson_type'] as String,
     has_access: json['has_access'] as bool,
@@ -57,6 +58,7 @@ Map<String, dynamic> _$CourseDetailResponseToJson(CourseDetailResponse instance)
       'first_lesson_type': instance.first_lesson_type,
       'has_access': instance.has_access,
       'categories_object': instance.categories_object,
+      'token_auth': instance.token_auth,
     };
 
 FaqBean _$FaqBeanFromJson(Map<String, dynamic> json) {
@@ -226,3 +228,14 @@ Map<String, dynamic> _$ImagesBeanToJson(ImagesBean instance) => <String, dynamic
       'full': instance.full,
       'small': instance.small,
     };
+
+
+TokenAuthToCourse _$TokenAuthToCourseFromJson(Map<String, dynamic> json) {
+  return TokenAuthToCourse(
+    token_auth: json['token_auth'] as String,
+  );
+}
+
+Map<String, dynamic> _$TokenAuthToCourseToJson(TokenAuthToCourse instance) => <String, dynamic>{
+  'token_auth': instance.token_auth,
+};

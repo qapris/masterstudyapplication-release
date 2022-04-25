@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:inject/inject.dart';
@@ -8,6 +9,7 @@ import 'package:masterstudy_app/data/repository/courses_repository.dart';
 import 'package:masterstudy_app/data/repository/purchase_repository.dart';
 import 'package:masterstudy_app/data/repository/review_respository.dart';
 
+import '../../../data/models/purchase/AllPlansResponse.dart';
 import './bloc.dart';
 
 @provide
@@ -16,7 +18,7 @@ class CourseBloc extends Bloc<CourseEvent, CourseState> {
   final ReviewRepository _reviewRepository;
   final PurchaseRepository _purchaseRepository;
   CourseDetailResponse? courseDetailResponse;
-  List<UserPlansBean> availablePlans = [];
+  List<AllPlansBean> availablePlans = [];
 
   // if payment id is -1, selected type is one time payment
   int selectedPaymetId = -1;
@@ -26,7 +28,7 @@ class CourseBloc extends Bloc<CourseEvent, CourseState> {
   CourseBloc(this._coursesRepository, this._reviewRepository, this._purchaseRepository) : super(InitialCourseState()) {
     //FetchEvent
     on<FetchEvent>((event, emit) async {
-     _fetchCourse(event.courseId);
+      _fetchCourse(event.courseId);
     });
 
     //DeleteFromFavorite
@@ -75,16 +77,26 @@ class CourseBloc extends Bloc<CourseEvent, CourseState> {
       var response = await _purchaseRepository.addToCart(event.courseId);
       emit(OpenPurchaseState(response.cart_url));
     });
+
+    on<GetTokenToCourse>((event, emit) async {
+      var response = await _coursesRepository.getTokenToCourse(event.courseId);
+
+      emit(OpenPurchaseDialogState(response));
+    });
   }
 
   Future<CourseState> _fetchCourse(courseId) async {
     if (courseDetailResponse == null || state is ErrorCourseState) emit(InitialCourseState());
     try {
       courseDetailResponse = await _coursesRepository.getCourse(courseId);
+
       var reviews = await _reviewRepository.getReviews(courseId);
-      var plans = await _purchaseRepository.getUserPlans();
-      availablePlans = await _purchaseRepository.getPlans();
-      emit(LoadedCourseState(courseDetailResponse!, reviews, []));
+
+      var plans = await _purchaseRepository.getUserPlans(courseId);
+
+      availablePlans = await _purchaseRepository.getPlans(courseId: courseId);
+
+      emit(LoadedCourseState(courseDetailResponse!, reviews, plans));
     } catch (e, s) {
       print(e);
       print(s);

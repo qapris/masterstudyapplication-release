@@ -5,10 +5,13 @@ import 'package:meta/meta.dart';
 abstract class OrdersState {}
 
 class InitialOrdersState extends OrdersState {}
+
 class EmptyOrdersState extends OrdersState {}
 
+class EmptyMembershipsState extends OrdersState {}
+
 class LoadedOrdersState extends OrdersState{
-  final List<OrderBean> orders;
+  final OrdersResponse orders;
 
   LoadedOrdersState(this.orders);
 }

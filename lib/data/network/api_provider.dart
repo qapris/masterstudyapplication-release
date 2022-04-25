@@ -25,6 +25,7 @@ import 'package:masterstudy_app/data/models/curriculum.dart';
 import 'package:masterstudy_app/data/models/purchase/UserPlansResponse.dart';
 import 'package:masterstudy_app/data/models/user_course.dart';
 
+import '../models/purchase/AllPlansResponse.dart';
 import '../utils.dart';
 
 @provide
@@ -373,21 +374,23 @@ class UserApiProvider {
   }
 
   //getUserPlans
-  Future<UserPlansResponse> getUserPlans() async {
-    Response response = await dio.post(apiEndpoint + "user_plans",
+  Future<UserPlansResponse> getUserPlans(int courseId) async {
+    Response response = await dio.post(apiEndpoint + "user_plans",data: {'course_id': courseId},
         options: Options(
           headers: {"requirestoken": "true"},
         ));
-    return UserPlansResponse.fromJsonArray(response.data);
+
+    return UserPlansResponse.fromJson(response.data);
   }
 
   //getPlans
-  Future<UserPlansResponse> getPlans() async {
+  Future<AllPlansResponse> getPlans(int courseId) async {
     Response response = await dio.get(apiEndpoint + "plans",
+        queryParameters: {'course_id': courseId},
         options: Options(
           headers: {"requirestoken": "true"},
         ));
-    return UserPlansResponse.fromJsonArray(response.data);
+    return AllPlansResponse.fromJsonArray(response.data);
   }
 
   //getOrders
@@ -396,7 +399,7 @@ class UserApiProvider {
         options: Options(
           headers: {"requirestoken": "true"},
         ));
-    return OrdersResponse.fromJsonArray(response.data["posts"]);
+    return OrdersResponse.fromJson(response.data);
   }
 
   //addToCart
@@ -411,11 +414,16 @@ class UserApiProvider {
 
   //usePlan
   Future<bool?> usePlan(int courseId, int subscriptionId) async {
+
+    log(courseId.toString());
+    log(subscriptionId.toString());
     Response response = await dio.put(apiEndpoint + "use_plan",
-        data: {"course_id": courseId, "subscription_id": subscriptionId},
+        queryParameters: {"course_id": courseId, "subscription_id": subscriptionId},
         options: Options(
           headers: {"requirestoken": "true"},
         ));
+
+    log(response.data.toString());
     if (response.statusCode == 200) return true;
     return null;
   }
@@ -454,15 +462,13 @@ class UserApiProvider {
   }
 
   //restorePassword
-  Future<Response> changePassword(String oldPassword,String newPassword) async {
-
+  Future<Response> changePassword(String oldPassword, String newPassword) async {
     var queryParams = {
       'old_password': oldPassword,
       'new_password': newPassword,
     };
 
-    Response response = await dio.post(apiEndpoint + "account/edit_profile",queryParameters: queryParams);
-
+    Response response = await dio.post(apiEndpoint + "account/edit_profile", queryParameters: queryParams);
 
     return response;
   }
@@ -478,5 +484,17 @@ class UserApiProvider {
     );
     if (response.statusCode == 200) return true;
     return false;
+  }
+
+  Future<TokenAuthToCourse> getTokenToCourse(int courseId) async {
+    Response response = await dio.post(
+      apiEndpoint + 'get_auth_token_to_course',
+      data: {'course_id': courseId},
+      options: Options(
+        headers: {"requirestoken": "true"},
+      ),
+    );
+
+    return TokenAuthToCourse.fromJson(response.data);
   }
 }
