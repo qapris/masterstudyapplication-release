@@ -67,16 +67,20 @@ class PurchaseDialogState extends State<PurchaseDialog> {
 
     List<Widget> list = [];
 
-    list.add(
-      _buildDefaultItem((selectedId == -1), localizations!.getLocalization("one_time_payment"), "${localizations!.getLocalization("course_regular_price")} ${state.courseDetailResponse.price!.price}",
-          state.courseDetailResponse.price!.price, () {
-        setState(() {
-          selectedId = -1;
-        });
-      }),
-    );
+    if(state.courseDetailResponse.price!.free == false) {
+      list.add(
+        _buildDefaultItem(
+            (selectedId == -1), localizations!.getLocalization("one_time_payment"), "${localizations!.getLocalization("course_regular_price")} ${state.courseDetailResponse.price!.price}",
+            state.courseDetailResponse.price!.price, () {
+          setState(() {
+            selectedId = -1;
+          });
+        }),
+      );
+    }
 
     if (state.userPlans.subscriptions.isNotEmpty && _haveValidPlan(state.userPlans)) {
+      log('1'.toString());
       state.userPlans.subscriptions.forEach((value) {
         list.add(_buildPriceItem((selectedId == int.parse(value!.subscription_id)), localizations!.getLocalization("enroll_with_membership"), value.name, value.quotas_left, () {
           setState(() {
@@ -85,6 +89,7 @@ class PurchaseDialogState extends State<PurchaseDialog> {
         }));
       });
     } else if (_bloc.availablePlans.isNotEmpty) {
+
       _bloc.availablePlans.forEach((value) {
         list.add(_buildPriceItem((selectedId == int.parse(value.id)), "${localizations!.getLocalization("available_in_plan")} \"${value.name}\"", value.name, value.quotas_left, () {
           setState(() {
@@ -94,6 +99,7 @@ class PurchaseDialogState extends State<PurchaseDialog> {
       });
     }
 
+    //Button "Select"
     list.add(
       Padding(
         padding: const EdgeInsets.only(top: 20.0),
@@ -221,7 +227,7 @@ class PurchaseDialogState extends State<PurchaseDialog> {
                           Text(
                             "$title",
                             textScaleFactor: 1.0,
-                            style: TextStyle(fontSize: 18),
+                            style: TextStyle(fontSize: 16),
                           ),
                           Text(
                             "$subtitle ",
@@ -278,9 +284,8 @@ class PurchaseDialogState extends State<PurchaseDialog> {
                 style: ElevatedButton.styleFrom(
                   primary: mainColor,
                 ),
-                // TODO: Добавить перевод
                 child: Text(
-                  'GET NOW',
+                  localizations!.getLocalization("get_now"),
                   textScaleFactor: 1.0,
                 ),
                 onPressed: () async {

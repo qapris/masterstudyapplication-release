@@ -116,12 +116,11 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
             }
 
             if (state is CloseEditProfileState) {
-              // TODO: Добавить перевод для кнопки отмены
               //SnackBar after edit profile
               BlocProvider.of<ProfileBloc>(context)..add(FetchProfileEvent());
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(
-                  'Profile change canceled',
+                  localizations!.getLocalization("profile_change_canceled"),
                   textScaleFactor: 1.0,
                 ),
                 duration: const Duration(seconds: 2),

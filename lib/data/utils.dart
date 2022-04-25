@@ -1,15 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
-import 'dart:ui';
-
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'models/AppSettings.dart';
 
 extension QueryParameterAdd on Map {
   addParam(key, value) {
@@ -24,17 +18,17 @@ List<Map<String, int>> recordMap = [];
 
 var dio = Dio();
 
-late SharedPreferences preferences;
-
 ///Timer
 late Timer timer;
 
 ///Hive
-var db;
+late SharedPreferences preferences;
 
+///Platforms
 AndroidDeviceInfo? androidInfo;
 IosDeviceInfo? iosDeviceInfo;
 
+///App Settings
 String? appLogoUrl;
 Directory? appDocDir;
 

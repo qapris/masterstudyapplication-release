@@ -61,9 +61,7 @@ class _ChangePasswordWidgetState extends State<ChangePasswordWidget> {
         if (state is SuccessChangePasswordState)
           Scaffold.of(context).showSnackBar(
             SnackBar(
-              // TODO: Добавить password is changed
-              // content: Text(localizations!.getLocalization("restore_password_sent_text")),
-              content: Text("Password is Changed"),
+              content: Text(localizations!.getLocalization("password_is_changed")),
               backgroundColor: Colors.green,
             ),
           );

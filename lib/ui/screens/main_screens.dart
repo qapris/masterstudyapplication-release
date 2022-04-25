@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -88,11 +87,15 @@ class MainScreenState extends State<MainScreenWidget> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: _buildIcon("assets/icons/ms_nav_home.svg", localizations!.getLocalization("home_bottom_nav"), 0), label: SizedBox.shrink().toString()),
-          BottomNavigationBarItem(icon: _buildIcon("assets/icons/ms_nav_courses.svg", localizations!.getLocalization("courses_bottom_nav"), 1), label: SizedBox.shrink().toString()),
-          BottomNavigationBarItem(icon: _buildIcon("assets/icons/ms_nav_search.svg", localizations!.getLocalization("search_bottom_nav"), 2), label: SizedBox.shrink().toString()),
-          BottomNavigationBarItem(icon: _buildIcon("assets/icons/ms_nav_fav.svg", localizations!.getLocalization("favorites_bottom_nav"), 3), label: SizedBox.shrink().toString()),
-          BottomNavigationBarItem(icon: _buildIcon("assets/icons/ms_nav_profile.svg", localizations!.getLocalization("profile_bottom_nav"), 4), label: SizedBox.shrink().toString()),
+          BottomNavigationBarItem(icon: _buildIcon("assets/icons/ms_nav_home.svg", localizations!.getLocalization("home_bottom_nav"), 0), label: localizations!.getLocalization("home_bottom_nav")),
+          BottomNavigationBarItem(
+              icon: _buildIcon("assets/icons/ms_nav_courses.svg", localizations!.getLocalization("courses_bottom_nav"), 1), label: localizations!.getLocalization("courses_bottom_nav")),
+          BottomNavigationBarItem(
+              icon: _buildIcon("assets/icons/ms_nav_search.svg", localizations!.getLocalization("search_bottom_nav"), 2), label: localizations!.getLocalization("search_bottom_nav")),
+          BottomNavigationBarItem(
+              icon: _buildIcon("assets/icons/ms_nav_fav.svg", localizations!.getLocalization("favorites_bottom_nav"), 3), label: localizations!.getLocalization("favorites_bottom_nav")),
+          BottomNavigationBarItem(
+              icon: _buildIcon("assets/icons/ms_nav_profile.svg", localizations!.getLocalization("profile_bottom_nav"), 4), label: localizations!.getLocalization("profile_bottom_nav")),
         ],
         elevation: 0.0,
         selectedFontSize: 0,
