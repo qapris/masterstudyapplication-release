@@ -138,28 +138,12 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
       child: BlocBuilder<TextLessonBloc, TextLessonState>(
         bloc: _bloc,
         builder: (BuildContext context, TextLessonState state) {
-          /*     //When image downloaded
-          final snackBar = SnackBar(
-            content: Text(
-              'Image downloaded',
-              textScaleFactor: 1.0,
-            ),
-            duration: const Duration(seconds: 1),
-          );
-
-          if (_progress == 100) {
-            WidgetsBinding.instance?.addPostFrameCallback((_) {
-              ScaffoldMessenger.of(context).showSnackBar(snackBar);
-            });
-          }*/
           return Scaffold(
             appBar: AppBar(
               backgroundColor: HexColor.fromHex("#273044"),
               title: _buildTitle(state),
             ),
-            body: SingleChildScrollView(
-              child: _buildBody(state),
-            ),
+            body: _buildBody(state),
             bottomNavigationBar: (!widget.trial) ? null : _buildBottomNavigation(state),
           );
         },
@@ -232,12 +216,16 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
     if (state is InitialTextLessonState) return _buildLoading();
 
     if (state is LoadedTextLessonState) {
-      return Column(
-        children: [
-          _buildWebView(state),
-          _connectionStatus == ConnectivityResult.wifi || _connectionStatus == ConnectivityResult.mobile ? _buildLessonMaterials(state) : SizedBox(),
-        ],
-      );
+      return LayoutBuilder(builder: (context, constraints) {
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+              _buildWebView(state, constraints, context),
+              _buildLessonMaterials(state),
+            ],
+          ),
+        );
+      });
     }
   }
 
@@ -248,9 +236,9 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
   late WebViewController _webViewController;
   bool showLoadingWebview = true;
 
-  _buildWebView(LoadedTextLessonState state) {
-    return Container(
-      height: MediaQuery.of(context).size.height,
+  _buildWebView(LoadedTextLessonState state, constraints, context) {
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxHeight: 500, minHeight: MediaQuery.of(context).size.height > 600 ? 30 + MediaQuery.of(context).size.height * 0.05 : 30),
       child: WebView(
         javascriptMode: JavascriptMode.unrestricted,
         initialUrl: 'data:text/html;base64,${base64Encode(const Utf8Encoder().convert(state.lessonResponse.content))}',
@@ -273,7 +261,7 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
 
   _buildLessonMaterials(LoadedTextLessonState state) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 25),
+      padding: EdgeInsets.symmetric(horizontal: 25,vertical: 10),
       margin: EdgeInsets.only(bottom: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

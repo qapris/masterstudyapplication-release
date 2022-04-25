@@ -538,10 +538,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
                       builder: (BuildContext context) {
                         return Container(
                           height: double.infinity,
-                          margin: const EdgeInsets.only(top: 26),
                           child: Stack(
-                            /*mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,*/
                             children: <Widget>[
                               Container(
                                 height: double.infinity,
@@ -555,15 +552,18 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
                                   ],
                                 ),
                               ),
-                              Align(
-                                alignment: Alignment.topLeft,
-                                child: IconButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  icon: Icon(
-                                    Icons.close,
-                                    color: Colors.white,
+                              Padding(
+                                padding: const EdgeInsets.only(top: 25.0),
+                                child: Align(
+                                  alignment: Alignment.topLeft,
+                                  child: IconButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    icon: Icon(
+                                      Icons.close,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -635,16 +635,46 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
   _buildPrice(CourseState state) {
     if (state is LoadedCourseState) {
       var userSubscriptions = state.userPlans.subscriptions;
-      if (!state.courseDetailResponse.has_access) {
+      if (state.courseDetailResponse.has_access == false) {
         if (state.courseDetailResponse.price?.free ?? false) {
+          var dialog;
           return Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Text(
-                localizations!.getLocalization("course_free_price"),
+                localizations!.getLocalization("enroll_with_membership"),
                 textScaleFactor: 1.0,
               ),
-              Icon(Icons.arrow_drop_down),
+              IconButton(
+                onPressed: () {
+                  dialog = showDialog(
+                    context: context,
+                    builder: (builder) {
+                      return StatefulBuilder(
+                        builder: (context, setState) {
+                          return BlocProvider.value(
+                            child: Dialog(
+                              child: PurchaseDialog(courseToken: courseToken),
+                            ),
+                            value: _bloc,
+                          );
+                        },
+                      );
+                    },
+                  );
+
+                  dialog.then((value) {
+                    if (value == "update") {
+                      _bloc.add(FetchEvent(widget.coursesBean.id!));
+                    } else {
+                      setState(() {
+                        selectedPlan = value;
+                      });
+                    }
+                  });
+                },
+                icon: Icon(Icons.arrow_drop_down),
+              ),
             ],
           );
         } else {
@@ -666,7 +696,6 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
 
           return GestureDetector(
             onTap: () async {
-
               dialog = showDialog(
                 context: context,
                 builder: (builder) {

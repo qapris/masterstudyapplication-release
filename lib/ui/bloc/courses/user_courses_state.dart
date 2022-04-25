@@ -31,6 +31,5 @@ class LoadedCoursesState extends UserCoursesState {
   LoadedCoursesState(this.courses);
 
   @override
-  // TODO: implement props
   List<Object>? get props => null;
 }

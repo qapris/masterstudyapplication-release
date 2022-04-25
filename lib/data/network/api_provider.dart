@@ -363,7 +363,6 @@ class UserApiProvider {
       ),
     );
 
-    log(response.toString());
     return QuestionAddResponse.fromJson(response.data);
   }
 
@@ -375,7 +374,8 @@ class UserApiProvider {
 
   //getUserPlans
   Future<UserPlansResponse> getUserPlans(int courseId) async {
-    Response response = await dio.post(apiEndpoint + "user_plans",data: {'course_id': courseId},
+    Response response = await dio.post(apiEndpoint + "user_plans",
+        data: {'course_id': courseId},
         options: Options(
           headers: {"requirestoken": "true"},
         ));
@@ -385,11 +385,14 @@ class UserApiProvider {
 
   //getPlans
   Future<AllPlansResponse> getPlans(int courseId) async {
+    log(courseId.toString());
     Response response = await dio.get(apiEndpoint + "plans",
         queryParameters: {'course_id': courseId},
         options: Options(
           headers: {"requirestoken": "true"},
         ));
+
+    log(response.data.toString());
     return AllPlansResponse.fromJsonArray(response.data);
   }
 
@@ -414,16 +417,12 @@ class UserApiProvider {
 
   //usePlan
   Future<bool?> usePlan(int courseId, int subscriptionId) async {
-
-    log(courseId.toString());
-    log(subscriptionId.toString());
     Response response = await dio.put(apiEndpoint + "use_plan",
         queryParameters: {"course_id": courseId, "subscription_id": subscriptionId},
         options: Options(
           headers: {"requirestoken": "true"},
         ));
 
-    log(response.data.toString());
     if (response.statusCode == 200) return true;
     return null;
   }

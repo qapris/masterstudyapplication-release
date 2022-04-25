@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
-
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/utils.dart';
 import '../models/curriculum.dart';
