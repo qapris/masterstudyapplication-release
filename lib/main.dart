@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/adapter.dart';
@@ -9,8 +8,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive_flutter/adapters.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/repository/localization_repository.dart';
 import 'package:masterstudy_app/theme/theme.dart';
@@ -126,7 +124,28 @@ void main() async {
   ));
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Hive.initFlutter();
+
+  if (Platform.isAndroid) {
+    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+
+    var swAvailable = await AndroidWebViewFeature.isFeatureSupported(
+        AndroidWebViewFeature.SERVICE_WORKER_BASIC_USAGE);
+    var swInterceptAvailable = await AndroidWebViewFeature.isFeatureSupported(
+        AndroidWebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST);
+
+    if (swAvailable && swInterceptAvailable) {
+      AndroidServiceWorkerController serviceWorkerController =
+      AndroidServiceWorkerController.instance();
+
+      await serviceWorkerController
+          .setServiceWorkerClient(AndroidServiceWorkerClient(
+        shouldInterceptRequest: (request) async {
+          print(request);
+          return null;
+        },
+      ));
+    }
+  }
 
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
 
@@ -143,16 +162,10 @@ void main() async {
   localizations = LocalizationRepositoryImpl(await getDefaultLocalization());
 
   appDocDir = await getApplicationDocumentsDirectory();
-  appView = preferences.getBool("app_view") ?? false;
+  appView = preferences!.getBool("app_view") ?? false;
 
   if (Platform.isAndroid) androidInfo = await deviceInfo.androidInfo;
   if (Platform.isIOS) iosDeviceInfo = await deviceInfo.iosInfo;
-
-  //Http certificate
-  (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (HttpClient client) {
-    client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
-    return client;
-  };
 
   //runApp
   runZoned(() async {

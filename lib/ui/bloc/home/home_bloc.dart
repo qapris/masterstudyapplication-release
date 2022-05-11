@@ -19,13 +19,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeState get initialState => InitialHomeState();
 
   HomeBloc(this._homeRepository, this._coursesRepository, this._instructorsRepository) : super(InitialHomeState()) {
-    on<HomeEvent>((event, emit) async {
-      await homeEvent(event, emit);
-    });
-  }
-
-  Future<void> homeEvent(HomeEvent event, Emitter<HomeState> emit) async {
-    if (event is FetchEvent) {
+    on<FetchEvent>((event, emit) async {
       if (state is ErrorHomeState) emit(InitialHomeState());
       try {
         var layouts = (await _homeRepository.getAppSettings()).home_layout;
@@ -40,15 +34,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
         AppSettings appSettings = await _homeRepository.getAppSettings();
 
-
-
-        emit(LoadedHomeState(categories, coursesTrending.courses, layouts, coursesNew.courses, coursesFree.courses, instructors,appSettings));
+        emit(LoadedHomeState(categories, coursesTrending.courses, layouts, coursesNew.courses, coursesFree.courses, instructors, appSettings));
       } catch (error, stacktrace) {
         print(error);
         print(stacktrace);
         emit(ErrorHomeState());
       }
-    }
+    });
   }
-
 }

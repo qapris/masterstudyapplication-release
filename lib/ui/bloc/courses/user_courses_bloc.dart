@@ -1,13 +1,10 @@
 import 'dart:async';
 import 'dart:developer';
-
 import 'package:bloc/bloc.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/cache/cache_manager.dart';
 import 'package:masterstudy_app/data/models/user_course.dart';
 import 'package:masterstudy_app/data/repository/user_course_repository.dart';
-import 'package:masterstudy_app/data/utils.dart';
-
 import './bloc.dart';
 
 @provide
@@ -18,13 +15,7 @@ class UserCoursesBloc extends Bloc<UserCoursesEvent, UserCoursesState> {
   UserCoursesState get initialState => InitialUserCoursesState();
 
   UserCoursesBloc(this._userCourseRepository, this._cacheManager) : super(InitialUserCoursesState()) {
-    on<UserCoursesEvent>((event, emit) async {
-      await _userCourses(event, emit);
-    });
-  }
-
-  Future<void> _userCourses(UserCoursesEvent event, Emitter<UserCoursesState> emit) async {
-    if (event is FetchEvent) {
+    on<FetchEvent>((event, emit) async {
       if (state is ErrorUserCoursesState) emit(InitialUserCoursesState());
 
       try {
@@ -39,7 +30,6 @@ class UserCoursesBloc extends Bloc<UserCoursesEvent, UserCoursesState> {
           emit(LoadedCoursesState(response.posts));
         }
       } catch (e, s) {
-        log('2'.toString());
         var cache = await _cacheManager.getFromCache();
 
         if (cache != null) {
@@ -67,11 +57,10 @@ class UserCoursesBloc extends Bloc<UserCoursesEvent, UserCoursesState> {
           } catch (e, s) {
             emit(ErrorUserCoursesState());
           }
-        }else {
+        } else {
           emit(EmptyCacheCoursesState());
         }
-
       }
-    }
+    });
   }
 }

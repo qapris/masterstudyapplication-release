@@ -1,13 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
-
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/repository/auth_repository.dart';
-
 import './bloc.dart';
 
 @provide
@@ -17,50 +14,41 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthState get initialState => InitialAuthState();
 
   AuthBloc(this._repository) : super(InitialAuthState()) {
-    on<AuthEvent>((event, emit) async {
-      await _authMap(event, emit);
-    });
-  }
-
-  Future<void> _authMap(AuthEvent event, Emitter<AuthState> emit) async {
-    if (event is RegisterEvent) {
+    on<RegisterEvent>((event, emit) async {
       emit(LoadingAuthState());
       try {
         await _repository.register(event.login, event.email, event.password);
         emit(SuccessAuthState());
       } on DioError catch (e) {
-        // print(e.response?.data);
-        emit(_errorToState(e.response?.data['message']));
+        log(e.response.toString());
+        emit(ErrorAuthState(e.response?.data['message']));
       }
-    }
+    });
 
-    if (event is LoginEvent) {
+    on<LoginEvent>((event, emit) async {
       emit(LoadingAuthState());
       try {
         await _repository.authUser(event.login, event.password);
         emit(SuccessAuthState());
       } on DioError catch (e) {
-        emit(_errorToState(e.response?.data['message']));
+        emit(ErrorAuthState(e.response?.data['message']));
       }
-    }
+    });
 
-    if (event is DemoAuthEvent) {
+    on<DemoAuthEvent>((event, emit) async {
       emit(LoadingAuthState());
       try {
         await _repository.demoAuth();
         emit(SuccessAuthState());
       } catch (error) {
+        log(error.toString());
         var errorData = json.decode(error.toString());
-        emit(_errorToState(errorData['message']));
+        emit(ErrorAuthState(errorData['message']));
       }
-    }
+    });
 
-    if (event is CloseDialogEvent) {
+    on<CloseDialogEvent>((event, emit) {
       emit(InitialAuthState());
-    }
-  }
-
-  _errorToState(message) async {
-    emit(ErrorAuthState(message));
+    });
   }
 }

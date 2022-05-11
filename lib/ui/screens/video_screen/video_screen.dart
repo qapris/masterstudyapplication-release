@@ -112,8 +112,7 @@ class _VideoScreenState extends State<_VideoScreenWidget> {
 
   @override
   Widget build(BuildContext context) {
-    print(MediaQuery.of(context).size.height * (10 / 100));
-    return BlocBuilder<VideoBloc, VideoState>(
+      return BlocBuilder<VideoBloc, VideoState>(
       bloc: _bloc,
       builder: (context, state) {
         return Scaffold(

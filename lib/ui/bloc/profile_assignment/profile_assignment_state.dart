@@ -6,7 +6,7 @@ abstract class ProfileAssignmentState {}
 class InitialProfileAssignmentState extends ProfileAssignmentState {}
 
 class LoadedProfileAssignmentState extends ProfileAssignmentState {
-    LoadedProfileAssignmentState();
+  LoadedProfileAssignmentState();
 }
 
 class ErrorProfileAssignmentState extends ProfileAssignmentState {}

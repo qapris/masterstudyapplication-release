@@ -13,11 +13,7 @@ class UserCourseLockedBloc extends Bloc<UserCourseLockedEvent, UserCourseLockedS
   UserCourseLockedState get initialState => InitialUserCourseLockedState();
 
   UserCourseLockedBloc(this._repository) : super(InitialUserCourseLockedState()) {
-    on<UserCourseLockedEvent>((event, emit) async => await userCourseLocked(event, emit));
-  }
-
-  Future<void> userCourseLocked(UserCourseLockedEvent event, Emitter<UserCourseLockedState> emit) async {
-    if (event is FetchEvent) {
+    on<FetchEvent>((event, emit) async {
       try {
         var response = await _repository.getCourse(event.courseId);
         emit(LoadedUserCourseLockedState(response));
@@ -25,6 +21,6 @@ class UserCourseLockedBloc extends Bloc<UserCourseLockedEvent, UserCourseLockedS
         print(e);
         print(s);
       }
-    }
+    });
   }
 }

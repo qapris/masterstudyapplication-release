@@ -34,6 +34,7 @@ class _HomeSimpleScreenState extends State<HomeSimpleScreen> {
     return Scaffold(
         backgroundColor: HexColor.fromHex("F3F5F9"),
         appBar: AppBar(
+          backgroundColor: mainColor,
           bottom: PreferredSize(
               preferredSize: const Size.fromHeight(26),
               child: Padding(

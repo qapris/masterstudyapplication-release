@@ -8,7 +8,7 @@ import '../models/curriculum.dart';
 class CurriculumLocalStorage {
   List<CurriculumResponse> getCurriculumLocal(int id) {
     try {
-      List<String>? cached = preferences.getStringList('courseCurriculum');
+      List<String>? cached = preferences?.getStringList('courseCurriculum');
       cached ??= [];
 
       return cached.map((json) => CurriculumResponse.fromJson(jsonDecode(json))).toList();
@@ -20,13 +20,13 @@ class CurriculumLocalStorage {
   void saveCurriculum(CurriculumResponse curriculumResponse, int id) {
     String json = jsonEncode(curriculumResponse.toJson());
 
-    List<String>? cached = preferences.getStringList('courseCurriculum');
+    List<String>? cached = preferences?.getStringList('courseCurriculum');
 
     cached ??= [];
 
     cached = [];
     cached.add(json);
 
-    preferences.setStringList('courseCurriculum', cached);
+    preferences?.setStringList('courseCurriculum', cached);
   }
 }

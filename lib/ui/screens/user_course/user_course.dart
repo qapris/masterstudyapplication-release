@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:html_unescape/html_unescape.dart';
@@ -36,47 +37,47 @@ class UserCourseScreenArgs {
   dynamic isFirstStart;
 
   UserCourseScreenArgs(
-    this.course_id,
-    this.title,
-    this.app_image,
-    this.avatar_url,
-    this.login,
-    this.authorId,
-    this.progress,
-    this.lesson_type,
-    this.lesson_id, {
-    this.isFirstStart,
-  }) : this.postsBean = PostsBean(
-          course_id: course_id,
-          title: title,
-          app_image: app_image,
-          progress: progress,
-          lesson_type: lesson_type,
-          lesson_id: lesson_id,
-          categories_object: [],
-          author: PostAuthorBean(
-            id: authorId,
-            avatar_url: avatar_url,
-            login: '',
-            url: '',
-            meta: null,
-          ),
-          terms_list: [],
-          progress_label: null,
-          start_time: null,
-          sale_price: null,
-          terms: [],
-          link: null,
-          price: null,
-          duration: null,
-          post_status: null,
-          image_id: null,
-          hash: '',
-          views: null,
-          fromCache: false,
-          image: null,
-          current_lesson_id: null,
-        );
+      this.course_id,
+      this.title,
+      this.app_image,
+      this.avatar_url,
+      this.login,
+      this.authorId,
+      this.progress,
+      this.lesson_type,
+      this.lesson_id, {
+        this.isFirstStart,
+      }) : this.postsBean = PostsBean(
+    course_id: course_id,
+    title: title,
+    app_image: app_image,
+    progress: progress,
+    lesson_type: lesson_type,
+    lesson_id: lesson_id,
+    categories_object: [],
+    author: PostAuthorBean(
+      id: authorId,
+      avatar_url: avatar_url,
+      login: '',
+      url: '',
+      meta: null,
+    ),
+    terms_list: [],
+    progress_label: null,
+    start_time: null,
+    sale_price: null,
+    terms: [],
+    link: null,
+    price: null,
+    duration: null,
+    post_status: null,
+    image_id: null,
+    hash: '',
+    views: null,
+    fromCache: false,
+    image: null,
+    current_lesson_id: null,
+  );
 
   UserCourseScreenArgs.fromPostsBean(PostsBean postsBean)
       : course_id = postsBean.course_id,
@@ -124,9 +125,17 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
     return _scrollController.hasClients && _scrollController.offset > (MediaQuery.of(context).size.height / 3 - (kToolbarHeight));
   }
 
+  void _enableRotation() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  }
+
   @override
   void initState() {
     super.initState();
+    _enableRotation();
 
     _bloc = BlocProvider.of<UserCourseBloc>(context)..add(FetchEvent(widget.args));
     _scrollController = ScrollController()
@@ -338,19 +347,19 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
       return widget.args.isFirstStart == true
           ? SizedBox()
           : SizedBox(
-              width: 50,
-              height: 50,
-              child: FlatButton(
-                  shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
-                  onPressed: () {
-                    if (state is LoadedUserCourseState && !state.showCachingProgress! && !state.isCached!) {
-                      _bloc.add(CacheCourseEvent(widget.args));
-                    }
-                  },
-                  padding: EdgeInsets.only(left: 0.0),
-                  color: HexColor.fromHex("#FFFFFF").withOpacity(0.1),
-                  child: icon),
-            );
+        width: 50,
+        height: 50,
+        child: FlatButton(
+            shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+            onPressed: () {
+              if (state is LoadedUserCourseState && !state.showCachingProgress! && !state.isCached!) {
+                _bloc.add(CacheCourseEvent(widget.args));
+              }
+            },
+            padding: EdgeInsets.only(left: 0.0),
+            color: HexColor.fromHex("#FFFFFF").withOpacity(0.1),
+            child: icon),
+      );
     } else {
       return SizedBox(width: 50, height: 50);
     }

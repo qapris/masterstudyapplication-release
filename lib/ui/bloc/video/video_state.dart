@@ -6,5 +6,5 @@ abstract class VideoState {}
 class InitialVideoState extends VideoState {}
 
 class LoadedVideoState extends VideoState {
-    LoadedVideoState();
+  LoadedVideoState();
 }

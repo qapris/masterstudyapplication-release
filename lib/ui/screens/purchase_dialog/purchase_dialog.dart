@@ -80,7 +80,6 @@ class PurchaseDialogState extends State<PurchaseDialog> {
     }
 
     if (state.userPlans.subscriptions.isNotEmpty && _haveValidPlan(state.userPlans)) {
-      log('1'.toString());
       state.userPlans.subscriptions.forEach((value) {
         list.add(_buildPriceItem((selectedId == int.parse(value!.subscription_id)), localizations!.getLocalization("enroll_with_membership"), value.name, value.quotas_left, () {
           setState(() {
@@ -207,65 +206,62 @@ class PurchaseDialogState extends State<PurchaseDialog> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          SizedBox(
-            height: 50,
-            child: Stack(
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Icon(
-                      selected ? Icons.check_circle : Icons.panorama_fish_eye,
-                      color: selected ? secondColor : Colors.grey,
-                      size: 40,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Text(
-                            "$title",
-                            textScaleFactor: 1.0,
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          Text(
-                            "$subtitle ",
-                            textScaleFactor: 1.0,
-                            style: TextStyle(fontSize: 12),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-                Visibility(
-                  visible: value != null,
-                  child: Positioned(
-                    right: 0,
-                    top: 0,
-                    bottom: 0,
-                    child: Center(
-                        child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+          Stack(
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Icon(
+                    selected ? Icons.check_circle : Icons.panorama_fish_eye,
+                    color: selected ? secondColor : Colors.grey,
+                    size: 40,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
                         Text(
-                          "$value",
+                          "$title",
                           textScaleFactor: 1.0,
-                          style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: secondColor),
+                          style: TextStyle(fontSize: title.length > 20 ? 14 : 18),
                         ),
                         Text(
-                          localizations!.getLocalization("plan_count_left"),
+                          "$subtitle ",
                           textScaleFactor: 1.0,
-                          style: TextStyle(fontSize: 9, color: secondColor),
-                        )
+                          style: TextStyle(fontSize: 12),
+                        ),
                       ],
-                    )),
-                  ),
-                )
-              ],
-            ),
+                    ),
+                  )
+                ],
+              ),
+              Visibility(
+                visible: value != null,
+                child: Positioned(
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: Center(
+                      child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text(
+                        "$value",
+                        textScaleFactor: 1.0,
+                        style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: secondColor),
+                      ),
+                      Text(
+                        localizations!.getLocalization("plan_count_left"),
+                        textScaleFactor: 1.0,
+                        style: TextStyle(fontSize: 9, color: secondColor),
+                      )
+                    ],
+                  )),
+                ),
+              )
+            ],
           ),
         ],
       ),

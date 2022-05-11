@@ -8,7 +8,7 @@ import '../models/account.dart';
 class AccountLocalStorage {
   List<Account> getAccountLocal() {
     try {
-      List<String>? cached = preferences.getStringList('accountLocal');
+      List<String>? cached = preferences?.getStringList('accountLocal');
       cached ??= [];
 
       return cached.map((json) => Account.fromJson(jsonDecode(json))).toList();
@@ -20,13 +20,13 @@ class AccountLocalStorage {
   void saveAccountLocal(Account account) {
     String json = jsonEncode(account.toJson());
 
-    List<String>? cached = preferences.getStringList('accountLocal');
+    List<String>? cached = preferences?.getStringList('accountLocal');
 
     cached ??= [];
 
     cached = [];
     cached.add(json);
 
-    preferences.setStringList('accountLocal', cached);
+    preferences?.setStringList('accountLocal', cached);
   }
 }

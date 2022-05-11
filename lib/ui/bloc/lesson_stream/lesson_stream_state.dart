@@ -11,6 +11,7 @@ class LoadedLessonStreamState extends LessonStreamState {
 
     LoadedLessonStreamState(this.lessonResponse);
 }
+
 class CacheWarningLessonStreamState extends LessonStreamState{
 
 }

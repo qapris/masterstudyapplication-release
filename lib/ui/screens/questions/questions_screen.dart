@@ -16,6 +16,7 @@ import 'package:masterstudy_app/ui/bloc/questions/bloc.dart';
 import 'package:masterstudy_app/ui/screens/question_ask/question_ask_screen.dart';
 import 'package:masterstudy_app/ui/screens/question_details/question_details_screen.dart';
 import 'package:masterstudy_app/ui/screens/detail_profile/detail_profile_screen.dart';
+import 'package:masterstudy_app/ui/widgets/dialog_author.dart';
 
 import '../../../data/utils.dart';
 
@@ -56,7 +57,6 @@ class QuestionsWidgetState extends State<QuestionsWidget> {
   TextEditingController reply = TextEditingController();
   List<TextEditingController> _controllers = [];
 
-
   final interval = const Duration(seconds: 1);
 
   final int timerMaxSeconds = 20;
@@ -67,6 +67,7 @@ class QuestionsWidgetState extends State<QuestionsWidget> {
 
   bool isLoadingTimer = false;
   bool isLoadingButton = false;
+  late bool demo;
 
   startTimeout() {
     var duration = interval;
@@ -93,6 +94,11 @@ class QuestionsWidgetState extends State<QuestionsWidget> {
   @override
   void initState() {
     super.initState();
+    if (preferences!.getBool('demo') == null) {
+      demo = false;
+    } else {
+      demo = preferences!.getBool('demo');
+    }
     _bloc = BlocProvider.of<QuestionsBloc>(context);
     _bloc.add(FetchEvent(widget.lessonId, widget.page, "", ""));
   }
@@ -316,15 +322,19 @@ class QuestionsWidgetState extends State<QuestionsWidget> {
                 onPressed: isLoadingButton
                     ? null
                     : () {
-                        if (controller.text != '') {
-                          setState(() {
-                            isLoadingButton = true;
-                          });
+                        if (demo) {
+                          showDialogError(context, 'Demo Mode');
+                        } else {
+                          if (controller.text != '') {
+                            setState(() {
+                              isLoadingButton = true;
+                            });
 
-                          _bloc.add(
-                            MyQuestionAddEvent(questionsAll, widget.lessonId, controller.text, int.tryParse(question.comment_ID)!),
-                          );
-                          controller.clear();
+                            _bloc.add(
+                              MyQuestionAddEvent(questionsAll, widget.lessonId, controller.text, int.tryParse(question.comment_ID)!),
+                            );
+                            controller.clear();
+                          }
                         }
                       },
                 child: isLoadingTimer
@@ -478,25 +488,31 @@ class QuestionsWidgetState extends State<QuestionsWidget> {
               Expanded(
                 flex: 8,
                 child: Padding(
-                    padding: EdgeInsets.only(left: 20.0, right: 20.0),
-                    child: MaterialButton(
-                        height: 50,
-                        color: mainColor,
-                        onPressed: () {
-                          Navigator.of(context)
-                              .pushNamed(
-                            QuestionAskScreen.routeName,
-                            arguments: QuestionAskScreenArgs(widget.lessonId),
-                          )
-                              .then((value) {
-                            _refreshState();
-                          });
-                        },
-                        child: Text(
-                          "ASK A QUESTION",
-                          textScaleFactor: 1.0,
-                          style: TextStyle(fontSize: 14.0),
-                        ))),
+                  padding: EdgeInsets.only(left: 20.0, right: 20.0),
+                  child: MaterialButton(
+                    height: 50,
+                    color: mainColor,
+                    onPressed: () {
+                      if (demo) {
+                        showDialogError(context, 'Demo Mode');
+                      } else {
+                        Navigator.of(context)
+                            .pushNamed(
+                          QuestionAskScreen.routeName,
+                          arguments: QuestionAskScreenArgs(widget.lessonId),
+                        )
+                            .then((value) {
+                          _refreshState();
+                        });
+                      }
+                    },
+                    child: Text(
+                      "ASK A QUESTION",
+                      textScaleFactor: 1.0,
+                      style: TextStyle(fontSize: 14.0),
+                    ),
+                  ),
+                ),
               ),
               SizedBox(
                 width: 35,

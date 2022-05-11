@@ -1,6 +1,6 @@
 # masterstudy_app
 
-A new Flutter project.
+A new Flutter project version 2.0.0
 
 ## Getting Started
 

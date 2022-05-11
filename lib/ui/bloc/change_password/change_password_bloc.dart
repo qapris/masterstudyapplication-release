@@ -18,8 +18,6 @@ class ChangePasswordBloc extends Bloc<ChangePasswordEvent, ChangePasswordState> 
         emit(LoadingChangePasswordState());
         Response response = await _authRepository.changePassword(event.oldPassword, event.newPassword);
 
-        log(response.data.toString());
-
         if(response.data['modified']['new_password'] == false) {
           emit(ErrorChangePasswordState(response.data['values']['old_password'] ?? response.data['values']['new_password']));
         }else{

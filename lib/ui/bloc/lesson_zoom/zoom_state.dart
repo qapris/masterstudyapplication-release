@@ -1,4 +1,3 @@
-//State//
 import 'package:meta/meta.dart';
 
 import '../../../data/models/LessonResponse.dart';
@@ -13,4 +12,3 @@ class LoadedLessonZoomState extends LessonZoomState {
 
   LoadedLessonZoomState(this.lessonResponse);
 }
-//State//

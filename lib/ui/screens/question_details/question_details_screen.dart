@@ -11,6 +11,7 @@ import 'package:masterstudy_app/data/models/QuestionsResponse.dart';
 import 'package:masterstudy_app/main.dart';
 import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/bloc/question_details/bloc.dart';
+import 'package:masterstudy_app/ui/widgets/dialog_author.dart';
 
 import '../../../data/utils.dart';
 
@@ -55,6 +56,7 @@ class QuestionDetailsWidgetState extends State<QuestionDetailsWidget> {
 
   bool sendRequest = false;
   bool isLoading = false;
+  late bool demo;
   final interval = const Duration(seconds: 1);
 
   final int timerMaxSeconds = 20;
@@ -85,6 +87,11 @@ class QuestionDetailsWidgetState extends State<QuestionDetailsWidget> {
   @override
   void initState() {
     super.initState();
+    if (preferences!.getBool('demo') == null) {
+      demo = false;
+    } else {
+      demo = preferences!.getBool('demo');
+    }
     _bloc = BlocProvider.of<QuestionDetailsBloc>(context)..add(FetchEvent());
     aList = widget.questionBean.replies;
   }
@@ -224,11 +231,17 @@ class QuestionDetailsWidgetState extends State<QuestionDetailsWidget> {
                 onPressed: sendRequest
                     ? null
                     : () {
-                        setState(() {
-                          isLoading = true;
-                        });
-                        _bloc.add(QuestionAddEvent(widget.lessonId, _reply.text, int.tryParse(widget.questionBean.comment_ID)!));
-                        _reply.clear();
+                        if (demo) {
+                          showDialogError(context, 'Demo Mode');
+                        } else {
+                          if (_reply.text != '') {
+                            setState(() {
+                              isLoading = true;
+                            });
+                            _bloc.add(QuestionAddEvent(widget.lessonId, _reply.text, int.tryParse(widget.questionBean.comment_ID)!));
+                            _reply.clear();
+                          }
+                        }
                       },
                 child: sendRequest
                     ? Text(

@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:masterstudy_app/data/utils.dart';
 import 'package:masterstudy_app/main.dart';
 import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/bloc/assignment/bloc.dart';
@@ -15,6 +16,7 @@ import 'package:masterstudy_app/ui/screens/lesson_video/lesson_video_screen.dart
 import 'package:masterstudy_app/ui/screens/questions/questions_screen.dart';
 import 'package:masterstudy_app/ui/screens/quiz_lesson/quiz_lesson_screen.dart';
 import 'package:masterstudy_app/ui/screens/text_lesson/text_lesson_screen.dart';
+import 'package:masterstudy_app/ui/widgets/dialog_author.dart';
 import 'package:masterstudy_app/ui/widgets/warning_lessong_dialog.dart';
 
 import './assignment_state/assignment_draft.dart';
@@ -65,10 +67,16 @@ class _AssignmentScreenWidget extends StatefulWidget {
 class _AssignmentScreenWidgetState extends State<_AssignmentScreenWidget> {
   late AssignmentBloc _bloc;
   bool assignmentAdd = false;
+  late bool demo;
 
   @override
   void initState() {
     super.initState();
+    if(preferences!.getBool('demo') == null) {
+      demo = false;
+    }else {
+      demo = preferences!.getBool('demo');
+    }
     _bloc = BlocProvider.of<AssignmentBloc>(context)..add(FetchEvent(widget.courseId, widget.assignmentId));
   }
 
@@ -235,7 +243,11 @@ class _AssignmentScreenWidgetState extends State<_AssignmentScreenWidget> {
               height: 50,
               color: mainColor,
               onPressed: () {
-                _bloc.add(StartAssignmentEvent(widget.courseId, widget.assignmentId));
+                if(demo) {
+                  showDialogError(context, 'Demo Mode');
+                }else {
+                  _bloc.add(StartAssignmentEvent(widget.courseId, widget.assignmentId));
+                }
               },
               // ignore: unnecessary_type_check
               child: setUpButtonChild((state is LoadedAssignmentState) ? state.assignmentResponse.button : "", state is LoadedAssignmentState),

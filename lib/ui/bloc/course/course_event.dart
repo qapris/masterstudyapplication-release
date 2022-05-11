@@ -48,7 +48,6 @@ class VerifyInAppPurchase extends CourseEvent {
   VerifyInAppPurchase(this.serverVerificationData, this.price, this.courseId);
 }
 
-
 class GetTokenToCourse extends CourseEvent {
   final dynamic courseId;
 

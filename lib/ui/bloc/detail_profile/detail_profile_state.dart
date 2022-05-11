@@ -10,8 +10,5 @@ class LoadedDetailProfileState extends DetailProfileState {
   final List<CoursesBean?>? courses;
   final bool isTeacher;
 
-  LoadedDetailProfileState(
-    this.courses ,
-    this.isTeacher,
-  );
+  LoadedDetailProfileState(this.courses, this.isTeacher);
 }

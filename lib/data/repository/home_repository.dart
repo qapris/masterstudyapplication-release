@@ -53,21 +53,22 @@ class HomeRepositoryImpl implements HomeRepository {
   Future<AppSettings> getAppSettings() async {
     AppSettings appSettings = await apiProvider.getAppSettings();
 
+
     if (appSettings.options?.main_color != null) {
-      preferences.setInt('main_color_r', appSettings.options?.main_color?.r.toInt());
-      preferences.setInt('main_color_g', appSettings.options?.main_color?.g.toInt());
-      preferences.setInt('main_color_b', appSettings.options?.main_color?.b.toInt());
-      preferences.setDouble('main_color_a', appSettings.options?.main_color?.a.toDouble());
+      preferences!.setInt('main_color_r', appSettings.options?.main_color?.r.toInt());
+      preferences!.setInt('main_color_g', appSettings.options?.main_color?.g.toInt());
+      preferences!.setInt('main_color_b', appSettings.options?.main_color?.b.toInt());
+      preferences!.setDouble('main_color_a', appSettings.options?.main_color?.a.toDouble());
     }
 
     if (appSettings.options?.secondary_color != null) {
-      preferences.setInt('second_color_r', appSettings.options?.secondary_color?.r.toInt());
-      preferences.setInt('second_color_g', appSettings.options?.secondary_color?.g.toInt());
-      preferences.setInt('second_color_b', appSettings.options?.secondary_color?.b.toInt());
-      preferences.setDouble('second_color_a', appSettings.options?.secondary_color?.a.toDouble());
+      preferences!.setInt('second_color_r', appSettings.options?.secondary_color?.r.toInt());
+      preferences!.setInt('second_color_g', appSettings.options?.secondary_color?.g.toInt());
+      preferences!.setInt('second_color_b', appSettings.options?.secondary_color?.b.toInt());
+      preferences!.setDouble('second_color_a', appSettings.options?.secondary_color?.a.toDouble());
     }
 
-    preferences.setBool('app_view', appSettings.options?.app_view);
+    preferences!.setBool('app_view', appSettings.options?.app_view);
 
     return appSettings;
   }

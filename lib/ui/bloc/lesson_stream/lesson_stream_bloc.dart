@@ -15,13 +15,7 @@ class LessonStreamBloc extends Bloc<LessonStreamEvent, LessonStreamState> {
   LessonStreamState get initialState => InitialLessonStreamState();
 
   LessonStreamBloc(this.repository, this.cacheManager) : super(InitialLessonStreamState()) {
-    on<LessonStreamEvent>((event, emit) async {
-      await _lessonStream(event, emit);
-    });
-  }
-
-  Future<void> _lessonStream(LessonStreamEvent event, Emitter<LessonStreamState> emit) async {
-    if (event is FetchEvent) {
+    on<FetchEvent>((event, emit) async {
       try {
         var response = await repository.getLesson(event.courseId, event.lessonId);
         print(response);
@@ -33,6 +27,6 @@ class LessonStreamBloc extends Bloc<LessonStreamEvent, LessonStreamState> {
         print(e);
         print(s);
       }
-    }
+    });
   }
 }

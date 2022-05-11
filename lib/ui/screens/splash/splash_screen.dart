@@ -51,56 +51,76 @@ class SplashWidgetState extends State<SplashWidget> {
     ///If user connect to mobile or wifi
     if (connectivityResult == ConnectivityResult.wifi || connectivityResult == ConnectivityResult.mobile) {
       Response response = await dio.get('$apiEndpoint' + 'app_settings');
-      if (response.statusCode == 200) {
-        try {
-          var mainColorItem = response.data['options']['main_color'];
-          var secondColorItem = response.data['options']['secondary_color'];
 
-          if (mainColorItem != null) {
-            mainColor = Color.fromRGBO(
-              mainColorItem['r'],
-              mainColorItem['g'],
-              mainColorItem['b'],
-              double.parse(mainColorItem['a'].toString()),
-            );
+      if (response.statusCode == 200) {
+        if (response.data['options']['main_color_hex'].toString().contains('#') || response.data['options']['secondary_color_hex'].toString().contains('#')) {
+          log('1'.toString());
+          var mainColorHex = response.data['options']['main_color_hex'];
+          var secondColorHex = response.data['options']['secondary_color_hex'];
+
+          if (mainColorHex != null) {
+            mainColor = HexColor.fromHex(response.data['options']['main_color_hex']);
+            mainColorA = HexColor.fromHex(response.data['options']['main_color_hex']);
           } else {
             mainColor = blue_blue;
           }
 
-          if (secondColorItem != null) {
-            secondColor = Color.fromRGBO(
-              secondColorItem['r'],
-              secondColorItem['g'],
-              secondColorItem['b'],
-              double.parse(secondColorItem['a'].toString()),
-            );
+          if (secondColorHex != null) {
+            secondColor = HexColor.fromHex(response.data['options']['secondary_color_hex']);
           } else {
             secondColor = seaweed;
           }
+        } else {
+          try {
+            var mainColorItem = response.data['options']['main_color'];
+            var secondColorItem = response.data['options']['secondary_color'];
 
-          mainColorA = Color.fromRGBO(
-            mainColorItem['r'],
-            mainColorItem['g'],
-            mainColorItem['b'],
-            0.999,
-          );
-        } catch (e) {
-          mainColor = blue_blue;
-          mainColorA = blue_blue_a;
-          secondColor = seaweed;
+            if (mainColorItem != null) {
+              mainColor = Color.fromRGBO(
+                mainColorItem['r'],
+                mainColorItem['g'],
+                mainColorItem['b'],
+                double.parse(mainColorItem['a'].toString()),
+              );
+
+              mainColorA = Color.fromRGBO(
+                mainColorItem['r'],
+                mainColorItem['g'],
+                mainColorItem['b'],
+                0.999,
+              );
+            } else {
+              mainColor = blue_blue;
+            }
+
+            if (secondColorItem != null) {
+              secondColor = Color.fromRGBO(
+                secondColorItem['r'],
+                secondColorItem['g'],
+                secondColorItem['b'],
+                double.parse(secondColorItem['a'].toString()),
+              );
+            } else {
+              secondColor = seaweed;
+            }
+          } on DioError catch (e) {
+            mainColor = blue_blue;
+            mainColorA = blue_blue_a;
+            secondColor = seaweed;
+          }
         }
       }
     } else {
       try {
-        final mcr = preferences.getInt("main_color_r");
-        final mcg = preferences.getInt("main_color_g");
-        final mcb = preferences.getInt("main_color_b");
-        final mca = preferences.getDouble("main_color_a");
+        final mcr = preferences!.getInt("main_color_r");
+        final mcg = preferences!.getInt("main_color_g");
+        final mcb = preferences!.getInt("main_color_b");
+        final mca = preferences!.getDouble("main_color_a");
 
-        final scr = preferences.getInt("second_color_r");
-        final scg = preferences.getInt("second_color_g");
-        final scb = preferences.getInt("second_color_b");
-        final sca = preferences.getDouble("second_color_a");
+        final scr = preferences!.getInt("second_color_r");
+        final scg = preferences!.getInt("second_color_g");
+        final scb = preferences!.getInt("second_color_b");
+        final sca = preferences!.getDouble("second_color_a");
 
         mainColor = Color.fromRGBO(mcr, mcg, mcb, mca);
         mainColorA = Color.fromRGBO(mcr, mcg, mcb, 0.999);

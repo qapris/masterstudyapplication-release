@@ -1,12 +1,10 @@
 import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/models/ReviewAddResponse.dart';
 import 'package:masterstudy_app/data/models/account.dart';
 import 'package:masterstudy_app/data/repository/account_repository.dart';
 import 'package:masterstudy_app/data/repository/review_respository.dart';
-
 import './bloc.dart';
 
 @provide
@@ -18,13 +16,7 @@ class ReviewWriteBloc extends Bloc<ReviewWriteEvent, ReviewWriteState> {
   ReviewWriteState get initialState => InitialReviewWriteState();
 
   ReviewWriteBloc(this._accountRepository, this._reviewRepository) : super(InitialReviewWriteState()) {
-    on<ReviewWriteEvent>((event, emit) async {
-      await _reviewWrite(event, emit);
-    });
-  }
-
-  Future<void> _reviewWrite(ReviewWriteEvent event, Emitter<ReviewWriteState> emit) async {
-    if (event is SaveReviewEvent) {
+    on<SaveReviewEvent>((event, emit) async {
       try {
         ReviewAddResponse reviewAddResponse = await _reviewRepository.addReview(event.id, event.mark, event.review);
 
@@ -32,9 +24,9 @@ class ReviewWriteBloc extends Bloc<ReviewWriteEvent, ReviewWriteState> {
       } catch (error) {
         print(error);
       }
-    }
+    });
 
-    if (event is FetchEvent) {
+    on<FetchEvent>((event, emit) async {
       try {
         Account account = await _accountRepository.getUserAccount();
         accountObj = account;
@@ -43,6 +35,6 @@ class ReviewWriteBloc extends Bloc<ReviewWriteEvent, ReviewWriteState> {
         print('Account resp error');
         print(error);
       }
-    }
+    });
   }
 }

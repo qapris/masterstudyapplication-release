@@ -18,39 +18,36 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ProfileState get initialState => InitialProfileState();
 
   ProfileBloc(this._accountRepository, this._authRepository) : super(InitialProfileState()) {
-    on<ProfileEvent>((event, emit) async => await _profile(event, emit));
-  }
-
-  Future<void> _profile(ProfileEvent event, Emitter<ProfileState> emit) async {
-    if (event is FetchProfileEvent) {
+    on<FetchProfileEvent>((event, emit) async {
       try {
         Account account = await _accountRepository.getUserAccount();
         _accountRepository.saveAccountLocal(account);
 
         emit(LoadedProfileState(account));
       } catch (error, stacktrace) {
-        List<Account> accountLocal  = await _accountRepository.getAccountLocal();
+        List<Account> accountLocal = await _accountRepository.getAccountLocal();
 
         emit(LoadedProfileState(accountLocal.first));
         print(error);
         print(stacktrace);
       }
-    }
-    if (event is UpdateProfileEvent) {
+    });
+
+    on<UpdateProfileEvent>((event, emit) async {
       emit(InitialProfileState());
       try {
         Account account = await _accountRepository.getUserAccount();
         emit(LoadedProfileState(account));
-      } catch (excaption, stacktrace) {
-        print(excaption);
+      } catch (exception, stacktrace) {
+        print(exception);
         print(stacktrace);
       }
-    }
+    });
 
-    if (event is LogoutProfileEvent) {
+    on<LogoutProfileEvent>((event, emit) async {
       await _authRepository.logout();
-      preferences.clear();
+      preferences!.clear();
       emit(LogoutProfileState());
-    }
+    });
   }
 }

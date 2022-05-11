@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/repository/courses_repository.dart';
@@ -13,14 +11,7 @@ class HomeSimpleBloc extends Bloc<HomeSimpleEvent, HomeSimpleState> {
   HomeSimpleState get initialState => InitialHomeSimpleState();
 
   HomeSimpleBloc(this._coursesRepository) : super(InitialHomeSimpleState()) {
-    on<HomeSimpleEvent>((event, emit) async {
-      await _homeSimpleBloc(event, emit);
-    });
-  }
-
-  @override
-  Future<void> _homeSimpleBloc(HomeSimpleEvent event, Emitter<HomeSimpleState> emit) async {
-    if (event is FetchHomeSimpleEvent) {
+    on<FetchHomeSimpleEvent>((event, emit) async {
       try {
         var coursesNew = await _coursesRepository.getCourses(sort: Sort.date_low);
 
@@ -29,6 +20,6 @@ class HomeSimpleBloc extends Bloc<HomeSimpleEvent, HomeSimpleState> {
         print(error);
         print(stackTrace);
       }
-    }
+    });
   }
 }

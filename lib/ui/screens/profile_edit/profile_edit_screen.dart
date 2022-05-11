@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,11 +8,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:masterstudy_app/data/models/account.dart';
 import 'package:masterstudy_app/main.dart';
-import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/bloc/edit_profile_bloc/bloc.dart';
 import 'package:masterstudy_app/ui/bloc/profile/profile_bloc.dart';
 import 'package:masterstudy_app/ui/bloc/profile/profile_event.dart';
 import 'package:masterstudy_app/ui/screens/change_password/change_password_screen.dart';
+
+import '../../../data/utils.dart';
+import '../../widgets/dialog_author.dart';
 
 class ProfileEditScreenArgs {
   final Account? account;
@@ -66,6 +67,7 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
   TextEditingController _instagramController = TextEditingController();
 
   var enableInputs = true;
+  late bool demoEnableInputs;
   var passwordVisible = false;
   late EditProfileBloc _bloc;
 
@@ -81,11 +83,17 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
     _facebookController.text = _bloc.account.meta!.facebook!;
     _twitterController.text = _bloc.account.meta!.twitter;
     _instagramController.text = _bloc.account.meta!.instagram;
+    if(preferences!.getBool('demo') == null) {
+      demoEnableInputs = false;
+    }else {
+      demoEnableInputs = preferences!.getBool('demo');
+    }
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
         appBar: AppBar(
           backgroundColor: mainColor,
@@ -214,11 +222,15 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
                 padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(8)),
               ),
               onPressed: () async {
-                XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+                if(demoEnableInputs) {
+                  showDialogError(context,'Demo Mode');
+                }else {
+                  XFile? image = await _picker.pickImage(source: ImageSource.gallery);
 
-                setState(() {
-                  _image = File(image!.path);
-                });
+                  setState(() {
+                    _image = File(image!.path);
+                  });
+                }
               },
               child: Padding(
                   padding: const EdgeInsets.only(left: 8.0, right: 8.0),
@@ -247,6 +259,7 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
             child: TextFormField(
               controller: _firstNameController,
               enabled: enableInputs,
+              readOnly: demoEnableInputs,
               cursorColor: mainColor,
               decoration: InputDecoration(
                 labelText: localizations!.getLocalization("first_name"),
@@ -269,6 +282,7 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
             child: TextFormField(
               controller: _lastNameController,
               enabled: enableInputs,
+              readOnly: demoEnableInputs,
               cursorColor: mainColor,
               decoration: InputDecoration(
                 labelText: localizations!.getLocalization("last_name"),
@@ -292,6 +306,7 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
                   child: TextFormField(
                     controller: _occupationController,
                     enabled: enableInputs,
+                    readOnly: demoEnableInputs,
                     cursorColor: mainColor,
                     decoration: InputDecoration(
                       labelText: localizations!.getLocalization("occupation"),
@@ -316,6 +331,7 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
               controller: _emailController,
               enabled: enableInputs,
               validator: _validateEmail,
+              readOnly: demoEnableInputs,
               cursorColor: mainColor,
               decoration: InputDecoration(
                 labelText: localizations!.getLocalization("email_label_text"),
@@ -386,6 +402,7 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
               controller: _bioController,
               enabled: enableInputs,
               maxLines: 5,
+              readOnly: demoEnableInputs,
               textCapitalization: TextCapitalization.sentences,
               cursorColor: mainColor,
               decoration: InputDecoration(
@@ -410,6 +427,7 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
             child: TextFormField(
               controller: _facebookController,
               enabled: enableInputs,
+              readOnly: demoEnableInputs,
               cursorColor: mainColor,
               decoration: InputDecoration(
                 labelText: 'Facebook',
@@ -434,6 +452,7 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
               controller: _twitterController,
               enabled: enableInputs,
               cursorColor: mainColor,
+              readOnly: demoEnableInputs,
               decoration: InputDecoration(
                 labelText: 'Twitter',
                 hintText: localizations!.getLocalization("enter_url"),
@@ -457,6 +476,7 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
               controller: _instagramController,
               enabled: enableInputs,
               cursorColor: mainColor,
+              readOnly: demoEnableInputs,
               decoration: InputDecoration(
                 labelText: 'Instagram',
                 hintText: localizations!.getLocalization("enter_url"),
@@ -480,10 +500,25 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
               minWidth: double.infinity,
               color: mainColor,
               onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  if (_image == null) {
-                    _bloc.add(
-                      SaveEvent(
+                if(demoEnableInputs) {
+                  showDialogError(context,'Demo Mode');
+                }else {
+                  if (_formKey.currentState!.validate()) {
+                    if (_image == null) {
+                      _bloc.add(
+                        SaveEvent(
+                          _firstNameController.text,
+                          _lastNameController.text,
+                          _passwordController.text,
+                          _bioController.text,
+                          _occupationController.text,
+                          _facebookController.text,
+                          _twitterController.text,
+                          _instagramController.text,
+                        ),
+                      );
+                    } else {
+                      _bloc.add(SaveEvent(
                         _firstNameController.text,
                         _lastNameController.text,
                         _passwordController.text,
@@ -492,20 +527,9 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
                         _facebookController.text,
                         _twitterController.text,
                         _instagramController.text,
-                      ),
-                    );
-                  } else {
-                    _bloc.add(SaveEvent(
-                      _firstNameController.text,
-                      _lastNameController.text,
-                      _passwordController.text,
-                      _bioController.text,
-                      _occupationController.text,
-                      _facebookController.text,
-                      _twitterController.text,
-                      _instagramController.text,
-                      _image,
-                    ));
+                        _image,
+                      ));
+                    }
                   }
                 }
               },
@@ -520,7 +544,11 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
               minWidth: double.infinity,
               color: mainColor,
               onPressed: () {
-                Navigator.of(context).pushNamed(ChangePasswordScreen.routeName);
+                if(demoEnableInputs) {
+                  showDialogError(context,'Demo Mode');
+                }else {
+                  Navigator.of(context).pushNamed(ChangePasswordScreen.routeName);
+                }
               },
               child: Text(
                 "CHANGE PASSWORD",

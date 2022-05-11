@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:external_path/external_path.dart';
@@ -15,7 +14,6 @@ import 'package:masterstudy_app/data/utils.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-
 import '../../../main.dart';
 import '../../../theme/theme.dart';
 import '../../bloc/lesson_zoom/bloc.dart';

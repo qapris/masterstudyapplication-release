@@ -7,5 +7,5 @@ class FetchEvent extends SearchDetailEvent {
   final String query;
   final dynamic categoryId;
 
-  FetchEvent(this.query,this.categoryId);
+  FetchEvent(this.query, this.categoryId);
 }

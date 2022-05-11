@@ -9,6 +9,7 @@ class FetchEvent extends LessonVideoEvent {
 
     FetchEvent(this.courseId, this.lessonId);
 }
+
 class CompleteLessonEvent extends LessonVideoEvent {
     final int courseId;
     final int lessonId;

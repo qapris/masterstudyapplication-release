@@ -1,4 +1,3 @@
-//Event//
 import 'package:meta/meta.dart';
 
 @immutable
@@ -10,10 +9,10 @@ class FetchEvent extends LessonZoomEvent {
 
   FetchEvent(this.courseId, this.lessonId);
 }
+
 class CompleteLessonEvent extends LessonZoomEvent {
   final int courseId;
   final int lessonId;
 
   CompleteLessonEvent(this.courseId, this.lessonId);
 }
-//Event//

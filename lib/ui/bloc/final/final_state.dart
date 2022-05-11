@@ -13,4 +13,5 @@ class LoadedFinalState extends FinalState {
 }
 
 class ErrorFinalState extends FinalState {}
+
 class CacheWarningState extends FinalState {}

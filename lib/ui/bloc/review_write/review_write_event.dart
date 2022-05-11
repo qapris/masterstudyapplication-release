@@ -4,15 +4,15 @@ import 'package:meta/meta.dart';
 abstract class ReviewWriteEvent {}
 
 class FetchEvent extends ReviewWriteEvent {
-    final int courseId;
+  final int courseId;
 
-    FetchEvent(this.courseId);
+  FetchEvent(this.courseId);
 }
 
 class SaveReviewEvent extends ReviewWriteEvent {
-    final int id;
-    final int mark;
-    final String review;
+  final int id;
+  final int mark;
+  final String review;
 
-    SaveReviewEvent(this.id, this.mark, this.review);
+  SaveReviewEvent(this.id, this.mark, this.review);
 }

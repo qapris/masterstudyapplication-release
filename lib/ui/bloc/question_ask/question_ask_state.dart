@@ -7,12 +7,13 @@ abstract class QuestionAskState {}
 class InitialQuestionAskState extends QuestionAskState {}
 
 class LoadedQuestionAskState extends QuestionAskState {
-    LoadedQuestionAskState();
+  LoadedQuestionAskState();
 }
 
 class QuestionAddedState extends QuestionAskState {
-    final QuestionAddResponse questionAddResponse;
-    QuestionAddedState(this.questionAddResponse);
+  final QuestionAddResponse questionAddResponse;
+
+  QuestionAddedState(this.questionAddResponse);
 }
 
 class ErrorQuestionAskState extends QuestionAskState {}

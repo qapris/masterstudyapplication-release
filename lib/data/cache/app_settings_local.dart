@@ -8,7 +8,7 @@ import 'package:masterstudy_app/data/utils.dart';
 class AppLocalStorage {
   List<AppSettings> getAppSettingsLocal() {
     try {
-      List<String>? cached = preferences.getStringList('appSettings');
+      List<String>? cached = preferences?.getStringList('appSettings');
       cached ??= [];
 
       return cached.map((json) => AppSettings.fromJson(jsonDecode(json))).toList();
@@ -20,13 +20,13 @@ class AppLocalStorage {
   void saveLocalAppSetting(AppSettings appSettingsRec) {
     String json = jsonEncode(appSettingsRec.toJson());
 
-    List<String>? cachedApp = preferences.getStringList('appSettings');
+    List<String>? cachedApp = preferences?.getStringList('appSettings');
 
     cachedApp ??= [];
 
     cachedApp = [];
     cachedApp.add(json);
 
-    preferences.setStringList('appSettings', cachedApp);
+    preferences?.setStringList('appSettings', cachedApp);
   }
 }

@@ -9,6 +9,7 @@ class FetchEvent extends TextLessonEvent {
 
   FetchEvent(this.courseId, this.lessonId);
 }
+
 class CompleteLessonEvent extends TextLessonEvent {
   final int courseId;
   final int lessonId;

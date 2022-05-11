@@ -27,5 +27,4 @@ class QuestionAskBloc extends Bloc<QuestionAskEvent, QuestionAskState> {
       }
     });
   }
-
 }

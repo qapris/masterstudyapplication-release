@@ -24,20 +24,15 @@ class UserCourseBloc extends Bloc<UserCourseEvent, UserCourseState> {
 
   UserCourseBloc(this._repository, this.cacheManager, this._lessonsRepository) : super(InitialUserCourseState()) {
     on<FetchEvent>((event, emit) async {
-      //ErrorState
       if (state is ErrorUserCourseState) emit(InitialUserCourseState());
 
-      //GetCourseId
       int courseId = int.parse(event.userCourseScreenArgs.course_id!);
 
-      //Check isCached or not cached
       var isCached = await cacheManager.isCached(courseId);
 
       try {
-        //getCourseCurriculum
         var response = await _repository.getCourseCurriculum(courseId);
 
-        //LocaleSaveCurriculum
         _repository.saveLocalCurriculum(response, courseId);
 
         emit(LoadedUserCourseState(
@@ -51,7 +46,6 @@ class UserCourseBloc extends Bloc<UserCourseEvent, UserCourseState> {
         ));
 
         if (isCached) {
-          //getCurrentCourseHash
           var currentHash = (await cacheManager.getFromCache())?.courses.firstWhere((element) => courseId == element?.id)?.hash;
 
           if (event.userCourseScreenArgs.postsBean?.hash != currentHash) {
@@ -89,14 +83,14 @@ class UserCourseBloc extends Bloc<UserCourseEvent, UserCourseState> {
                 course.lessons = await _lessonsRepository.getAllLessons(int.parse(event.userCourseScreenArgs.course_id!), iDs);
 
                 await cacheManager.writeToCache(course).then((value) => emit(LoadedUserCourseState(
-                  state.sections,
-                  state.progress,
-                  state.current_lesson_id,
-                  state.lesson_type,
-                  state.response,
-                  true,
-                  false,
-                )));
+                      state.sections,
+                      state.progress,
+                      state.current_lesson_id,
+                      state.lesson_type,
+                      state.response,
+                      true,
+                      false,
+                    )));
               } catch (e, s) {
                 print(e);
                 print(s);
@@ -197,5 +191,4 @@ class UserCourseBloc extends Bloc<UserCourseEvent, UserCourseState> {
       }
     });
   }
-
 }

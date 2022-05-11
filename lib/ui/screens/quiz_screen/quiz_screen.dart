@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:masterstudy_app/data/models/LessonResponse.dart';
 import 'package:masterstudy_app/data/models/QuizResponse.dart';
+import 'package:masterstudy_app/data/utils.dart';
 import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/bloc/quiz_screen/bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -68,7 +69,7 @@ class QuizScreenWidgetState extends State<QuizScreenWidget> {
   // TODO: QUIZ DATA DELETE
   bool isCoursePassed(QuizResponse response) {
     bool passed = false;
-     if (response.quiz_data.isNotEmpty) {
+    if (response.quiz_data.isNotEmpty) {
       widget.quizResponse.quiz_data.forEach((value) {
         if (value?.status == "passed") passed = true;
       });
@@ -78,6 +79,7 @@ class QuizScreenWidgetState extends State<QuizScreenWidget> {
 
   @override
   Widget build(BuildContext context) {
+    log(widget.quizResponse.view_link.toString());
     return BlocBuilder<QuizScreenBloc, QuizScreenState>(
       bloc: _bloc,
       builder: (context, state) {
@@ -116,7 +118,6 @@ class QuizScreenWidgetState extends State<QuizScreenWidget> {
   }
 
   _buildWebView() {
-    log(widget.quizResponse.view_link.toString());
     if (widget.quizResponse.view_link != null && widget.quizResponse.view_link.isNotEmpty)
       return Stack(
         children: <Widget>[
@@ -126,21 +127,23 @@ class QuizScreenWidgetState extends State<QuizScreenWidget> {
             onPageFinished: (some) async {},
             onPageStarted: (some) {},
             onWebViewCreated: (controller) async {
-             /* SharedPreferences prefs = await SharedPreferences.getInstance();
-              String header = prefs.get("apiToken");
+
+              String header = preferences!.get("apiToken");
+              Map<String, String> headers = {"token": header};
 
               controller.clearCache();
               this._webViewController = controller;
-              controller.loadUrl(widget.quizResponse.view_link, headers: {"token": header});*/
+              controller.loadUrl(widget.quizResponse.view_link, headers: headers);
             },
             javascriptChannels: Set.from([
               JavascriptChannel(
-                  name: "lmsEvent",
-                  onMessageReceived: (JavascriptMessage result) {
-                    if (jsonDecode(result.message)["event_type"] == "close_quiz") {
-                      Navigator.pop(context);
-                    }
-                  }),
+                name: "lmsEvent",
+                onMessageReceived: (JavascriptMessage result) {
+                  if (jsonDecode(result.message)["event_type"] == "close_quiz") {
+                    Navigator.pop(context);
+                  }
+                },
+              ),
             ]),
           )
         ],
