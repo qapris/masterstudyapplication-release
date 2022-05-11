@@ -7,13 +7,13 @@ import './bloc.dart';
 
 @provide
 class VideoBloc extends Bloc<VideoEvent, VideoState> {
+  VideoState get initialState => InitialVideoState();
 
-    VideoState get initialState => InitialVideoState();
+  VideoBloc() : super(InitialVideoState()) {
+    on<VideoEvent>((event, emit) async => await _videoBloc(event, emit));
+  }
 
-    VideoBloc() : super(InitialVideoState()) {
-        on<VideoEvent>((event, emit) async => await _videoBloc(event,emit));
-    }
-
-
-    Future<void> _videoBloc(VideoEvent event, Emitter<VideoState> emit) async { emit(LoadedVideoState());  }
+  Future<void> _videoBloc(VideoEvent event, Emitter<VideoState> emit) async {
+    emit(LoadedVideoState());
+  }
 }

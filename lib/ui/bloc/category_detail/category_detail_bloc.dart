@@ -1,10 +1,8 @@
 import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/repository/courses_repository.dart';
 import 'package:masterstudy_app/data/repository/home_repository.dart';
-
 import './bloc.dart';
 
 @provide
@@ -15,13 +13,7 @@ class CategoryDetailBloc extends Bloc<CategoryDetailEvent, CategoryDetailState> 
   CategoryDetailState get initialState => InitialCategoryDetailState();
 
   CategoryDetailBloc(this._homeRepository, this._coursesRepository) : super(InitialCategoryDetailState()) {
-    on<CategoryDetailEvent>((event, emit) async {
-      await _getCategoryDetail(event, emit);
-    });
-  }
-
-  Future<void> _getCategoryDetail(CategoryDetailEvent event, Emitter<CategoryDetailState> emit) async {
-    if (event is FetchEvent) {
+    on<FetchEvent>((event, emit) async {
       emit(InitialCategoryDetailState());
       try {
         var categories = await _homeRepository.getCategories();
@@ -34,6 +26,6 @@ class CategoryDetailBloc extends Bloc<CategoryDetailEvent, CategoryDetailState> 
         print(stackTrace);
         emit(ErrorCategoryDetailState(event.categoryId));
       }
-    }
+    });
   }
 }

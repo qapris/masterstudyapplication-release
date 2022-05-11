@@ -9,9 +9,8 @@ class LoadingChangePasswordState extends ChangePasswordState {}
 
 class SuccessChangePasswordState extends ChangePasswordState {}
 
-// ignore: must_be_immutable
 class ErrorChangePasswordState extends ChangePasswordState {
-  dynamic message;
+  final dynamic message;
 
   ErrorChangePasswordState(this.message);
 }

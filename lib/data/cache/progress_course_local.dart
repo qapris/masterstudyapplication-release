@@ -8,7 +8,7 @@ import '../models/user_course.dart';
 class ProgressCoursesLocalStorage {
   List<UserCourseResponse> getUserCoursesLocal() {
     try {
-      List<String>? cached = preferences.getStringList('userCourses');
+      List<String>? cached = preferences?.getStringList('userCourses');
       cached ??= [];
 
       return cached.map((json) => UserCourseResponse.fromJson(jsonDecode(json))).toList();
@@ -20,13 +20,13 @@ class ProgressCoursesLocalStorage {
   void saveProgressCourses(UserCourseResponse userCourseResponse) {
     String json = jsonEncode(userCourseResponse.toJson());
 
-    List<String>? cached = preferences.getStringList('userCourses');
+    List<String>? cached = preferences?.getStringList('userCourses');
 
     cached ??= [];
 
     cached = [];
     cached.add(json);
 
-    preferences.setStringList('userCourses', cached);
+    preferences!.setStringList('userCourses', cached);
   }
 }

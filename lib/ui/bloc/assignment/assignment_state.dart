@@ -13,4 +13,5 @@ class LoadedAssignmentState extends AssignmentState {
 }
 
 class ErrorAssignmentState extends AssignmentState {}
+
 class CacheWarningAssignmentState extends AssignmentState {}

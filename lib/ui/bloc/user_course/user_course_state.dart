@@ -27,5 +27,3 @@ class LoadedUserCourseState extends UserCourseState {
     this.showCachingProgress,
   );
 }
-
-

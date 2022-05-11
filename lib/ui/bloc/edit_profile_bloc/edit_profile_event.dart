@@ -14,7 +14,7 @@ class SaveEvent extends EditProfileEvent {
   final String facebook;
   final String twitter;
   final String instagram;
-  File? photo;
+  final File? photo;
 
   SaveEvent(
     this.firstName,

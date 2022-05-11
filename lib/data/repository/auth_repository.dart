@@ -47,23 +47,23 @@ class AuthRepositoryImpl extends AuthRepository {
   }
 
   Future<String> getToken() {
-    return Future.value(preferences.getString(tokenKey));
+    return Future.value(preferences!.getString(tokenKey));
   }
 
   void _saveToken(String token) {
-    preferences.setString(tokenKey, token);
+    preferences!.setString(tokenKey, token);
     dio.options.headers.addAll({"token": "$token"});
   }
 
   Future<bool> isSigned() {
-    var token = preferences.getString(tokenKey);
+    var token = preferences!.getString(tokenKey);
     dio.options.headers.addAll({"token": "$token"});
     if (token != null && token.isNotEmpty) return Future.value(true);
     return Future.value(false);
   }
 
   Future logout() async {
-    preferences.setString("apiToken", "");
+    preferences!.setString("apiToken", "");
     await CacheManager().cleanCache();
   }
 

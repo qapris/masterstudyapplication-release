@@ -4,6 +4,7 @@ import 'package:meta/meta.dart';
 abstract class SearchScreenEvent {}
 
 class FetchEvent extends SearchScreenEvent {}
+
 class SearchEvent extends SearchScreenEvent {
   final String query;
 

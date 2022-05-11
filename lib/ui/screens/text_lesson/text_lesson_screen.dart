@@ -84,6 +84,7 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
   ConnectivityResult _connectionStatus = ConnectivityResult.none;
   final Connectivity _connectivity = Connectivity();
   bool completed = false;
+  num kef = 2;
 
   @override
   void initState() {
@@ -128,6 +129,7 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
 
   @override
   Widget build(BuildContext context) {
+    kef = (MediaQuery.of(context).size.height > 690) ? kef : 1.8;
     return BlocListener(
       bloc: _bloc,
       listener: (context, state) {
@@ -216,16 +218,15 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
     if (state is InitialTextLessonState) return _buildLoading();
 
     if (state is LoadedTextLessonState) {
-      return LayoutBuilder(builder: (context, constraints) {
-        return SingleChildScrollView(
-          child: Column(
-            children: [
-              _buildWebView(state, constraints, context),
-              _buildLessonMaterials(state),
-            ],
-          ),
+      return  Column(
+          children: [
+            Expanded(
+              child:  _buildWebView(state, context),
+            ),
+            _buildLessonMaterials(state),
+          ],
         );
-      });
+
     }
   }
 
@@ -235,19 +236,23 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
 
   late WebViewController _webViewController;
   bool showLoadingWebview = true;
+  dynamic descriptionHeight;
 
-  _buildWebView(LoadedTextLessonState state, constraints, context) {
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxHeight: 500, minHeight: MediaQuery.of(context).size.height > 600 ? 30 + MediaQuery.of(context).size.height * 0.05 : 30),
-      child: WebView(
-        javascriptMode: JavascriptMode.unrestricted,
-        initialUrl: 'data:text/html;base64,${base64Encode(const Utf8Encoder().convert(state.lessonResponse.content))}',
-        onPageFinished: (some) async {},
-        onWebViewCreated: (controller) async {
-          controller.clearCache();
-          this._webViewController = controller;
-        },
-      ),
+  _buildWebView(LoadedTextLessonState state, context) {
+    return WebView(
+      javascriptMode: JavascriptMode.unrestricted,
+      initialUrl: 'data:text/html;base64,${base64Encode(const Utf8Encoder().convert(state.lessonResponse.content))}',
+      onPageFinished: (some) async {
+        double height = double.parse(await _webViewController.runJavascriptReturningResult("document.documentElement.scrollHeight;"));
+        setState(() {
+          descriptionHeight = height;
+          print("webview $height");
+        });
+      },
+      onWebViewCreated: (controller) async {
+        controller.clearCache();
+        this._webViewController = controller;
+      },
     );
   }
 
@@ -572,8 +577,8 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
                             });
                           }
                         } else {
-                          if (preferences.getString('textLessonComplete') != null) {
-                            var existRecord = jsonDecode(preferences.getString('textLessonComplete'));
+                          if (preferences!.getString('textLessonComplete') != null) {
+                            var existRecord = jsonDecode(preferences!.getString('textLessonComplete'));
 
                             for (var el in existRecord) {
                               if (el.toString().contains('added') && el['lesson_id'] == widget.lessonId) {
@@ -585,7 +590,7 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
                                   'added': 1,
                                 });
 
-                                preferences.setString('textLessonComplete', jsonEncode(recordMap));
+                                preferences!.setString('textLessonComplete', jsonEncode(recordMap));
 
                                 setState(() {
                                   completed = true;
@@ -599,7 +604,7 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
                               'added': 1,
                             });
 
-                            preferences.setString('textLessonComplete', jsonEncode(recordMap));
+                            preferences!.setString('textLessonComplete', jsonEncode(recordMap));
                             setState(() {
                               completed = true;
                             });

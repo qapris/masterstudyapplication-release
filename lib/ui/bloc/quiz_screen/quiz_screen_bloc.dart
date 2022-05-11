@@ -1,9 +1,7 @@
 import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/repository/lesson_repository.dart';
-
 import './bloc.dart';
 
 @provide
@@ -13,11 +11,7 @@ class QuizScreenBloc extends Bloc<QuizScreenEvent, QuizScreenState> {
   QuizScreenState get initialState => InitialQuizScreenState();
 
   QuizScreenBloc(this._repository) : super(InitialQuizScreenState()) {
-    on<QuizScreenEvent>((event, emit) async => await _quiz(event, emit));
-  }
-
-  Future<void> _quiz(QuizScreenEvent event, Emitter<QuizScreenState> emit) async {
-    if (event is FetchEvent) {
+    on<FetchEvent>((event, emit) async {
       try {
         if (event.quizResponse != null) emit(LoadedQuizScreenState(event.quizResponse));
         var response = await _repository.getLesson(event.courseId, event.lessonId);
@@ -26,6 +20,6 @@ class QuizScreenBloc extends Bloc<QuizScreenEvent, QuizScreenState> {
         print(e);
         print(s);
       }
-    }
+    });
   }
 }

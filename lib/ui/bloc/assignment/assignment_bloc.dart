@@ -1,12 +1,10 @@
 import 'dart:async';
 import 'dart:developer';
-
 import 'package:bloc/bloc.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/cache/cache_manager.dart';
 import 'package:masterstudy_app/data/models/AssignmentResponse.dart';
 import 'package:masterstudy_app/data/repository/assignment_repository.dart';
-
 import './bloc.dart';
 
 @provide

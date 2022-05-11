@@ -6,7 +6,6 @@ import 'package:dio/dio.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/models/LessonResponse.dart';
 import 'package:masterstudy_app/data/repository/lesson_repository.dart';
-
 import './bloc.dart';
 
 @provide
@@ -16,20 +15,15 @@ class LessonVideoBloc extends Bloc<LessonVideoEvent, LessonVideoState> {
   LessonVideoState get initialState => InitialLessonVideoState();
 
   LessonVideoBloc(this._lessonRepository) : super(InitialLessonVideoState()) {
-    on<LessonVideoEvent>((event, emit) async {
-      await _lessonVideo(event, emit);
-    });
-  }
-
-  Future<void> _lessonVideo(LessonVideoEvent event, Emitter<LessonVideoState> emit) async {
-    if (event is FetchEvent) {
+    on<FetchEvent>((event, emit) async {
       try {
         LessonResponse response = await _lessonRepository.getLesson(event.courseId, event.lessonId);
 
         emit(LoadedLessonVideoState(response));
-      } on DioError catch(e) {
-      }
-    } else if (event is CompleteLessonEvent) {
+      } on DioError catch (e) {}
+    });
+
+    on<CompleteLessonEvent>((event, emit) async {
       try {
         var response = await _lessonRepository.completeLesson(event.courseId, event.lessonId);
       } catch (e, s) {
@@ -37,6 +31,6 @@ class LessonVideoBloc extends Bloc<LessonVideoEvent, LessonVideoState> {
         print(e);
         print(s);
       }
-    }
+    });
   }
 }

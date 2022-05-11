@@ -225,3 +225,34 @@ class DialogAuthorWidget extends StatelessWidget {
     await launch(url);
   }
 }
+
+
+void showDialogError(context, text) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text(
+          localizations!.getLocalization("warning"),
+          textScaleFactor: 1.0,
+          style: TextStyle(color: Colors.black, fontSize: 20.0),
+        ),
+        content: Text(text, textScaleFactor: 1.0),
+        actions: <Widget>[
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              primary: mainColor,
+            ),
+            child: Text(
+              localizations!.getLocalization("ok_dialog_button"),
+              textScaleFactor: 1.0,
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}

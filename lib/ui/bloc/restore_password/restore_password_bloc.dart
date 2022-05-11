@@ -10,11 +10,7 @@ class RestorePasswordBloc extends Bloc<RestorePasswordEvent, RestorePasswordStat
   RestorePasswordState get initialState => InitialRestorePasswordState();
 
   RestorePasswordBloc(this._authRepository) : super(InitialRestorePasswordState()) {
-    on<RestorePasswordEvent>((event, emit) async => await _restorePassword(event, emit));
-  }
-
-  Future<void> _restorePassword(RestorePasswordEvent event, Emitter<RestorePasswordState> emit) async {
-    if (event is SendRestorePasswordEvent) {
+    on<SendRestorePasswordEvent>((event, emit) async {
       try {
         emit(LoadingRestorePasswordState());
         await _authRepository.restorePassword(event.email);
@@ -23,6 +19,6 @@ class RestorePasswordBloc extends Bloc<RestorePasswordEvent, RestorePasswordStat
         print(e);
         print(s);
       }
-    }
+    });
   }
 }

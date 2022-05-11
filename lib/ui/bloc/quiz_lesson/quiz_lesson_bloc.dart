@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/cache/cache_manager.dart';
@@ -13,11 +12,7 @@ class QuizLessonBloc extends Bloc<QuizLessonEvent, QuizLessonState> {
   QuizLessonState get initialState => InitialQuizLessonState();
 
   QuizLessonBloc(this.repository, this.cacheManager) : super(InitialQuizLessonState()) {
-    on<QuizLessonEvent>((event, emit) async => await _quizLesson(event, emit));
-  }
-
-  Future<void> _quizLesson(QuizLessonEvent event, Emitter<QuizLessonState> emit) async {
-    if (event is FetchEvent) {
+    on<FetchEvent>((event, emit) async {
       try {
         var response = await repository.getQuiz(event.courseId, event.lessonId);
 
@@ -29,6 +24,6 @@ class QuizLessonBloc extends Bloc<QuizLessonEvent, QuizLessonState> {
         print(e);
         print(s);
       }
-    }
+    });
   }
 }

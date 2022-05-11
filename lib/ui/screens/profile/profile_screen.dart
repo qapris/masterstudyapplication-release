@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
@@ -370,6 +369,7 @@ class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
         style: TextStyle(color: mainColor),
       ),
       onPressed: () {
+        preferences!.setBool('demo', false);
         _bloc.add(LogoutProfileEvent());
       },
     );

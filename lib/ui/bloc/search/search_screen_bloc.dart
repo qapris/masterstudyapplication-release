@@ -1,26 +1,20 @@
 import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/models/course/CourcesResponse.dart';
 import 'package:masterstudy_app/data/repository/courses_repository.dart';
-
 import './bloc.dart';
 
 @provide
 class SearchScreenBloc extends Bloc<SearchScreenEvent, SearchScreenState> {
   final CoursesRepository _coursesRepository;
-   List<String>? _popularSearches;
-   List<CoursesBean>? _newCourses;
+  List<String>? _popularSearches;
+  List<CoursesBean>? _newCourses;
 
   SearchScreenState get initialState => InitialSearchScreenState();
 
   SearchScreenBloc(this._coursesRepository) : super(InitialSearchScreenState()) {
-    on<SearchScreenEvent>((event, emit) async => await _searchBloc(event, emit));
-  }
-
-  Future<void> _searchBloc(SearchScreenEvent event, Emitter<SearchScreenState> emit) async {
-    if (event is FetchEvent) {
+    on<FetchEvent>((event, emit) async {
       if (state is ErrorSearchScreenState) emit(InitialSearchScreenState());
       if (_popularSearches == null || _newCourses == null) {
         emit(InitialSearchScreenState());
@@ -33,6 +27,6 @@ class SearchScreenBloc extends Bloc<SearchScreenEvent, SearchScreenState> {
           emit(ErrorSearchScreenState());
         }
       }
-    }
+    });
   }
 }

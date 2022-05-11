@@ -145,6 +145,8 @@ class _SignUpPageState extends State<_SignUpPage> {
   FocusNode myFocusNode = new FocusNode();
 
   var passwordVisible = false;
+  bool enableInputsDemo = false;
+  bool enableInputs = true;
 
   @override
   void initState() {
@@ -155,15 +157,19 @@ class _SignUpPageState extends State<_SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
+    print('Demo: ${preferences!.getBool('demo')}');
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
-        var enableInputs = !(state is LoadingAuthState);
-
         if (state is SuccessAuthState) {
+            enableInputsDemo = false;
+            enableInputs = true;
           WidgetsBinding.instance?.addPostFrameCallback((_) => Navigator.pushReplacementNamed(context, MainScreen.routeName, arguments: MainScreenArgs(widget.optionsBean)));
         }
 
         if (state is ErrorAuthState) {
+            enableInputs = true;
+            enableInputsDemo = false;
+            preferences!.setBool('demo', false);
           WidgetsBinding.instance?.addPostFrameCallback((_) => showDialogError(context, state.message));
         }
 
@@ -277,6 +283,9 @@ class _SignUpPageState extends State<_SignUpPage> {
                   color: mainColor,
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
+                      setState(() {
+                        enableInputs = false;
+                      });
                       _bloc.add(
                         RegisterEvent(
                           _loginController.text,
@@ -299,9 +308,15 @@ class _SignUpPageState extends State<_SignUpPage> {
                     minWidth: double.infinity,
                     color: mainColor,
                     onPressed: () {
+                      setState(() {
+                        enableInputsDemo = true;
+                      });
+
+                      preferences!.setBool('demo', true);
+
                       _bloc.add(DemoAuthEvent());
                     },
-                    child: setUpButtonChildDemo(enableInputs),
+                    child: setUpButtonChildDemo(enableInputsDemo),
                     textColor: Colors.white,
                   ),
                 ),
@@ -363,8 +378,8 @@ class _SignUpPageState extends State<_SignUpPage> {
   }
 
   //Label in button "Demo Auth"
-  Widget setUpButtonChildDemo(enable) {
-    if (enable == true) {
+  Widget setUpButtonChildDemo(enableDemo) {
+    if (enableDemo == false) {
       return new Text(
         localizations!.getLocalization("registration_demo_button"),
         textScaleFactor: 1.0,

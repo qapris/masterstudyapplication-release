@@ -21,8 +21,8 @@ var dio = Dio();
 ///Timer
 late Timer timer;
 
-///Hive
-late SharedPreferences preferences;
+///SharedPreferences
+late SharedPreferences? preferences;
 
 ///Platforms
 AndroidDeviceInfo? androidInfo;
@@ -33,5 +33,5 @@ String? appLogoUrl;
 Directory? appDocDir;
 
 ///URL
-const BASE_URL = "http://ms.stylemix.biz";
-const String apiEndpoint = BASE_URL + "/wp-json/ms_lms/v1/";
+const BASE_URL = "https://masterstudy.stylemixthemes.com/academy";
+const String apiEndpoint = BASE_URL + "/wp-json/ms_lms/v2/";

@@ -8,16 +8,16 @@ abstract class ReviewWriteState {}
 class InitialReviewWriteState extends ReviewWriteState {}
 
 class LoadedReviewWriteState extends ReviewWriteState {
-    final Account account;
+  final Account account;
 
-    LoadedReviewWriteState(this.account);
+  LoadedReviewWriteState(this.account);
 }
 
 class ReviewResponseState extends ReviewWriteState {
-    final ReviewAddResponse reviewAddResponse;
-    final Account account;
+  final ReviewAddResponse reviewAddResponse;
+  final Account account;
 
-    ReviewResponseState(this.reviewAddResponse, this.account);
+  ReviewResponseState(this.reviewAddResponse, this.account);
 }
 
 class ErrorReviewWriteState extends ReviewWriteState {}

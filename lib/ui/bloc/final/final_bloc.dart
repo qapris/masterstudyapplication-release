@@ -16,17 +16,9 @@ class FinalBloc extends Bloc<FinalEvent, FinalState> {
   FinalState get initialState => InitialFinalState();
 
   FinalBloc(this._finalRepository, this.cacheManager) : super(InitialFinalState()) {
-    on<FinalEvent>((event, emit) async {
-      await _finalBloc(event, emit);
-    });
-  }
-
-  Future<void> _finalBloc(FinalEvent event, Emitter<FinalState> emit) async {
-    if (event is FetchEvent) {
+    on<FetchEvent>((event, emit) async {
       try {
         FinalResponse response = await _finalRepository.getCourseResults(event.courseId);
-
-        print(response);
 
         emit(LoadedFinalState(response));
       } catch (error) {
@@ -36,6 +28,6 @@ class FinalBloc extends Bloc<FinalEvent, FinalState> {
         print('Final Page Error');
         print(error);
       }
-    }
+    });
   }
 }

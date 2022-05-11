@@ -10,6 +10,7 @@ import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/screens/course/meta_icon.dart';
 import 'package:masterstudy_app/ui/screens/review_write/review_write_screen.dart';
 import 'package:masterstudy_app/ui/widgets/MeasureSizeWidget.dart';
+import 'package:masterstudy_app/ui/widgets/dialog_author.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../../../../data/utils.dart';
@@ -30,7 +31,18 @@ class _OverviewWidgetState extends State<OverviewWidget> with AutomaticKeepAlive
   bool descTextShowFlag = false;
   bool reviewTextShowFlag = false;
   bool annoncementTextShowFlag = false;
+  late bool demo;
   int reviewsListShowItems = 1;
+
+  @override
+  void initState() {
+    if(preferences!.getBool('demo') == null) {
+      demo = false;
+    }else {
+      demo = preferences!.getBool('demo');
+    }
+    super.initState();
+  }
 
   @override
   // ignore: must_call_super
@@ -68,10 +80,13 @@ class _OverviewWidgetState extends State<OverviewWidget> with AutomaticKeepAlive
                                 )
                               ],
                             ),
-                            Text(
-                              value.text,
-                              textScaleFactor: 1.0,
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                            Expanded(
+                              child: Text(
+                                value.text,
+                                textScaleFactor: 1.0,
+                                textAlign: TextAlign.end,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
                             )
                           ],
                         ),
@@ -95,10 +110,14 @@ class _OverviewWidgetState extends State<OverviewWidget> with AutomaticKeepAlive
                 minWidth: double.infinity,
                 color: mainColor,
                 onPressed: () {
-                  Navigator.of(context).pushNamed(
-                    ReviewWriteScreen.routeName,
-                    arguments: ReviewWriteScreenArgs(widget.response.id, widget.response.title),
-                  );
+                  if(demo) {
+                    showDialogError(context, 'Demo Mode');
+                  }else {
+                    Navigator.of(context).pushNamed(
+                      ReviewWriteScreen.routeName,
+                      arguments: ReviewWriteScreenArgs(widget.response.id, widget.response.title),
+                    );
+                  }
                 },
                 child: Text(
                   localizations!.getLocalization("write_review_button"),

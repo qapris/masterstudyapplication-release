@@ -16,10 +16,6 @@ class DetailProfileBloc extends Bloc<DetailProfileEvent, DetailProfileState> {
 
   DetailProfileState get initialState => InitialDetailProfileState();
 
-  DetailProfileBloc(this._repository, this._coursesRepository) : super(InitialDetailProfileState()) {
-    on<DetailProfileEvent>((event, emit) async => await _detailProfile(event, emit));
-  }
-
   Account? account;
   int? _teacherId;
 
@@ -31,8 +27,8 @@ class DetailProfileBloc extends Bloc<DetailProfileEvent, DetailProfileState> {
     _teacherId = teacherId;
   }
 
-  Future<void> _detailProfile(DetailProfileEvent event, Emitter<DetailProfileState> emit) async {
-    if (event is LoadDetailProfile) {
+  DetailProfileBloc(this._repository, this._coursesRepository) : super(InitialDetailProfileState()) {
+    on<LoadDetailProfile>((event, emit) async {
       if (account == null) {
         try {
           account = await _repository.getAccountById(_teacherId!);
@@ -45,8 +41,11 @@ class DetailProfileBloc extends Bloc<DetailProfileEvent, DetailProfileState> {
       } else {
         emit(LoadedDetailProfileState(null, false));
       }
-    }
+    });
   }
+
+
+
 
 
 }

@@ -15,7 +15,7 @@ class AppInterceptors extends Interceptor {
       //remove the auxiliary header
       options.headers.remove("requirestoken");
 
-      var header = preferences.getString("apiToken");
+      var header = preferences!.getString("apiToken");
       options.headers.addAll({"token": "$header"});
 
       return options;
@@ -27,7 +27,7 @@ class AppInterceptors extends Interceptor {
   Future<dynamic> onErrors(DioError err) async {
     if (err.response != null && err.response?.statusCode != null && err.response?.statusCode == 401) {
       (await CacheManager()).cleanCache();
-      preferences.setString("apiToken", "");
+      preferences!.setString("apiToken", "");
       navigatorKey.currentState?.pushNamed(SplashScreen.routeName);
     }
     return err;

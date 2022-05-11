@@ -1,5 +1,4 @@
 import 'package:masterstudy_app/data/models/LessonResponse.dart';
-import 'package:masterstudy_app/data/models/QuizResponse.dart';
 import 'package:meta/meta.dart';
 
 @immutable

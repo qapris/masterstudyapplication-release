@@ -16,7 +16,6 @@ class QuestionDetailsBloc extends Bloc<QuestionDetailsEvent, QuestionDetailsStat
   QuestionDetailsState get initialState => InitialQuestionDetailsState();
 
   QuestionDetailsBloc(this._questionsRepository) : super(InitialQuestionDetailsState()) {
-
     on<FetchEvent>((event, emit) async {
       emit(LoadedQuestionDetailsState());
     });

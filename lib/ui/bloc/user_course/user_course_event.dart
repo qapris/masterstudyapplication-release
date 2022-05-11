@@ -1,4 +1,3 @@
-import 'package:masterstudy_app/data/models/user_course.dart';
 import 'package:masterstudy_app/ui/screens/user_course/user_course.dart';
 import 'package:meta/meta.dart';
 
