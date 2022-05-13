@@ -8,7 +8,7 @@ part 'account.g.dart';
 class Account {
   num id;
   String login;
-  String avatar;
+  dynamic avatar;
   String? avatar_url;
   String email;
   String url;
@@ -20,7 +20,7 @@ class Account {
   Account(
       {required this.id,
       required this.login,
-      required this.avatar,
+        this.avatar,
       required this.avatar_url,
       required this.email,
       required this.url,

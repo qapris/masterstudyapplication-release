@@ -346,7 +346,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
                                               child: CircleAvatar(
                                                 backgroundImage: NetworkImage(
                                                   (state is LoadedCourseState)
-                                                      ? state.courseDetailResponse.author?.avatar_url
+                                                      ? state.courseDetailResponse.author?.avatar_url ?? 'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png'
                                                       : 'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png',
                                                 ),
                                               ),
@@ -630,7 +630,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
 
   _buildPrice(CourseState state) {
     if (state is LoadedCourseState) {
-      var userSubscriptions = state.userPlans.subscriptions;
+      var userSubscriptions = state.userPlans?.subscriptions ?? [];
       if (state.courseDetailResponse.has_access == false) {
         if (state.courseDetailResponse.price?.free ?? false) {
           var dialog;

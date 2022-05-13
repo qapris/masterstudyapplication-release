@@ -17,9 +17,9 @@ class OpenPurchaseState extends CourseState {
 class LoadedCourseState extends CourseState {
   final CourseDetailResponse courseDetailResponse;
   final ReviewResponse reviewResponse;
-  final UserPlansResponse userPlans;
+  final UserPlansResponse? userPlans;
 
-  LoadedCourseState(this.courseDetailResponse, this.reviewResponse, this.userPlans);
+  LoadedCourseState(this.courseDetailResponse, this.reviewResponse, {this.userPlans});
 }
 
 class OpenPurchaseDialogState extends CourseState {

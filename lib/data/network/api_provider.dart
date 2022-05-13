@@ -373,14 +373,18 @@ class UserApiProvider {
   }
 
   //getUserPlans
-  Future<UserPlansResponse> getUserPlans(int courseId) async {
+  Future<UserPlansResponse?> getUserPlans(int courseId) async {
     Response response = await dio.post(apiEndpoint + "user_plans",
         data: {'course_id': courseId},
         options: Options(
           headers: {"requirestoken": "true"},
         ));
 
-    return UserPlansResponse.fromJson(response.data);
+    if(response.data.isEmpty) {
+      return null;
+    }else {
+      return UserPlansResponse.fromJson(response.data);
+    }
   }
 
   //getPlans
