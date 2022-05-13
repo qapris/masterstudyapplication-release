@@ -7,7 +7,7 @@ import 'package:masterstudy_app/data/network/api_provider.dart';
 import '../models/purchase/AllPlansResponse.dart';
 
 abstract class PurchaseRepository {
-  Future<UserPlansResponse> getUserPlans(int courseId);
+  Future<UserPlansResponse?> getUserPlans(int courseId);
 
   Future<List<AllPlansBean>> getPlans({int courseId});
 
@@ -24,7 +24,7 @@ class PurchaseRepositoryImpl extends PurchaseRepository {
   PurchaseRepositoryImpl(this._apiProvider);
 
   @override
-  Future<UserPlansResponse> getUserPlans(int courseId) {
+  Future<UserPlansResponse?> getUserPlans(int courseId) {
     return _apiProvider.getUserPlans(courseId);
   }
 

@@ -79,23 +79,24 @@ class PurchaseDialogState extends State<PurchaseDialog> {
       );
     }
 
-    if (state.userPlans.subscriptions.isNotEmpty && _haveValidPlan(state.userPlans)) {
-      state.userPlans.subscriptions.forEach((value) {
-        list.add(_buildPriceItem((selectedId == int.parse(value!.subscription_id)), localizations!.getLocalization("enroll_with_membership"), value.name, value.quotas_left, () {
-          setState(() {
-            selectedId = int.parse(value.subscription_id);
-          });
-        }));
-      });
-    } else if (_bloc.availablePlans.isNotEmpty) {
-
-      _bloc.availablePlans.forEach((value) {
-        list.add(_buildPriceItem((selectedId == int.parse(value.id)), "${localizations!.getLocalization("available_in_plan")} \"${value.name}\"", value.name, value.quotas_left, () {
-          setState(() {
-            selectedId = int.parse(value.id);
-          });
-        }));
-      });
+    if(state.userPlans != null) {
+      if (state.userPlans!.subscriptions.isNotEmpty && _haveValidPlan(state.userPlans!)) {
+        state.userPlans!.subscriptions.forEach((value) {
+          list.add(_buildPriceItem((selectedId == int.parse(value!.subscription_id)), localizations!.getLocalization("enroll_with_membership"), value.name, value.quotas_left, () {
+            setState(() {
+              selectedId = int.parse(value.subscription_id);
+            });
+          }));
+        });
+      } else if (_bloc.availablePlans.isNotEmpty) {
+        _bloc.availablePlans.forEach((value) {
+          list.add(_buildPriceItem((selectedId == int.parse(value.id)), "${localizations!.getLocalization("available_in_plan")} \"${value.name}\"", value.name, value.quotas_left, () {
+            setState(() {
+              selectedId = int.parse(value.id);
+            });
+          }));
+        });
+      }
     }
 
     //Button "Select"
@@ -106,12 +107,12 @@ class PurchaseDialogState extends State<PurchaseDialog> {
           minWidth: double.infinity,
           color: mainColor,
           onPressed: () async {
-            if (state is LoadedCourseState && state.userPlans.subscriptions.isNotEmpty) {
+            if (state is LoadedCourseState && state.userPlans!.subscriptions.isNotEmpty) {
               _bloc.add(PaymentSelectedEvent(selectedId, state.courseDetailResponse.id));
               Navigator.pop(context);
             } else {
               if (selectedId != -1) {
-                if(state.userPlans.other_subscriptions) {
+                if(state.userPlans!.other_subscriptions) {
                   _warningDialog();
                 }else {
                   await launch('${courseToken}&payment=$selectedId').then((value) {

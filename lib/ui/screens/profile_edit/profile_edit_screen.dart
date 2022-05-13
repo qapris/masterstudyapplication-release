@@ -154,7 +154,12 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
   _buildBody(state, avatar_url) {
     enableInputs = !(state is LoadingEditProfileState);
     Widget image;
-    String userRole = _bloc.account.roles[0];
+    String userRole = '';
+    if(_bloc.account.roles.isEmpty) {
+       userRole = 'subscriber';
+    }else {
+       userRole = _bloc.account.roles[0];
+    }
     final Widget svg = SvgPicture.asset(
       "assets/icons/file_icon.svg",
       color: Colors.white,

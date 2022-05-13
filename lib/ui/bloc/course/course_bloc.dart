@@ -96,7 +96,7 @@ class CourseBloc extends Bloc<CourseEvent, CourseState> {
 
       availablePlans = await _purchaseRepository.getPlans(courseId: courseId);
 
-      emit(LoadedCourseState(courseDetailResponse!, reviews, plans));
+      emit(LoadedCourseState(courseDetailResponse!, reviews, userPlans: plans));
     } catch (e, s) {
       print(e);
       print(s);
