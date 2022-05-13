@@ -64,10 +64,10 @@ class _FavoritesScreenWidgetState extends State<_FavoritesScreenWidget> {
             if (state is LoadedFavoritesState) {
               return Padding(
                 padding: const EdgeInsets.only(left: 16.0, right: 16),
-                child: StaggeredGridView.countBuilder(
-                  crossAxisCount: 4,
-                  // I only need two card horizontally
-                  padding: const EdgeInsets.all(2.0),
+                child: AlignedGridView.count(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 4,
+                  crossAxisSpacing: 4,
                   itemCount: state.favoriteCourses.length,
                   itemBuilder: (context, index) {
                     var item = state.favoriteCourses[index];
@@ -115,13 +115,10 @@ class _FavoritesScreenWidgetState extends State<_FavoritesScreenWidget> {
                       ),
                     );
                   },
-                  //Here is the place that we are getting flexible/ dynamic card for various images
-                  staggeredTileBuilder: (_) => StaggeredTile.fit(2),
-                  mainAxisSpacing: 4.0,
-                  crossAxisSpacing: 4.0, // add some space
                 ),
               );
             }
+
             if (state is InitialFavoritesState) {
               return Center(
                 child: CircularProgressIndicator(),

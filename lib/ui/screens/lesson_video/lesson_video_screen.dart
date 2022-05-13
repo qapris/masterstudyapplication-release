@@ -214,31 +214,31 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
           (widget.hasPreview)
               ? Center()
               : SizedBox(
-            width: 40,
-            height: 40,
-            child: ElevatedButton(
-              style: ButtonStyle(
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
-                ),
-                padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.zero),
-                backgroundColor: MaterialStateProperty.all(HexColor.fromHex("#3E4555")),
-              ),
-              onPressed: () {
-                Navigator.of(context).pushNamed(
-                  QuestionsScreen.routeName,
-                  arguments: QuestionsScreenArgs(widget.lessonId, 1),
-                );
-              },
-              child: SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: SvgPicture.asset(
-                    "assets/icons/question_icon.svg",
-                    color: Colors.white,
-                  )),
-            ),
-          )
+                  width: 40,
+                  height: 40,
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
+                      ),
+                      padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.zero),
+                      backgroundColor: MaterialStateProperty.all(HexColor.fromHex("#3E4555")),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(
+                        QuestionsScreen.routeName,
+                        arguments: QuestionsScreenArgs(widget.lessonId, 1),
+                      );
+                    },
+                    child: SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: SvgPicture.asset(
+                          "assets/icons/question_icon.svg",
+                          color: Colors.white,
+                        )),
+                  ),
+                )
         ],
       );
     }
@@ -276,59 +276,59 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
                 padding: EdgeInsets.only(top: 10.0, right: 7.0, bottom: 0.0, left: 7.0),
                 child: (item.video != "")
                     ? Container(
-                  height: 211.0,
-                  child: Stack(
-                    children: <Widget>[
-                      //Background Photo of Video
-                      Container(
-                        width: MediaQuery.of(context).size.width,
                         height: 211.0,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            fit: BoxFit.fill,
-                            image: NetworkImage(item.video_poster),
-                          ),
-                        ),
-                      ),
-                      //Button "Play Video"
-                      Align(
-                        alignment: Alignment.center,
-                        child: SizedBox(
-                          width: 1600,
-                          height: 50,
-                          child: Container(
-                            decoration: new BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black,
-                                  blurRadius: 10,
-                                  // has the effect of softening the shadow
-                                  spreadRadius: -2,
-                                  // has the effect of extending the shadow
-                                  offset: Offset(
-                                    0,
-                                    // horizontal, move right 10
-                                    12.0, // vertical, move down 10
-                                  ),
-                                )
-                              ],
+                        child: Stack(
+                          children: <Widget>[
+                            //Background Photo of Video
+                            Container(
+                              width: MediaQuery.of(context).size.width,
+                              height: 211.0,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  fit: BoxFit.fill,
+                                  image: NetworkImage(item.video_poster),
+                                ),
+                              ),
                             ),
                             //Button "Play Video"
-                            child: ElevatedButton(
-                              style: ButtonStyle(
-                                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
-                                ),
-                                padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.zero),
-                                backgroundColor: MaterialStateProperty.all(HexColor.fromHex("#D7143A")),
-                              ),
-                              onPressed: () async {
-                                Navigator.of(context).pushNamed(
-                                  VideoScreen.routeName,
-                                  arguments: VideoScreenArgs(item.title, item.video),
-                                );
-                                //_buildVideoPopup(state);
-                                /*if (Platform.isIOS) {
+                            Align(
+                              alignment: Alignment.center,
+                              child: SizedBox(
+                                width: 1600,
+                                height: 50,
+                                child: Container(
+                                  decoration: new BoxDecoration(
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black,
+                                        blurRadius: 10,
+                                        // has the effect of softening the shadow
+                                        spreadRadius: -2,
+                                        // has the effect of extending the shadow
+                                        offset: Offset(
+                                          0,
+                                          // horizontal, move right 10
+                                          12.0, // vertical, move down 10
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  //Button "Play Video"
+                                  child: ElevatedButton(
+                                    style: ButtonStyle(
+                                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                        RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+                                      ),
+                                      padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.zero),
+                                      backgroundColor: MaterialStateProperty.all(HexColor.fromHex("#D7143A")),
+                                    ),
+                                    onPressed: () async {
+                                      Navigator.of(context).pushNamed(
+                                        VideoScreen.routeName,
+                                        arguments: VideoScreenArgs(item.title, item.video),
+                                      );
+                                      //_buildVideoPopup(state);
+                                      /*if (Platform.isIOS) {
                                             _launchURL(item.video);
                                           } else {
                                             Navigator.of(context).pushNamed(
@@ -336,32 +336,32 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
                                               arguments: VideoScreenArgs(item.title, item.video),
                                             );
                                           }*/
-                              },
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: EdgeInsets.only(left: 0, right: 4.0),
-                                    child: Icon(
-                                      Icons.play_arrow,
-                                      color: Colors.white,
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 0, right: 4.0),
+                                          child: Icon(
+                                            Icons.play_arrow,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        Text(
+                                          localizations!.getLocalization("play_video_button"),
+                                          textScaleFactor: 1.0,
+                                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 14.0),
+                                        )
+                                      ],
                                     ),
                                   ),
-                                  Text(
-                                    localizations!.getLocalization("play_video_button"),
-                                    textScaleFactor: 1.0,
-                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 14.0),
-                                  )
-                                ],
+                                ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                )
+                      )
                     : const SizedBox()),
             //WebView
             Expanded(
@@ -389,11 +389,13 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
               ),
             ),
             //Materials "Text"
-            Text(
-              localizations!.getLocalization("materials"),
-              textScaleFactor: 1.0,
-              style: TextStyle(color: HexColor.fromHex("#FFFFFF"), fontSize: 24, fontWeight: FontWeight.w700),
-            ),
+            state.lessonResponse.materials.isNotEmpty
+                ? Text(
+                    localizations!.getLocalization("materials"),
+                    textScaleFactor: 1.0,
+                    style: TextStyle(color: HexColor.fromHex("#FFFFFF"), fontSize: 24, fontWeight: FontWeight.w700),
+                  )
+                : const SizedBox(),
             //Materials
             ListView.builder(
                 shrinkWrap: true,
@@ -487,122 +489,119 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
                         IconButton(
                           onPressed: isLoading
                               ? () {
-                            log('1'.toString());
-                          }
-                              : () async {
-                            var cyrillicSymbols = RegExp('[а-яёА-ЯЁ]');
-                            bool isSymbols = cyrillicSymbols.hasMatch(item.url);
-                            String? dir;
-
-                            if (Platform.isAndroid) {
-                              dir = (await ExternalPath.getExternalStoragePublicDirectory(ExternalPath.DIRECTORY_DOWNLOADS));
-                            } else if (Platform.isIOS) {
-                              dir = (await getApplicationDocumentsDirectory()).path;
-                            }
-
-                            if (item.url.toString().contains('jpeg') || item.url.toString().contains('png') || item.url.toString().contains('jpg')) {
-                              if (Platform.isIOS && isSymbols) {
-                                AlertDialog alert = AlertDialog(
-                                  title: Text('Error image', textScaleFactor: 1.0, style: TextStyle(color: Colors.black, fontSize: 20.0)),
-                                  content: Text(
-                                    "Photo format error",
-                                    textScaleFactor: 1.0,
-                                  ),
-                                  actions: [
-                                    ElevatedButton(
-                                      child: Text(
-                                        'Ok',
-                                        textScaleFactor: 1.0,
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        primary: Colors.white,
-                                      ),
-                                    )
-                                  ],
-                                );
-
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return alert;
-                                  },
-                                );
-                              } else {
-                                setState(() {
-                                  isLoadingImg = true;
-                                  progressMapImg!['item_url'] = item.url;
-                                });
-
-                                var imageId = await ImageDownloader.downloadImage(item.url);
-
-                                if (imageId == null) {
-                                  return print('Error');
+                                  log('1'.toString());
                                 }
-                              }
-                            } else {
-                              setState(() {
-                                isLoading = true;
-                                progressMap!['item_url'] = item.url;
-                              });
+                              : () async {
+                                  var cyrillicSymbols = RegExp('[а-яёА-ЯЁ]');
+                                  bool isSymbols = cyrillicSymbols.hasMatch(item.url);
+                                  String? dir;
 
-                              String fileName = item.url.substring(item.url.lastIndexOf("/") + 1);
+                                  if (Platform.isAndroid) {
+                                    dir = (await ExternalPath.getExternalStoragePublicDirectory(ExternalPath.DIRECTORY_DOWNLOADS));
+                                  } else if (Platform.isIOS) {
+                                    dir = (await getApplicationDocumentsDirectory()).path;
+                                  }
 
-                              String fullPath = dir! + '/$fileName';
+                                  if (item.url.toString().contains('jpeg') || item.url.toString().contains('png') || item.url.toString().contains('jpg')) {
+                                    if (Platform.isIOS && isSymbols) {
+                                      AlertDialog alert = AlertDialog(
+                                        title: Text('Error image', textScaleFactor: 1.0, style: TextStyle(color: Colors.black, fontSize: 20.0)),
+                                        content: Text(
+                                          "Photo format error",
+                                          textScaleFactor: 1.0,
+                                        ),
+                                        actions: [
+                                          ElevatedButton(
+                                            child: Text(
+                                              'Ok',
+                                              textScaleFactor: 1.0,
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              primary: Colors.white,
+                                            ),
+                                          )
+                                        ],
+                                      );
 
-                              Response response = await dio.get(
-                                item.url,
-                                onReceiveProgress: (received, total) {
-                                  setState(() {
-                                    progress = ((received / total * 100).toStringAsFixed(0) + '%');
-                                  });
-                                  progressMap!.addParam('progress', progress);
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return alert;
+                                        },
+                                      );
+                                    } else {
+                                      setState(() {
+                                        isLoadingImg = true;
+                                        progressMapImg!['item_url'] = item.url;
+                                      });
+
+                                      var imageId = await ImageDownloader.downloadImage(item.url);
+
+                                      if (imageId == null) {
+                                        return print('Error');
+                                      }
+                                    }
+                                  } else {
+                                    setState(() {
+                                      isLoading = true;
+                                      progressMap!['item_url'] = item.url;
+                                    });
+
+                                    String fileName = item.url.substring(item.url.lastIndexOf("/") + 1);
+
+                                    String fullPath = dir! + '/$fileName';
+
+                                    Response response = await dio.get(
+                                      item.url,
+                                      onReceiveProgress: (received, total) {
+                                        setState(() {
+                                          progress = ((received / total * 100).toStringAsFixed(0) + '%');
+                                        });
+                                        progressMap!.addParam('progress', progress);
+                                      },
+
+                                      //Received data with List<int>
+                                      options: Options(
+                                        responseType: ResponseType.bytes,
+                                        followRedirects: false,
+                                      ),
+                                    );
+
+                                    File file = File(fullPath);
+                                    var raf = file.openSync(mode: FileMode.write);
+                                    raf.writeFromSync(response.data);
+                                    await raf.close();
+
+                                    if (mounted) {
+                                      setState(() {
+                                        isLoading = false;
+                                      });
+                                    }
+                                  }
                                 },
-
-                                //Received data with List<int>
-                                options: Options(
-                                  responseType: ResponseType.bytes,
-                                  followRedirects: false,
-                                ),
-                              );
-
-                              File file = File(fullPath);
-                              var raf = file.openSync(mode: FileMode.write);
-                              raf.writeFromSync(response.data);
-                              await raf.close();
-
-                              if (mounted) {
-                                setState(() {
-                                  isLoading = false;
-                                });
-                              }
-                            }
-                          },
                           icon: isLoadingImg && item.url == progressMapImg!['item_url'] || isLoading && item.url == progressMap!['item_url']
                               ? SizedBox(
-                            width: 25,
-                            height: 25,
-                            child: CircularProgressIndicator(
-                              valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          )
+                                  width: 25,
+                                  height: 25,
+                                  child: CircularProgressIndicator(
+                                    valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
+                                  ),
+                                )
                               : Icon(
-                            _progressImg == 100 && item.url == progressMapImg!['item_url'] || progress == '${100}%' && item.url == progressMap!['item_url'] ? Icons.check : Icons.download,
-                            color: Colors.white,
-                          ),
+                                  _progressImg == 100 && item.url == progressMapImg!['item_url'] || progress == '${100}%' && item.url == progressMap!['item_url'] ? Icons.check : Icons.download,
+                                  color: Colors.white,
+                                ),
                         ),
                       ],
                     ),
                   );
                 })
-
-
-
           ],
         );
       }
@@ -616,7 +615,7 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
   }
 
   ///Web Content
-  _buildWebContent(String content,state) {
+  _buildWebContent(String content, state) {
     return Column(
       children: [
         Expanded(
@@ -745,114 +744,114 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
                       IconButton(
                         onPressed: isLoading
                             ? () {
-                          log('1'.toString());
-                        }
-                            : () async {
-                          var cyrillicSymbols = RegExp('[а-яёА-ЯЁ]');
-                          bool isSymbols = cyrillicSymbols.hasMatch(item.url);
-                          String? dir;
-
-                          if (Platform.isAndroid) {
-                            dir = (await ExternalPath.getExternalStoragePublicDirectory(ExternalPath.DIRECTORY_DOWNLOADS));
-                          } else if (Platform.isIOS) {
-                            dir = (await getApplicationDocumentsDirectory()).path;
-                          }
-
-                          if (item.url.toString().contains('jpeg') || item.url.toString().contains('png') || item.url.toString().contains('jpg')) {
-                            if (Platform.isIOS && isSymbols) {
-                              AlertDialog alert = AlertDialog(
-                                title: Text('Error image', textScaleFactor: 1.0, style: TextStyle(color: Colors.black, fontSize: 20.0)),
-                                content: Text(
-                                  "Photo format error",
-                                  textScaleFactor: 1.0,
-                                ),
-                                actions: [
-                                  ElevatedButton(
-                                    child: Text(
-                                      'Ok',
-                                      textScaleFactor: 1.0,
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      primary: Colors.white,
-                                    ),
-                                  )
-                                ],
-                              );
-
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return alert;
-                                },
-                              );
-                            } else {
-                              setState(() {
-                                isLoadingImg = true;
-                                progressMapImg!['item_url'] = item.url;
-                              });
-
-                              var imageId = await ImageDownloader.downloadImage(item.url);
-
-                              if (imageId == null) {
-                                return print('Error');
+                                log('1'.toString());
                               }
-                            }
-                          } else {
-                            setState(() {
-                              isLoading = true;
-                              progressMap!['item_url'] = item.url;
-                            });
+                            : () async {
+                                var cyrillicSymbols = RegExp('[а-яёА-ЯЁ]');
+                                bool isSymbols = cyrillicSymbols.hasMatch(item.url);
+                                String? dir;
 
-                            String fileName = item.url.substring(item.url.lastIndexOf("/") + 1);
+                                if (Platform.isAndroid) {
+                                  dir = (await ExternalPath.getExternalStoragePublicDirectory(ExternalPath.DIRECTORY_DOWNLOADS));
+                                } else if (Platform.isIOS) {
+                                  dir = (await getApplicationDocumentsDirectory()).path;
+                                }
 
-                            String fullPath = dir! + '/$fileName';
+                                if (item.url.toString().contains('jpeg') || item.url.toString().contains('png') || item.url.toString().contains('jpg')) {
+                                  if (Platform.isIOS && isSymbols) {
+                                    AlertDialog alert = AlertDialog(
+                                      title: Text('Error image', textScaleFactor: 1.0, style: TextStyle(color: Colors.black, fontSize: 20.0)),
+                                      content: Text(
+                                        "Photo format error",
+                                        textScaleFactor: 1.0,
+                                      ),
+                                      actions: [
+                                        ElevatedButton(
+                                          child: Text(
+                                            'Ok',
+                                            textScaleFactor: 1.0,
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            primary: Colors.white,
+                                          ),
+                                        )
+                                      ],
+                                    );
 
-                            Response response = await dio.get(
-                              item.url,
-                              onReceiveProgress: (received, total) {
-                                setState(() {
-                                  progress = ((received / total * 100).toStringAsFixed(0) + '%');
-                                });
-                                progressMap!.addParam('progress', progress);
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return alert;
+                                      },
+                                    );
+                                  } else {
+                                    setState(() {
+                                      isLoadingImg = true;
+                                      progressMapImg!['item_url'] = item.url;
+                                    });
+
+                                    var imageId = await ImageDownloader.downloadImage(item.url);
+
+                                    if (imageId == null) {
+                                      return print('Error');
+                                    }
+                                  }
+                                } else {
+                                  setState(() {
+                                    isLoading = true;
+                                    progressMap!['item_url'] = item.url;
+                                  });
+
+                                  String fileName = item.url.substring(item.url.lastIndexOf("/") + 1);
+
+                                  String fullPath = dir! + '/$fileName';
+
+                                  Response response = await dio.get(
+                                    item.url,
+                                    onReceiveProgress: (received, total) {
+                                      setState(() {
+                                        progress = ((received / total * 100).toStringAsFixed(0) + '%');
+                                      });
+                                      progressMap!.addParam('progress', progress);
+                                    },
+
+                                    //Received data with List<int>
+                                    options: Options(
+                                      responseType: ResponseType.bytes,
+                                      followRedirects: false,
+                                    ),
+                                  );
+
+                                  File file = File(fullPath);
+                                  var raf = file.openSync(mode: FileMode.write);
+                                  raf.writeFromSync(response.data);
+                                  await raf.close();
+
+                                  if (mounted) {
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+                                  }
+                                }
                               },
-
-                              //Received data with List<int>
-                              options: Options(
-                                responseType: ResponseType.bytes,
-                                followRedirects: false,
-                              ),
-                            );
-
-                            File file = File(fullPath);
-                            var raf = file.openSync(mode: FileMode.write);
-                            raf.writeFromSync(response.data);
-                            await raf.close();
-
-                            if (mounted) {
-                              setState(() {
-                                isLoading = false;
-                              });
-                            }
-                          }
-                        },
                         icon: isLoadingImg && item.url == progressMapImg!['item_url'] || isLoading && item.url == progressMap!['item_url']
                             ? SizedBox(
-                          width: 25,
-                          height: 25,
-                          child: CircularProgressIndicator(
-                            valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        )
+                                width: 25,
+                                height: 25,
+                                child: CircularProgressIndicator(
+                                  valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
+                                ),
+                              )
                             : Icon(
-                          _progressImg == 100 && item.url == progressMapImg!['item_url'] || progress == '${100}%' && item.url == progressMap!['item_url'] ? Icons.check : Icons.download,
-                          color: Colors.white,
-                        ),
+                                _progressImg == 100 && item.url == progressMapImg!['item_url'] || progress == '${100}%' && item.url == progressMap!['item_url'] ? Icons.check : Icons.download,
+                                color: Colors.white,
+                              ),
                       ),
                     ],
                   ),
@@ -861,7 +860,6 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
         )
 
         // if (_connectionStatus == ConnectivityResult.wifi || _connectionStatus == ConnectivityResult.mobile) _buildMaterialsContent(state) else SizedBox(),
-
       ],
     );
   }
@@ -972,114 +970,114 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
                       IconButton(
                         onPressed: isLoading
                             ? () {
-                          log('1'.toString());
-                        }
-                            : () async {
-                          var cyrillicSymbols = RegExp('[а-яёА-ЯЁ]');
-                          bool isSymbols = cyrillicSymbols.hasMatch(item.url);
-                          String? dir;
-
-                          if (Platform.isAndroid) {
-                            dir = (await ExternalPath.getExternalStoragePublicDirectory(ExternalPath.DIRECTORY_DOWNLOADS));
-                          } else if (Platform.isIOS) {
-                            dir = (await getApplicationDocumentsDirectory()).path;
-                          }
-
-                          if (item.url.toString().contains('jpeg') || item.url.toString().contains('png') || item.url.toString().contains('jpg')) {
-                            if (Platform.isIOS && isSymbols) {
-                              AlertDialog alert = AlertDialog(
-                                title: Text('Error image', textScaleFactor: 1.0, style: TextStyle(color: Colors.black, fontSize: 20.0)),
-                                content: Text(
-                                  "Photo format error",
-                                  textScaleFactor: 1.0,
-                                ),
-                                actions: [
-                                  ElevatedButton(
-                                    child: Text(
-                                      'Ok',
-                                      textScaleFactor: 1.0,
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      primary: Colors.white,
-                                    ),
-                                  )
-                                ],
-                              );
-
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return alert;
-                                },
-                              );
-                            } else {
-                              setState(() {
-                                isLoadingImg = true;
-                                progressMapImg!['item_url'] = item.url;
-                              });
-
-                              var imageId = await ImageDownloader.downloadImage(item.url);
-
-                              if (imageId == null) {
-                                return print('Error');
+                                log('1'.toString());
                               }
-                            }
-                          } else {
-                            setState(() {
-                              isLoading = true;
-                              progressMap!['item_url'] = item.url;
-                            });
+                            : () async {
+                                var cyrillicSymbols = RegExp('[а-яёА-ЯЁ]');
+                                bool isSymbols = cyrillicSymbols.hasMatch(item.url);
+                                String? dir;
 
-                            String fileName = item.url.substring(item.url.lastIndexOf("/") + 1);
+                                if (Platform.isAndroid) {
+                                  dir = (await ExternalPath.getExternalStoragePublicDirectory(ExternalPath.DIRECTORY_DOWNLOADS));
+                                } else if (Platform.isIOS) {
+                                  dir = (await getApplicationDocumentsDirectory()).path;
+                                }
 
-                            String fullPath = dir! + '/$fileName';
+                                if (item.url.toString().contains('jpeg') || item.url.toString().contains('png') || item.url.toString().contains('jpg')) {
+                                  if (Platform.isIOS && isSymbols) {
+                                    AlertDialog alert = AlertDialog(
+                                      title: Text('Error image', textScaleFactor: 1.0, style: TextStyle(color: Colors.black, fontSize: 20.0)),
+                                      content: Text(
+                                        "Photo format error",
+                                        textScaleFactor: 1.0,
+                                      ),
+                                      actions: [
+                                        ElevatedButton(
+                                          child: Text(
+                                            'Ok',
+                                            textScaleFactor: 1.0,
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            primary: Colors.white,
+                                          ),
+                                        )
+                                      ],
+                                    );
 
-                            Response response = await dio.get(
-                              item.url,
-                              onReceiveProgress: (received, total) {
-                                setState(() {
-                                  progress = ((received / total * 100).toStringAsFixed(0) + '%');
-                                });
-                                progressMap!.addParam('progress', progress);
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return alert;
+                                      },
+                                    );
+                                  } else {
+                                    setState(() {
+                                      isLoadingImg = true;
+                                      progressMapImg!['item_url'] = item.url;
+                                    });
+
+                                    var imageId = await ImageDownloader.downloadImage(item.url);
+
+                                    if (imageId == null) {
+                                      return print('Error');
+                                    }
+                                  }
+                                } else {
+                                  setState(() {
+                                    isLoading = true;
+                                    progressMap!['item_url'] = item.url;
+                                  });
+
+                                  String fileName = item.url.substring(item.url.lastIndexOf("/") + 1);
+
+                                  String fullPath = dir! + '/$fileName';
+
+                                  Response response = await dio.get(
+                                    item.url,
+                                    onReceiveProgress: (received, total) {
+                                      setState(() {
+                                        progress = ((received / total * 100).toStringAsFixed(0) + '%');
+                                      });
+                                      progressMap!.addParam('progress', progress);
+                                    },
+
+                                    //Received data with List<int>
+                                    options: Options(
+                                      responseType: ResponseType.bytes,
+                                      followRedirects: false,
+                                    ),
+                                  );
+
+                                  File file = File(fullPath);
+                                  var raf = file.openSync(mode: FileMode.write);
+                                  raf.writeFromSync(response.data);
+                                  await raf.close();
+
+                                  if (mounted) {
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+                                  }
+                                }
                               },
-
-                              //Received data with List<int>
-                              options: Options(
-                                responseType: ResponseType.bytes,
-                                followRedirects: false,
-                              ),
-                            );
-
-                            File file = File(fullPath);
-                            var raf = file.openSync(mode: FileMode.write);
-                            raf.writeFromSync(response.data);
-                            await raf.close();
-
-                            if (mounted) {
-                              setState(() {
-                                isLoading = false;
-                              });
-                            }
-                          }
-                        },
                         icon: isLoadingImg && item.url == progressMapImg!['item_url'] || isLoading && item.url == progressMap!['item_url']
                             ? SizedBox(
-                          width: 25,
-                          height: 25,
-                          child: CircularProgressIndicator(
-                            valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        )
+                                width: 25,
+                                height: 25,
+                                child: CircularProgressIndicator(
+                                  valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),
+                                ),
+                              )
                             : Icon(
-                          _progressImg == 100 && item.url == progressMapImg!['item_url'] || progress == '${100}%' && item.url == progressMap!['item_url'] ? Icons.check : Icons.download,
-                          color: Colors.white,
-                        ),
+                                _progressImg == 100 && item.url == progressMapImg!['item_url'] || progress == '${100}%' && item.url == progressMap!['item_url'] ? Icons.check : Icons.download,
+                                color: Colors.white,
+                              ),
                       ),
                     ],
                   ),
@@ -1111,50 +1109,50 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
                 height: 35,
                 child: (state.lessonResponse.prev_lesson != "")
                     ? FlatButton(
-                  shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0), side: BorderSide(color: HexColor.fromHex("#306ECE"))),
-                  onPressed: () {
-                    switch (state.lessonResponse.prev_lesson_type) {
-                      case "video":
-                        Navigator.of(context).pushReplacementNamed(
-                          LessonVideoScreen.routeName,
-                          arguments:
-                          LessonVideoScreenArgs(widget.courseId, int.tryParse(state.lessonResponse.prev_lesson)!, widget.authorAva, widget.authorName, widget.hasPreview, widget.trial),
-                        );
-                        break;
-                      case "quiz":
-                        Navigator.of(context).pushReplacementNamed(
-                          QuizLessonScreen.routeName,
-                          arguments: QuizLessonScreenArgs(widget.courseId, int.tryParse(state.lessonResponse.prev_lesson)!, widget.authorAva, widget.authorName),
-                        );
-                        break;
-                      case "assignment":
-                        Navigator.of(context).pushReplacementNamed(
-                          AssignmentScreen.routeName,
-                          arguments: AssignmentScreenArgs(widget.courseId, int.tryParse(state.lessonResponse.prev_lesson)!, widget.authorAva, widget.authorName),
-                        );
-                        break;
-                      case "stream":
-                        Navigator.of(context).pushReplacementNamed(
-                          LessonStreamScreen.routeName,
-                          arguments: LessonStreamScreenArgs(widget.courseId, int.tryParse(state.lessonResponse.prev_lesson)!, widget.authorAva, widget.authorName),
-                        );
-                        break;
-                      default:
-                        Navigator.of(context).pushReplacementNamed(
-                          TextLessonScreen.routeName,
-                          arguments: TextLessonScreenArgs(widget.courseId, int.tryParse(state.lessonResponse.prev_lesson)!, widget.authorAva, widget.authorName, widget.hasPreview, widget.trial),
-                        );
-                    }
-                  },
-                  padding: EdgeInsets.all(0.0),
-                  color: mainColor,
-                  hoverColor: secondColor,
-                  focusColor: secondColor,
-                  child: Icon(
-                    Icons.chevron_left,
-                    color: HexColor.fromHex("#273044"),
-                  ),
-                )
+                        shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0), side: BorderSide(color: HexColor.fromHex("#306ECE"))),
+                        onPressed: () {
+                          switch (state.lessonResponse.prev_lesson_type) {
+                            case "video":
+                              Navigator.of(context).pushReplacementNamed(
+                                LessonVideoScreen.routeName,
+                                arguments:
+                                    LessonVideoScreenArgs(widget.courseId, int.tryParse(state.lessonResponse.prev_lesson)!, widget.authorAva, widget.authorName, widget.hasPreview, widget.trial),
+                              );
+                              break;
+                            case "quiz":
+                              Navigator.of(context).pushReplacementNamed(
+                                QuizLessonScreen.routeName,
+                                arguments: QuizLessonScreenArgs(widget.courseId, int.tryParse(state.lessonResponse.prev_lesson)!, widget.authorAva, widget.authorName),
+                              );
+                              break;
+                            case "assignment":
+                              Navigator.of(context).pushReplacementNamed(
+                                AssignmentScreen.routeName,
+                                arguments: AssignmentScreenArgs(widget.courseId, int.tryParse(state.lessonResponse.prev_lesson)!, widget.authorAva, widget.authorName),
+                              );
+                              break;
+                            case "stream":
+                              Navigator.of(context).pushReplacementNamed(
+                                LessonStreamScreen.routeName,
+                                arguments: LessonStreamScreenArgs(widget.courseId, int.tryParse(state.lessonResponse.prev_lesson)!, widget.authorAva, widget.authorName),
+                              );
+                              break;
+                            default:
+                              Navigator.of(context).pushReplacementNamed(
+                                TextLessonScreen.routeName,
+                                arguments: TextLessonScreenArgs(widget.courseId, int.tryParse(state.lessonResponse.prev_lesson)!, widget.authorAva, widget.authorName, widget.hasPreview, widget.trial),
+                              );
+                          }
+                        },
+                        padding: EdgeInsets.all(0.0),
+                        color: mainColor,
+                        hoverColor: secondColor,
+                        focusColor: secondColor,
+                        child: Icon(
+                          Icons.chevron_left,
+                          color: HexColor.fromHex("#273044"),
+                        ),
+                      )
                     : Center(),
               ),
               Expanded(

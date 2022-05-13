@@ -91,6 +91,7 @@ class _ReviewWriteScreenWidgetState extends State<_ReviewWriteScreenWidget> {
                 setState(() {
                   isLoading = false;
                 });
+
                 Scaffold.of(context).showSnackBar(SnackBar(
                   content: Text(
                     state.reviewAddResponse.message,

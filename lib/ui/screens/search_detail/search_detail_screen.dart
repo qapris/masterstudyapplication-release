@@ -108,10 +108,9 @@ class _SearchDetailWidgetState extends State<SearchDetailWidget> {
     return Padding(
       padding: const EdgeInsets.only(left: 22.0, right: 22.0),
       child: Container(
-        child: StaggeredGridView.countBuilder(
+        child: AlignedGridView.count(
           shrinkWrap: true,
-          crossAxisCount: 4,
-          staggeredTileBuilder: (_) => StaggeredTile.fit(2),
+          crossAxisCount: 2,
           mainAxisSpacing: 4.0,
           crossAxisSpacing: 4.0,
           itemCount: courses?.length,

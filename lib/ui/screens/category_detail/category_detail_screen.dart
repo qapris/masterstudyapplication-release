@@ -169,11 +169,10 @@ class _CategoryDetailScreenWidgetState extends State<_CategoryDetailScreenWidget
     return Padding(
       padding: const EdgeInsets.only(left: 22.0, right: 22.0),
       child: Container(
-        child: StaggeredGridView.countBuilder(
+        child: AlignedGridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 4,
-          staggeredTileBuilder: (_) => StaggeredTile.fit(2),
+          crossAxisCount: 2,
           mainAxisSpacing: 4.0,
           crossAxisSpacing: 4.0,
           itemCount: state.courses.length,

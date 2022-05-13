@@ -191,7 +191,6 @@ class SplashWidgetState extends State<SplashWidget> {
         if (state.appSettings != null) {
           openMainPage(state.appSettings!.options!);
         } else {
-          log('2'.toString());
           openMainPage(state.appSettings!.options);
         }
       } else {
@@ -219,47 +218,49 @@ class SplashWidgetState extends State<SplashWidget> {
         if (state.appSettings!.addons != null) dripContentEnabled = state.appSettings!.addons?.sequential_drip_content != null && state.appSettings!.addons?.sequential_drip_content == "on";
         postsCount = state.appSettings!.options!.posts_count.toString();
 
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            imgUrl.contains('svg')
-                ? SvgPicture.network(imgUrl)
-                : CachedNetworkImage(
-                    imageUrl: imgUrl,
-                    placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                    errorWidget: (context, url, error) {
-                      if (newImage.toString().contains('svg')) {
-                        SizedBox(width: 83.0, child: SvgPicture.asset(newImage.toString()));
-                      } else if (!newImage.toString().contains('svg')) {
-                        SizedBox(width: 83.0, child: Image.file(File(newImage.toString())));
-                      }
-                      return SizedBox(
-                        width: 83.0,
-                        child: Image.asset('assets/icons/logo.png'),
-                      );
-                    },
-                    width: 83.0,
-                  ),
-            //Count course
-            Padding(
-              padding: EdgeInsets.only(top: 20.0, bottom: 5.0),
-              child: Text(
-                postsCount,
-                textScaleFactor: 1.0,
-                style: TextStyle(color: mainColor, fontSize: 40.0),
+        return Container(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              imgUrl.contains('svg')
+                  ? SvgPicture.network(imgUrl)
+                  : CachedNetworkImage(
+                      imageUrl: imgUrl,
+                      placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                      errorWidget: (context, url, error) {
+                        if (newImage.toString().contains('svg')) {
+                          SizedBox(width: 83.0, child: SvgPicture.asset(newImage.toString()));
+                        } else if (!newImage.toString().contains('svg')) {
+                          SizedBox(width: 83.0, child: Image.file(File(newImage.toString())));
+                        }
+                        return SizedBox(
+                          width: 83.0,
+                          child: Image.asset('assets/icons/logo.png'),
+                        );
+                      },
+                      width: 83.0,
+                    ),
+              //Count course
+              Padding(
+                padding: EdgeInsets.only(top: 20.0, bottom: 5.0),
+                child: Text(
+                  postsCount,
+                  textScaleFactor: 1.0,
+                  style: TextStyle(color: mainColor, fontSize: 40.0),
+                ),
               ),
-            ),
-            //Text "Course"
-            Padding(
-              padding: EdgeInsets.only(bottom: 0),
-              child: Text(
-                (postsCount != "") ? "COURSES" : "",
-                textScaleFactor: 1.0,
-                style: TextStyle(color: HexColor.fromHex("#000000"), fontSize: 14.0, fontWeight: FontWeight.w500),
+              //Text "Course"
+              Padding(
+                padding: EdgeInsets.only(bottom: 0),
+                child: Text(
+                  (postsCount != "") ? "COURSES" : "",
+                  textScaleFactor: 1.0,
+                  style: TextStyle(color: HexColor.fromHex("#000000"), fontSize: 14.0, fontWeight: FontWeight.w500),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         );
       }
     }

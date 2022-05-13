@@ -117,16 +117,25 @@ class SearchScreenWidgetState extends State<SearchScreenWidget> {
           Visibility(
             visible: state.popularSearch.isNotEmpty,
             child: Padding(
-                padding: const EdgeInsets.only(top: 30.0, left: 30.0),
-                child: Text(localizations!.getLocalization("popular_searchs"),
-                    textScaleFactor: 1.0, style: Theme.of(context).primaryTextTheme.headline5?.copyWith(color: dark, fontStyle: FontStyle.normal))),
+              padding: const EdgeInsets.only(top: 30.0, left: 30.0),
+              child: Text(
+                localizations!.getLocalization("popular_searchs"),
+                textScaleFactor: 1.0,
+                style: Theme.of(context).primaryTextTheme.headline5?.copyWith(color: dark, fontStyle: FontStyle.normal),
+              ),
+            ),
           ),
           _buildChips(state),
           Padding(
-              padding: const EdgeInsets.only(top: 30.0, left: 30.0),
-              child:
-                  Text(localizations!.getLocalization("new_courses"), textScaleFactor: 1.0, style: Theme.of(context).primaryTextTheme.headline5?.copyWith(color: dark, fontStyle: FontStyle.normal))),
-          _buildCourses(state)
+            padding: const EdgeInsets.only(top: 30.0, left: 30.0),
+            child: Text(
+              localizations!.getLocalization("new_courses"),
+              textScaleFactor: 1.0,
+              style: Theme.of(context).primaryTextTheme.headline5?.copyWith(color: dark, fontStyle: FontStyle.normal),
+            ),
+          ),
+          // _buildCourses(state)
+          _buildCourses(state),
         ],
       ),
     );
@@ -136,24 +145,14 @@ class SearchScreenWidgetState extends State<SearchScreenWidget> {
     return Padding(
       padding: const EdgeInsets.only(left: 22.0, right: 22.0),
       child: Container(
-        child: StaggeredGridView.countBuilder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 4,
-          staggeredTileBuilder: (_) => StaggeredTile.fit(2),
+        child: StaggeredGrid.count(
+          crossAxisCount: 2,
           mainAxisSpacing: 4.0,
           crossAxisSpacing: 4.0,
-          padding: const EdgeInsets.all(2.0),
-          itemCount: state.newCourses.length,
-          itemBuilder: (context, index) {
-            var paddingBottom = 0.0;
-            if (index == state.newCourses.length - 1) paddingBottom = 16.0;
-            var item = state.newCourses[index];
-            return Padding(
-              padding: EdgeInsets.only(bottom: paddingBottom),
-              child: CourseGridItem(item),
-            );
-          },
+          children: [
+            for(var el in state.newCourses)
+                 CourseGridItem(el),
+          ],
         ),
       ),
     );

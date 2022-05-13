@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:masterstudy_app/data/models/OrdersResponse.dart';
@@ -132,7 +133,6 @@ class OrdersWidgetState extends State<OrdersWidget> {
       ),
     );
   }
-
 }
 
 // ignore: must_be_immutable
@@ -306,7 +306,6 @@ class MembershipWidget extends StatefulWidget {
 class _MembershipWidgetState extends State<MembershipWidget> {
   bool expanded = false;
 
-
   @override
   void initState() {
     super.initState();
@@ -359,11 +358,13 @@ class _MembershipWidgetState extends State<MembershipWidget> {
             )
           ],
         ),
-       widget.membershipsBean!.enddate != null ? Text(
-          'EndDate: ${widget.membershipsBean!.enddate.toString()}',
-          textScaleFactor: 1.0,
-          style: TextStyle(fontSize: 20),
-        ) : const SizedBox(),
+        widget.membershipsBean!.enddate != null
+            ? Text(
+                'EndDate: ${widget.membershipsBean!.enddate.toString()}',
+                textScaleFactor: 1.0,
+                style: TextStyle(fontSize: 20),
+              )
+            : const SizedBox(),
         const SizedBox(height: 8),
       ],
     );
@@ -385,25 +386,47 @@ class _MembershipWidgetState extends State<MembershipWidget> {
             itemCount: 1,
             itemBuilder: (context, index) {
               var item = widget.membershipsBean;
+              var regExpHtml = RegExp('.*\\<[^>]+>.*');
+
+              print(regExpHtml.hasMatch(item!.description));
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Name: ${item!.name}',
+                    'Name: ${item.name}',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    'Description: ${item.description}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
-                    ),
-                  ),
+                  regExpHtml.hasMatch(item.description)
+                      ? Text(
+                          'Description:',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                          ),
+                        )
+                      : const SizedBox(),
+                  regExpHtml.hasMatch(item.description)
+                      ? Html(
+                          data: item.description,
+                          style: {
+                            'body': Style(
+                              fontSize: FontSize(14),
+                            )
+                          },
+                        )
+                      : Text(
+                          'Description: ${item.description}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                          ),
+                        ),
                   const SizedBox(height: 8),
                   Text(
                     'Cycle Period: ${item.cycle_period}',

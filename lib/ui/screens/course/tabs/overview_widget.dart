@@ -207,7 +207,7 @@ class _OverviewWidgetState extends State<OverviewWidget> with AutomaticKeepAlive
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
           Container(
               constraints: BoxConstraints.loose(Size(MediaQuery.of(context).size.width, annoncementTextShowFlag ? htmlDesctriptionHeight : 300)),
-              child: Stack(alignment: Alignment.topCenter, overflow: Overflow.clip, children: [
+              child: Stack(clipBehavior: Clip.hardEdge, alignment: Alignment.topCenter, children: [
                 Positioned(
                     top: -130.0,
                     child: MeasureSize(

@@ -170,8 +170,16 @@ class DialogAuthorWidget extends StatelessWidget {
                   child: Padding(
                     padding: EdgeInsets.only(left: 20.0, right: 5.0),
                     child: GestureDetector(
-                      onTap: () {
-                        _launchURL(state.courseDetailResponse.author.meta.facebook);
+                      onTap: () async {
+                        try {
+                          if (await canLaunch(state.courseDetailResponse.author.meta.facebook)) {
+                            await launch(state.courseDetailResponse.author.meta.facebook);
+                          } else {
+                            launch("https://www.facebook.com/");
+                          }
+                        } catch (e) {
+                          await launch("https://www.facebook.com/");
+                        }
                       },
                       child: SizedBox(width: 36, height: 36, child: Image(image: AssetImage('assets/icons/soc_fb.png'))),
                     ),
@@ -183,8 +191,16 @@ class DialogAuthorWidget extends StatelessWidget {
                   child: Padding(
                     padding: EdgeInsets.only(left: 5.0, right: 5.0),
                     child: GestureDetector(
-                      onTap: () {
-                        _launchURL(state.courseDetailResponse.author.meta.twitter);
+                      onTap: () async {
+                        try {
+                          if (await canLaunch(state.courseDetailResponse.author.meta.twitter)) {
+                        await launch(state.courseDetailResponse.author.meta.twitter);
+                        } else {
+                        launch("https://www.twitter.com/");
+                        }
+                        } catch (e) {
+                        await launch("https://www.twitter.com/");
+                        }
                       },
                       child: SizedBox(width: 36, height: 36, child: Image(image: AssetImage('assets/icons/soc_twit.png'))),
                     ),
@@ -196,8 +212,16 @@ class DialogAuthorWidget extends StatelessWidget {
                   child: Padding(
                     padding: EdgeInsets.only(left: 5.0, right: 5.0),
                     child: GestureDetector(
-                      onTap: () {
-                        _launchURL(state.courseDetailResponse.author.meta.instagram);
+                      onTap: () async {
+                        try {
+                          if (await canLaunch(state.courseDetailResponse.author.meta.instagram)) {
+                            await launch(state.courseDetailResponse.author.meta.instagram);
+                          } else {
+                            launch("https://www.instagram.com/");
+                          }
+                        } catch (e) {
+                          await launch("https://www.instagram.com/");
+                        }
                       },
                       child: SizedBox(width: 36, height: 36, child: Image(image: AssetImage('assets/icons/soc_insta.png'))),
                     ),
@@ -225,7 +249,6 @@ class DialogAuthorWidget extends StatelessWidget {
     await launch(url);
   }
 }
-
 
 void showDialogError(context, text) {
   showDialog(

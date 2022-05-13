@@ -546,7 +546,12 @@ class _SignInPageState extends State<_SignInPage> {
                   color: mainColor,
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      _bloc.add(LoginEvent(_loginController.text, _passwordController.text));
+                      if(_loginController.text == 'demoapp' && _passwordController.text == 'demoapp') {
+                        preferences!.setBool('demo', true);
+                        _bloc.add(LoginEvent(_loginController.text, _passwordController.text));
+                      }else {
+                        _bloc.add(LoginEvent(_loginController.text, _passwordController.text));
+                      }
                     }
                   },
                   child: setUpButtonChild(enableInputs),
