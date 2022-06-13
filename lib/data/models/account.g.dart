@@ -10,8 +10,8 @@ Account _$AccountFromJson(Map<String, dynamic> json) {
   return Account(
     id: json['id'] as num,
     login: json['login'] as String,
-    avatar: json['avatar'] as String,
-    avatar_url: json['avatar_url'],
+    avatar: json['avatar'],
+    avatar_url: json['avatar_url'] as String,
     email: json['email'] as String,
     url: json['url'] as String,
     meta: json['meta'] == null ? null : MetaBean.fromJson(json['meta'] as Map<String, dynamic>),

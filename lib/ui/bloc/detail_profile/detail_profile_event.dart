@@ -1,4 +1,3 @@
-import 'package:masterstudy_app/data/models/account.dart';
 import 'package:meta/meta.dart';
 
 @immutable

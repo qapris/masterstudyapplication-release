@@ -1,22 +1,14 @@
 import 'dart:developer';
-import 'dart:ui';
 
-import 'package:dio/dio.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/cache/localization_local.dart';
 import 'package:masterstudy_app/data/models/AppSettings.dart';
 import 'package:masterstudy_app/data/models/category.dart';
 import 'package:masterstudy_app/data/network/api_provider.dart';
 import 'package:masterstudy_app/data/utils.dart';
-import 'package:masterstudy_app/data/utils.dart';
-import 'package:masterstudy_app/data/utils.dart';
-import 'package:masterstudy_app/data/utils.dart';
-import 'package:masterstudy_app/main.dart';
-import 'package:masterstudy_app/theme/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../cache/app_settings_local.dart';
-import '../cache/exceptions.dart';
 
 abstract class HomeRepository {
   Future<List<Category>> getCategories();

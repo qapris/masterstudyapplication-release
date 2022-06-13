@@ -1,10 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:masterstudy_app/main.dart';
 import 'package:masterstudy_app/theme/theme.dart';
-import 'package:masterstudy_app/ui/bloc/course/course_bloc.dart';
 import 'package:masterstudy_app/ui/screens/lesson_video/lesson_video_screen.dart';
 import 'package:masterstudy_app/ui/screens/text_lesson/text_lesson_screen.dart';
 import 'package:masterstudy_app/ui/widgets/dialog_author.dart';

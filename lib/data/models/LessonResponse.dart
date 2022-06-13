@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'dart:developer';
 
 import 'package:json_annotation/json_annotation.dart';
 
@@ -15,12 +13,12 @@ class LessonResponse {
   String type;
   String content;
   List<Materials?> materials;
-  String video;
-  String video_poster;
-  String prev_lesson_type;
-  String next_lesson_type;
-  String prev_lesson;
-  String next_lesson;
+  dynamic video;
+  dynamic video_poster;
+  dynamic prev_lesson_type;
+  dynamic next_lesson_type;
+  dynamic prev_lesson;
+  dynamic next_lesson;
   bool completed;
   bool next_lesson_available;
   String view_link;

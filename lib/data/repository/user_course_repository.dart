@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:masterstudy_app/data/cache/cache_manager.dart';
 import 'package:masterstudy_app/data/cache/progress_course_local.dart';

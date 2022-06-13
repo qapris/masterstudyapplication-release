@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -301,7 +300,7 @@ class _SignUpPageState extends State<_SignUpPage> {
               ),
               //Button "DEMO auth"
               Visibility(
-                visible: demoEnabled,
+                visible: demoEnabled ?? false,
                 child: Padding(
                   padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
                   child: new MaterialButton(
@@ -456,7 +455,7 @@ class _SignInPageState extends State<_SignInPage> {
         }
 
         if (state is ErrorAuthState) {
-          WidgetsBinding.instance?.addPostFrameCallback((_) => showDialogError(context, state.message));
+          WidgetsBinding.instance.addPostFrameCallback((_) => showDialogError(context, state.message));
         }
 
         return Form(

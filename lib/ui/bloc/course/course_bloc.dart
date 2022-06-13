@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/models/course/CourseDetailResponse.dart';
-import 'package:masterstudy_app/data/models/purchase/UserPlansResponse.dart';
 import 'package:masterstudy_app/data/repository/courses_repository.dart';
 import 'package:masterstudy_app/data/repository/purchase_repository.dart';
 import 'package:masterstudy_app/data/repository/review_respository.dart';

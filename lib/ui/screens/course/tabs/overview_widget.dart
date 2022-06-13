@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -12,7 +11,6 @@ import 'package:masterstudy_app/ui/screens/review_write/review_write_screen.dart
 import 'package:masterstudy_app/ui/widgets/MeasureSizeWidget.dart';
 import 'package:masterstudy_app/ui/widgets/dialog_author.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../../../../data/utils.dart';
 import '../../../../main.dart';
 
@@ -437,7 +435,7 @@ class _OverviewWidgetState extends State<OverviewWidget> with AutomaticKeepAlive
   }
 
   _buildReviewList(List<ReviewBean?> reviews) {
-    if (reviews == null || reviews.isEmpty) return Center();
+    if (reviews.isEmpty) return Center();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

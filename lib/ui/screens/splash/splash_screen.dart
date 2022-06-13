@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'dart:io';
-import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
@@ -53,8 +52,9 @@ class SplashWidgetState extends State<SplashWidget> {
       Response response = await dio.get('$apiEndpoint' + 'app_settings');
 
       if (response.statusCode == 200) {
-        if (response.data['options']['main_color_hex'].toString().contains('#') || response.data['options']['secondary_color_hex'].toString().contains('#')) {
-          log('1'.toString());
+        log("${response.data['options']}");
+        if (response.data['options']['main_color_hex'].toString().contains('#') &&
+            response.data['options']['secondary_color_hex'].toString().contains('#')) {
           var mainColorHex = response.data['options']['main_color_hex'];
           var secondColorHex = response.data['options']['secondary_color_hex'];
 
@@ -89,6 +89,8 @@ class SplashWidgetState extends State<SplashWidget> {
                 mainColorItem['b'],
                 0.999,
               );
+            } else if (response.data['options']['main_color_hex'].toString().contains('#')) {
+              mainColor = HexColor.fromHex(response.data['options']['main_color_hex']);
             } else {
               mainColor = blue_blue;
             }
@@ -100,10 +102,12 @@ class SplashWidgetState extends State<SplashWidget> {
                 secondColorItem['b'],
                 double.parse(secondColorItem['a'].toString()),
               );
+            } else if (response.data['options']['secondary_color_hex'].toString().contains('#')) {
+              secondColor = HexColor.fromHex(response.data['options']['secondary_color_hex']);
             } else {
               secondColor = seaweed;
             }
-          } on DioError catch (e) {
+          } on DioError {
             mainColor = blue_blue;
             mainColorA = blue_blue_a;
             secondColor = seaweed;
@@ -203,19 +207,17 @@ class SplashWidgetState extends State<SplashWidget> {
 
       if (state.appSettings != null) {
         ///Logo
-        if (state.appSettings!.options!.logo != null) {
-          _fileFromImageUrl();
-          imgUrl = state.appSettings!.options?.logo == null ? "" : state.appSettings!.options!.logo;
-          appLogoUrl = state.appSettings!.options?.logo == null ? "" : state.appSettings!.options!.logo;
-        }
+        _fileFromImageUrl();
+        imgUrl = state.appSettings!.options?.logo == null ? "" : state.appSettings!.options!.logo;
+        appLogoUrl = state.appSettings!.options?.logo == null ? "" : state.appSettings!.options!.logo;
 
         ///Demo
-        if (state.appSettings!.demo != null) {
-          demoEnabled = state.appSettings!.demo;
-        }
+        demoEnabled = state.appSettings!.demo;
 
         ///Addons about count course
-        if (state.appSettings!.addons != null) dripContentEnabled = state.appSettings!.addons?.sequential_drip_content != null && state.appSettings!.addons?.sequential_drip_content == "on";
+        if (state.appSettings!.addons != null)
+          dripContentEnabled =
+              state.appSettings!.addons?.sequential_drip_content != null && state.appSettings!.addons?.sequential_drip_content == "on";
         postsCount = state.appSettings!.options!.posts_count.toString();
 
         return Container(
@@ -273,15 +275,17 @@ class SplashWidgetState extends State<SplashWidget> {
   }
 
   void openAuthPage(OptionsBean? optionsBean) {
-    SchedulerBinding.instance?.addPostFrameCallback((_) {
+    _ambiguate(SchedulerBinding.instance)!.addPostFrameCallback((_) {
       Future.delayed(const Duration(milliseconds: 2000), () {
         Navigator.of(context).pushReplacementNamed(AuthScreen.routeName, arguments: AuthScreenArgs(optionsBean!));
       });
     });
   }
 
+  T? _ambiguate<T>(T? value) => value;
+
   void openMainPage(OptionsBean? optionsBean) {
-    SchedulerBinding.instance?.addPostFrameCallback((_) {
+    _ambiguate(SchedulerBinding.instance)!.addPostFrameCallback((_) {
       Future.delayed(const Duration(milliseconds: 2000), () {
         Navigator.of(context).pushReplacementNamed(MainScreen.routeName, arguments: MainScreenArgs(optionsBean!));
       });

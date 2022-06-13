@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
@@ -165,7 +164,7 @@ class UserApiProvider {
       "instagram": instagram,
       "twitter": twitter,
     };
-    if (password != null && password.isNotEmpty) map.addAll({"password": password});
+    if (password.isNotEmpty) map.addAll({"password": password});
     dio.post(apiEndpoint + "account/edit_profile/",
         data: map,
         options: Options(

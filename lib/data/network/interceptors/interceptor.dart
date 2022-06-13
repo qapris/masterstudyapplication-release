@@ -1,11 +1,9 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:masterstudy_app/data/cache/cache_manager.dart';
 import 'package:masterstudy_app/data/utils.dart';
 import 'package:masterstudy_app/ui/screens/splash/splash_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../main.dart';
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:masterstudy_app/data/models/course/CourseDetailResponse.dart';
 import 'package:masterstudy_app/theme/theme.dart';
 

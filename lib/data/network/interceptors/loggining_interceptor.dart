@@ -5,10 +5,8 @@ class LoggingInterceptors extends Interceptor {
     print("--> ${options.method != null ? options.method.toUpperCase() : 'METHOD'} ${"" + (options.baseUrl ) + (options.path)}");
     print("Headers:");
     options.headers.forEach((k, v) => print('$k: $v'));
-    if (options.queryParameters != null) {
-      print("queryParameters:");
-      options.queryParameters.forEach((k, v) => print('$k: $v'));
-    }
+    print("queryParameters:");
+    options.queryParameters.forEach((k, v) => print('$k: $v'));
     if (options.data != null) {
       print("Body: ${options.data}");
     }

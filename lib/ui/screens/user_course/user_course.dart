@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,8 +19,6 @@ import 'package:masterstudy_app/ui/screens/text_lesson/text_lesson_screen.dart';
 import 'package:masterstudy_app/ui/screens/zoom/zoom.dart';
 import 'package:masterstudy_app/ui/widgets/loading_error_widget.dart';
 
-import '../../../data/utils.dart';
-
 class UserCourseScreenArgs {
   final String? course_id;
   final String? title;
@@ -37,47 +34,48 @@ class UserCourseScreenArgs {
   dynamic isFirstStart;
 
   UserCourseScreenArgs(
-      this.course_id,
-      this.title,
-      this.app_image,
-      this.avatar_url,
-      this.login,
-      this.authorId,
-      this.progress,
-      this.lesson_type,
-      this.lesson_id, {
-        this.isFirstStart,
-      }) : this.postsBean = PostsBean(
-    course_id: course_id,
-    title: title,
-    app_image: app_image,
-    progress: progress,
-    lesson_type: lesson_type,
-    lesson_id: lesson_id,
-    categories_object: [],
-    author: PostAuthorBean(
-      id: authorId,
-      avatar_url: avatar_url,
-      login: '',
-      url: '',
-      meta: null,
-    ),
-    terms_list: [],
-    progress_label: null,
-    start_time: null,
-    sale_price: null,
-    terms: [],
-    link: null,
-    price: null,
-    duration: null,
-    post_status: null,
-    image_id: null,
-    hash: '',
-    views: null,
-    fromCache: false,
-    image: null,
-    current_lesson_id: null,
-  );
+  {
+    this.course_id,
+    this.title,
+    this.app_image,
+    this.avatar_url,
+    this.login,
+    this.authorId,
+    this.progress,
+    this.lesson_type,
+    this.lesson_id,
+    this.isFirstStart,
+  }) : this.postsBean = PostsBean(
+          course_id: course_id,
+          title: title,
+          app_image: app_image,
+          progress: progress,
+          lesson_type: lesson_type,
+          lesson_id: lesson_id,
+          categories_object: [],
+          author: PostAuthorBean(
+            id: authorId,
+            avatar_url: avatar_url,
+            login: '',
+            url: '',
+            meta: null,
+          ),
+          terms_list: [],
+          progress_label: null,
+          start_time: null,
+          sale_price: null,
+          terms: [],
+          link: null,
+          price: null,
+          duration: null,
+          post_status: null,
+          image_id: null,
+          hash: '',
+          views: null,
+          fromCache: false,
+          image: null,
+          current_lesson_id: null,
+        );
 
   UserCourseScreenArgs.fromPostsBean(PostsBean postsBean)
       : course_id = postsBean.course_id,
@@ -183,7 +181,8 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
                             Hero(
                               tag: widget.args.course_id ?? 0,
                               child: CachedNetworkImage(
-                                imageUrl: widget.args.app_image ?? 'http://ms.stylemix.biz/wp-content/uploads/elementor/thumbs/placeholder-1919x1279-plpkge6q8d1n11vbq6ckurd53ap3zw1gbw0n5fqs0o.gif',
+                                imageUrl: widget.args.app_image ??
+                                    'http://ms.stylemix.biz/wp-content/uploads/elementor/thumbs/placeholder-1919x1279-plpkge6q8d1n11vbq6ckurd53ap3zw1gbw0n5fqs0o.gif',
                                 placeholder: (ctx, url) => SizedBox(
                                   height: MediaQuery.of(context).size.height / 3 + MediaQuery.of(context).padding.top,
                                 ),
@@ -274,17 +273,27 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
                                                   minWidth: double.infinity,
                                                   color: secondColor,
                                                   onPressed: () {
+                                                    var containsLastLesson = false;
                                                     if (state is LoadedUserCourseState) {
-                                                      if (state.response?.sections != null && state.response?.sections != null) {
-                                                        var containsLastLesson = false;
+                                                      if (state.response?.sections != null) {
                                                         state.response?.sections.forEach((section) {
+                                                          log('1'.toString());
                                                           if (section?.section_items != null) {
                                                             section?.section_items.forEach((sectionItem) {
-                                                              if (sectionItem?.item_id == int.tryParse(widget.args.lesson_id!)) containsLastLesson = true;
+                                                              print('itemID: ${sectionItem!.item_id}');
+                                                              print('title: ${sectionItem.title}');
+                                                              print('widgetArgs: ${widget.args.lesson_id}');
+                                                              if (sectionItem.item_id == int.tryParse(widget.args.lesson_id!)) {
+                                                                setState(() {
+                                                                  containsLastLesson = true;
+                                                                });
+                                                              }
+                                                              ;
                                                             });
                                                           }
                                                         });
                                                         if (containsLastLesson) {
+                                                          log('2'.toString());
                                                           _openLesson(widget.args.lesson_type!, int.parse(widget.args.lesson_id!));
                                                         }
                                                       }
@@ -347,19 +356,19 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
       return widget.args.isFirstStart == true
           ? SizedBox()
           : SizedBox(
-        width: 50,
-        height: 50,
-        child: FlatButton(
-            shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
-            onPressed: () {
-              if (state is LoadedUserCourseState && !state.showCachingProgress! && !state.isCached!) {
-                _bloc.add(CacheCourseEvent(widget.args));
-              }
-            },
-            padding: EdgeInsets.only(left: 0.0),
-            color: HexColor.fromHex("#FFFFFF").withOpacity(0.1),
-            child: icon),
-      );
+              width: 50,
+              height: 50,
+              child: FlatButton(
+                  shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+                  onPressed: () {
+                    if (state is LoadedUserCourseState && !state.showCachingProgress! && !state.isCached!) {
+                      _bloc.add(CacheCourseEvent(widget.args));
+                    }
+                  },
+                  padding: EdgeInsets.only(left: 0.0),
+                  color: HexColor.fromHex("#FFFFFF").withOpacity(0.1),
+                  child: icon),
+            );
     } else {
       return SizedBox(width: 50, height: 50);
     }
@@ -385,7 +394,7 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
 
   ///ListView with Curriculum
   _buildCurriculum(LoadedUserCourseState state) {
-    if (state.sections == null || state.sections.isEmpty) {
+    if (state.sections.isEmpty) {
       return _buildEmptyList();
     }
     return ListView.builder(
@@ -446,7 +455,7 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
             ],
           ),
         ),
-        if (sectionItem.section_items != null && sectionItem.section_items.isNotEmpty)
+        if (sectionItem.section_items.isNotEmpty)
           Column(
             children: sectionItem.section_items.map((value) {
               return _buildLesson(value!, sectionItem.items);
@@ -464,26 +473,47 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
 
     switch (section_itemsBean.type) {
       case 'video':
-        icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/ico_play.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
+        icon = SizedBox(
+            width: 24,
+            height: 24,
+            child: SvgPicture.asset("assets/icons/ico_play.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
         break;
       case 'stream':
-        icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/video-camera.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
+        icon = SizedBox(
+            width: 24,
+            height: 24,
+            child: SvgPicture.asset("assets/icons/video-camera.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
         break;
       case 'slide':
-        icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/slides_icon.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
+        icon = SizedBox(
+            width: 24,
+            height: 24,
+            child: SvgPicture.asset("assets/icons/slides_icon.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
         break;
       case 'assignment':
-        icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/assignment_icon.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
+        icon = SizedBox(
+            width: 24,
+            height: 24,
+            child: SvgPicture.asset("assets/icons/assignment_icon.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
         break;
       case 'quiz':
         duration = section_itemsBean.questions;
-        icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/ico_question.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
+        icon = SizedBox(
+            width: 24,
+            height: 24,
+            child: SvgPicture.asset("assets/icons/ico_question.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
         break;
       case 'text':
-        icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/ico_text.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
+        icon = SizedBox(
+            width: 24,
+            height: 24,
+            child: SvgPicture.asset("assets/icons/ico_text.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
         break;
       case 'lesson':
-        icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/ico_text.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
+        icon = SizedBox(
+            width: 24,
+            height: 24,
+            child: SvgPicture.asset("assets/icons/ico_text.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
         break;
       case 'zoom_conference':
         icon = SizedBox(
@@ -494,7 +524,10 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
             ));
         break;
       case '':
-        icon = SizedBox(width: 24, height: 24, child: SvgPicture.asset("assets/icons/ico_text.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
+        icon = SizedBox(
+            width: 24,
+            height: 24,
+            child: SvgPicture.asset("assets/icons/ico_text.svg", color: (!locked) ? mainColor : HexColor.fromHex("#2A3045").withOpacity(0.3)));
         break;
     }
 
@@ -619,8 +652,6 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
           arguments: TextLessonScreenArgs(int.tryParse(widget.args.course_id!)!, id, widget.args.avatar_url, widget.args.login!, false, true),
         );
     }
-    if (screenFuture != null) {
-      screenFuture.then((value) => {_bloc.add(FetchEvent(widget.args))});
-    }
+    screenFuture.then((value) => {_bloc.add(FetchEvent(widget.args))});
   }
 }

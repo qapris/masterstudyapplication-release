@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:external_path/external_path.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,7 +22,6 @@ import 'package:masterstudy_app/ui/screens/quiz_lesson/quiz_lesson_screen.dart';
 import 'package:masterstudy_app/ui/screens/user_course_locked/user_course_locked_screen.dart';
 import 'package:masterstudy_app/ui/widgets/warning_lessong_dialog.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:webview_flutter/platform_interface.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../../main.dart';
 
@@ -549,7 +547,7 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
                                 Navigator.of(context).pushReplacementNamed(
                                   TextLessonScreen.routeName,
                                   arguments:
-                                      TextLessonScreenArgs(widget.courseId, int.tryParse(state.lessonResponse.prev_lesson)!, widget.authorAva, widget.authorName, widget.hasPreview, widget.trial),
+                                      TextLessonScreenArgs(widget.courseId, state.lessonResponse.prev_lesson!, widget.authorAva, widget.authorName, widget.hasPreview, widget.trial),
                                 );
                             }
                           },
@@ -650,7 +648,7 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
                           default:
                             Navigator.of(context).pushReplacementNamed(
                               TextLessonScreen.routeName,
-                              arguments: TextLessonScreenArgs(widget.courseId, int.tryParse(state.lessonResponse.next_lesson)!, widget.authorAva, widget.authorName, widget.hasPreview, widget.trial),
+                              arguments: TextLessonScreenArgs(widget.courseId, state.lessonResponse.next_lesson!, widget.authorAva, widget.authorName, widget.hasPreview, widget.trial),
                             );
                         }
                       } else {

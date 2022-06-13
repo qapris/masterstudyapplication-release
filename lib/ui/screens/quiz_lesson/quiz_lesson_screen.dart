@@ -1,15 +1,11 @@
 import 'dart:convert';
-import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:masterstudy_app/main.dart';
 import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/bloc/quiz_lesson/bloc.dart';
-import 'package:masterstudy_app/ui/bloc/quiz_lesson/quiz_lesson_bloc.dart';
 import 'package:masterstudy_app/ui/screens/assignment/assignment_screen.dart';
 import 'package:masterstudy_app/ui/screens/final/final_screen.dart';
 import 'package:masterstudy_app/ui/screens/lesson_stream/lesson_stream_screen.dart';
@@ -19,7 +15,6 @@ import 'package:masterstudy_app/ui/screens/quiz_screen/quiz_screen.dart';
 import 'package:masterstudy_app/ui/screens/text_lesson/text_lesson_screen.dart';
 import 'package:masterstudy_app/ui/widgets/warning_lessong_dialog.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class QuizLessonScreenArgs {
   final int lessonId;

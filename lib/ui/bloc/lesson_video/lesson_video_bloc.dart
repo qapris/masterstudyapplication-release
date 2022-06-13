@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
@@ -20,7 +19,7 @@ class LessonVideoBloc extends Bloc<LessonVideoEvent, LessonVideoState> {
         LessonResponse response = await _lessonRepository.getLesson(event.courseId, event.lessonId);
 
         emit(LoadedLessonVideoState(response));
-      } on DioError catch (e) {}
+      } on DioError {}
     });
 
     on<CompleteLessonEvent>((event, emit) async {

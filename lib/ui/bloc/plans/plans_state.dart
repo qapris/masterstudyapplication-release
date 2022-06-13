@@ -1,4 +1,3 @@
-import 'package:masterstudy_app/data/models/purchase/UserPlansResponse.dart';
 import 'package:meta/meta.dart';
 
 import '../../../data/models/purchase/AllPlansResponse.dart';

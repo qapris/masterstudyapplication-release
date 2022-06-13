@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:inject/inject.dart';
@@ -44,7 +43,7 @@ class AssignmentBloc extends Bloc<AssignmentEvent, AssignmentState> {
         int course_id = event.courseId;
         int user_assignment_id = event.userAssignmentId;
         log(event.files.toString());
-        if (event.files != null && event.files.isNotEmpty) {
+        if (event.files.isNotEmpty) {
           event.files.forEach((elem) {
             var uploadFile = _assignmentRepository.uploadAssignmentFile(course_id, user_assignment_id, elem);
             print(uploadFile);

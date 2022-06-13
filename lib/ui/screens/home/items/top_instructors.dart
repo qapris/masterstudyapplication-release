@@ -1,11 +1,11 @@
-import 'dart:developer';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:masterstudy_app/data/models/InstructorsResponse.dart';
 import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/screens/detail_profile/detail_profile_screen.dart';
+
+import '../../../../main.dart';
 
 class TopInstructorsWidget extends StatelessWidget {
   final List<InstructorBean?> list;
@@ -23,7 +23,7 @@ class TopInstructorsWidget extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 30.0, left: 30.0, bottom: 20),
                 child: Text(
-                  title!,
+                  localizations!.getLocalization("instructors"),
                   textScaleFactor: 1.0,
                   style: Theme.of(context).primaryTextTheme.headline6?.copyWith(color: dark, fontStyle: FontStyle.normal),
                 ),

@@ -1,16 +1,9 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:developer';
 import 'package:bloc/bloc.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/cache/cache_manager.dart';
 import 'package:masterstudy_app/data/models/CachedCourse.dart';
-import 'package:masterstudy_app/data/models/curriculum.dart';
 import 'package:masterstudy_app/data/repository/lesson_repository.dart';
 import 'package:masterstudy_app/data/repository/user_course_repository.dart';
-import '../../../data/models/user_course.dart';
-import '../../../data/utils.dart';
 import './bloc.dart';
 
 @provide
@@ -66,11 +59,11 @@ class UserCourseBloc extends Bloc<UserCourseEvent, UserCourseState> {
                 CachedCourse course = CachedCourse(
                     id: int.parse(event.userCourseScreenArgs.course_id!),
                     postsBean: event.userCourseScreenArgs.postsBean?..fromCache = true,
-                    curriculumResponse: (state as LoadedUserCourseState).response,
+                    curriculumResponse: (state).response,
                     hash: event.userCourseScreenArgs.hash!,
                     lessons: []);
 
-                var sections = (state as LoadedUserCourseState).response?.sections.map((e) => e?.section_items);
+                var sections = (state).response?.sections.map((e) => e?.section_items);
 
                 List<int?> iDs = [];
 
@@ -107,7 +100,7 @@ class UserCourseBloc extends Bloc<UserCourseEvent, UserCourseState> {
             }
           }
         }
-      } catch (e, s) {
+      } catch (e) {
         if (isCached) {
           var cache = await cacheManager.getFromCache();
 
@@ -150,11 +143,11 @@ class UserCourseBloc extends Bloc<UserCourseEvent, UserCourseState> {
           CachedCourse course = CachedCourse(
               id: int.parse(event.userCourseScreenArgs.course_id!),
               postsBean: event.userCourseScreenArgs.postsBean?..fromCache = true,
-              curriculumResponse: (state as LoadedUserCourseState).response,
+              curriculumResponse: (state).response,
               hash: event.userCourseScreenArgs.hash!,
               lessons: []);
 
-          var sections = (state as LoadedUserCourseState).response?.sections.map((e) => e?.section_items);
+          var sections = (state).response?.sections.map((e) => e?.section_items);
 
           List<int?> iDs = [];
 

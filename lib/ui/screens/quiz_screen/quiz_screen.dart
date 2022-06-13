@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:masterstudy_app/data/models/LessonResponse.dart';
@@ -9,11 +8,8 @@ import 'package:masterstudy_app/data/models/QuizResponse.dart';
 import 'package:masterstudy_app/data/utils.dart';
 import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/bloc/quiz_screen/bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-import 'timer_widget.dart';
 
 class QuizScreenArgs {
   final LessonResponse quizResponse;
@@ -118,7 +114,7 @@ class QuizScreenWidgetState extends State<QuizScreenWidget> {
   }
 
   _buildWebView() {
-    if (widget.quizResponse.view_link != null && widget.quizResponse.view_link.isNotEmpty)
+    if (widget.quizResponse.view_link.isNotEmpty)
       return Stack(
         children: <Widget>[
           WebView(

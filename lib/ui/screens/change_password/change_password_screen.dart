@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../main.dart';
@@ -143,6 +142,7 @@ class _ChangePasswordWidgetState extends State<ChangePasswordWidget> {
                 if (RegExp(r'^[a-zA-Z]+$').hasMatch(val)) {
                   return 'Please a valid password';
                 }
+                return null;
               },
               decoration: InputDecoration(
                 labelText: localizations!.getLocalization('new_password'),

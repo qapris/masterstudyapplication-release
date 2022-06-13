@@ -1,11 +1,9 @@
-import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/cache/cache_manager.dart';
 import 'package:masterstudy_app/data/models/auth.dart';
 import 'package:masterstudy_app/data/network/api_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils.dart';
 
@@ -56,9 +54,12 @@ class AuthRepositoryImpl extends AuthRepository {
   }
 
   Future<bool> isSigned() {
-    var token = preferences!.getString(tokenKey);
+    String? token = preferences!.getString(tokenKey);
     dio.options.headers.addAll({"token": "$token"});
-    if (token != null && token.isNotEmpty) return Future.value(true);
+    if(token == null) {
+      return Future.value(false);
+    }
+    if (token.isNotEmpty) return Future.value(true);
     return Future.value(false);
   }
 

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:dio/adapter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -93,7 +92,7 @@ StreamController pushStreamController = StreamController<RemoteMessage>();
 Stream pushStream = pushStreamController.stream.asBroadcastStream();
 
 bool dripContentEnabled = false;
-bool demoEnabled = false;
+bool? demoEnabled = false;
 bool appView = false;
 
 Future<String> getDefaultLocalization() async {

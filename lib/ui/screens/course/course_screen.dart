@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -346,7 +345,8 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
                                               child: CircleAvatar(
                                                 backgroundImage: NetworkImage(
                                                   (state is LoadedCourseState)
-                                                      ? state.courseDetailResponse.author?.avatar_url ?? 'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png'
+                                                      ? state.courseDetailResponse.author?.avatar_url ??
+                                                          'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png'
                                                       : 'https://eitrawmaterials.eu/wp-content/uploads/2016/09/person-icon.png',
                                                 ),
                                               ),
@@ -422,7 +422,8 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
 
   bool get _isAppBarExpanded {
     if (screenHeight == null) screenHeight = MediaQuery.of(context).size.height;
-    if (_scrollController.offset > (screenHeight / kef - (kToolbarHeight * kef))) return _scrollController.hasClients && _scrollController.offset > (screenHeight / kef - (kToolbarHeight * kef));
+    if (_scrollController.offset > (screenHeight / kef - (kToolbarHeight * kef)))
+      return _scrollController.hasClients && _scrollController.offset > (screenHeight / kef - (kToolbarHeight * kef));
     return false;
   }
 
@@ -474,15 +475,15 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
               Navigator.of(context).pushNamed(
                 UserCourseScreen.routeName,
                 arguments: UserCourseScreenArgs(
-                  state.courseDetailResponse.id.toString(),
-                  widget.coursesBean.title,
-                  widget.coursesBean.images?.small,
-                  state.courseDetailResponse.author?.avatar_url,
-                  state.courseDetailResponse.author?.login,
-                  "0",
-                  "1",
-                  "",
-                  "",
+                  course_id: state.courseDetailResponse.id.toString(),
+                  title: widget.coursesBean.title,
+                  app_image: widget.coursesBean.images?.small,
+                  avatar_url: state.courseDetailResponse.author?.avatar_url,
+                  login: state.courseDetailResponse.author?.login,
+                  authorId: "0",
+                  progress: "1",
+                  lesson_type: "",
+                  lesson_id: "",
                   isFirstStart: true,
                 ),
               );

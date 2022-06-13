@@ -21,7 +21,7 @@ class MessageNotification extends StatelessWidget {
           trailing: IconButton(
               icon: Icon(Icons.close),
               onPressed: () {
-                if (onReplay != null) onReplay();
+ onReplay();
               }),
         ),
       ),

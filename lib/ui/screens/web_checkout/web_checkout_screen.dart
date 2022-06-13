@@ -4,7 +4,6 @@ import 'package:masterstudy_app/main.dart';
 import 'package:masterstudy_app/ui/screens/orders/orders.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class WebCheckoutScreenArgs {
   final String? url;

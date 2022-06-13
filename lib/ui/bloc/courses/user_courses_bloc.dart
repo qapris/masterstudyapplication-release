@@ -1,5 +1,3 @@
-import 'dart:async';
-import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/cache/cache_manager.dart';
@@ -29,7 +27,7 @@ class UserCoursesBloc extends Bloc<UserCoursesEvent, UserCoursesState> {
           emit(InitialUserCoursesState());
           emit(LoadedCoursesState(response.posts));
         }
-      } catch (e, s) {
+      } catch (e) {
         var cache = await _cacheManager.getFromCache();
 
         if (cache != null) {
@@ -54,7 +52,7 @@ class UserCoursesBloc extends Bloc<UserCoursesEvent, UserCoursesState> {
             });
 
             emit(LoadedCoursesState(list));
-          } catch (e, s) {
+          } catch (e) {
             emit(ErrorUserCoursesState());
           }
         } else {

@@ -71,17 +71,16 @@ class SymbolPath implements Comparable<SymbolPath> {
   ///
   /// [package], [path] and [symbol] must not be `null` or empty.
   factory SymbolPath(String package, String path, String symbol) {
-    if (package == null || package.isEmpty) {
+    if (package.isEmpty) {
       throw new ArgumentError.value(
           package, 'package', 'Non-empty value required');
     }
-    if (path == null ||
-        path.isEmpty ||
+    if (path.isEmpty ||
         package != _dartPackage && !path.endsWith(_dartExtension)) {
       throw new ArgumentError.value(
           path, 'path', 'Must have a .dart extension');
     }
-    if (symbol == null || symbol.isEmpty) {
+    if (symbol.isEmpty) {
       throw new ArgumentError.value(
           symbol, 'symbol', 'Non-empty value required');
     }
@@ -120,7 +119,7 @@ class SymbolPath implements Comparable<SymbolPath> {
   ///
   /// Relative URI are rejected with an exception.
   static Uri toAssetUri(Uri libUri) {
-    if (libUri.scheme == null || libUri.scheme.isEmpty) {
+    if (libUri.scheme.isEmpty) {
       throw 'Relative library URI not supported: ${libUri}';
     }
 
@@ -132,7 +131,7 @@ class SymbolPath implements Comparable<SymbolPath> {
     var outSegments = <String>[inSegments.first, 'lib']
       ..addAll(inSegments.skip(1));
 
-    return libUri.fragment != null && libUri.fragment.isNotEmpty
+    return libUri.fragment.isNotEmpty
         ? new Uri(
             scheme: 'asset',
             pathSegments: outSegments,
@@ -203,19 +202,16 @@ class SymbolPath implements Comparable<SymbolPath> {
       return new Uri(scheme: 'dart', path: path);
     }
 
-    if (relativeTo != null) {
-      // Attempt to construct relative import.
-      Uri normalizedBase = relativeTo.normalizePath();
-      List<String> baseSegments = normalizedBase.path.split('/')..removeLast();
-      List<String> targetSegments = toAbsoluteUri().path.split('/');
-      if (baseSegments.first == targetSegments.first &&
-          baseSegments[1] == targetSegments[1]) {
-        // Ok, we're in the same package and in the same top-level directory.
-        String relativePath = pkg_path.relative(
-            targetSegments.skip(2).join('/'),
-            from: baseSegments.skip(2).join('/'));
-        return new Uri(path: pkg_path.split(relativePath).join('/'));
-      }
+    Uri normalizedBase = relativeTo.normalizePath();
+    List<String> baseSegments = normalizedBase.path.split('/')..removeLast();
+    List<String> targetSegments = toAbsoluteUri().path.split('/');
+    if (baseSegments.first == targetSegments.first &&
+        baseSegments[1] == targetSegments[1]) {
+      // Ok, we're in the same package and in the same top-level directory.
+      String relativePath = pkg_path.relative(
+          targetSegments.skip(2).join('/'),
+          from: baseSegments.skip(2).join('/'));
+      return new Uri(path: pkg_path.split(relativePath).join('/'));
     }
 
     var pathSegments = path.split('/');

@@ -18,7 +18,7 @@ class ModuleSummary {
       throw new ArgumentError.notNull('clazz');
     }
 
-    if (providers == null || providers.isEmpty) {
+    if (providers.isEmpty) {
       throw new ArgumentError.value(
           providers, 'providers', 'Must not be null or empty.');
     }

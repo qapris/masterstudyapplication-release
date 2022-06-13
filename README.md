@@ -1,6 +1,12 @@
 # masterstudy_app
 
-A new Flutter project version 2.0.0
+MasterStudy App version: 2.0.2
+
+##Updated Info
+- Bug Fix
+- Updated Gradle from 4.2.0 to 7.1.2
+- Updated Kotlin version from 1.4.0 to 1.6.10
+- Updated Gradle Properties version from 7.2 to 7.4
 
 ## Getting Started
 

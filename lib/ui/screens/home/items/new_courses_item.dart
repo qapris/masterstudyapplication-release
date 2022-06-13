@@ -25,7 +25,7 @@ class NewCoursesWidget extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 30.0, left: 30.0, bottom: 20),
                 child: Text(
-                  title!,
+                  localizations!.getLocalization("new_courses"),
                   textScaleFactor: 1.0,
                   style: Theme.of(context).primaryTextTheme.headline6?.copyWith(color: dark, fontStyle: FontStyle.normal),
                 ),

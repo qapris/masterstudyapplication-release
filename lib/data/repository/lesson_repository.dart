@@ -1,15 +1,10 @@
 import 'dart:convert';
-import 'dart:convert';
-import 'dart:developer';
-import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart';
 import 'package:inject/inject.dart';
 import 'package:masterstudy_app/data/cache/cache_manager.dart';
 import 'package:masterstudy_app/data/models/LessonResponse.dart';
-import 'package:masterstudy_app/data/models/QuizResponse.dart';
 import 'package:masterstudy_app/data/network/api_provider.dart';
-import 'package:path_provider/path_provider.dart';
 
 abstract class LessonRepository {
   Future<LessonResponse> getLesson(int courseId, int lessonId);
@@ -81,16 +76,16 @@ class LessonRepositoryImpl extends LessonRepository {
       var setsToRemove = _getSrcSets(lessons[index].content);
       if (setsToRemove != null)
         for (String set in setsToRemove) {
-          var currentElement = (element as LessonResponse);
+          var currentElement = element;
           currentElement.content = currentElement.content.replaceFirst(set, "");
           lessons[lessons.indexOf(element)] = currentElement;
         }
 
-      List<String> urls = _getLinkedFileUrls((element as LessonResponse).content);
+      List<String> urls = _getLinkedFileUrls((element).content);
 
       for (String webUrl in urls) {
         var file64 = await _getBase64String(webUrl);
-        var currentElement = (element as LessonResponse);
+        var currentElement = element;
         currentElement.content = currentElement.content.replaceFirst(webUrl, file64);
         lessons[index] = currentElement;
       }

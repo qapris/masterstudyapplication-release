@@ -40,7 +40,7 @@ class _TrendingWidget extends State<TrendingWidget> {
               children: <Widget>[
                 Padding(
                     padding: const EdgeInsets.only(top: 30.0, left: 30.0, bottom: 20),
-                    child: Text(widget.title!, textScaleFactor: 1.0, style: Theme.of(context).primaryTextTheme.headline6?.copyWith(color: primaryTextColor, fontStyle: FontStyle.normal))),
+                    child: Text(localizations!.getLocalization("trending_courses"), textScaleFactor: 1.0, style: Theme.of(context).primaryTextTheme.headline6?.copyWith(color: primaryTextColor, fontStyle: FontStyle.normal))),
                 _buildList(context)
               ],
             ),

@@ -5,6 +5,8 @@ import 'package:masterstudy_app/data/models/category.dart';
 import 'package:masterstudy_app/theme/theme.dart';
 import 'package:masterstudy_app/ui/screens/category_detail/category_detail_screen.dart';
 
+import '../../../../main.dart';
+
 class CategoriesWidget extends StatelessWidget {
   final List<Category?> categories;
   final String? title;
@@ -21,7 +23,7 @@ class CategoriesWidget extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 30.0, left: 30.0),
                 child: Text(
-                  title!,
+                  localizations!.getLocalization("categories"),
                   textScaleFactor: 1.0,
                   style: Theme.of(context).primaryTextTheme.headline6?.copyWith(color: dark, fontStyle: FontStyle.normal),
                 ),
@@ -65,10 +67,10 @@ class CategoriesWidget extends StatelessWidget {
     );
   }
 
-  _buildRow(String imgUrl, color, title) {
+  _buildRow(String? imgUrl, color, title) {
     var unescape = new HtmlUnescape();
 
-    var imgFormat = (imgUrl != null && imgUrl != "") ? imgUrl.split(".") : null;
+    var imgFormat = (imgUrl != "" || imgUrl != null) ? imgUrl?.split(".") : null;
 
     return Card(
       color: color,
@@ -85,9 +87,9 @@ class CategoriesWidget extends StatelessWidget {
                       width: 50,
                       height: 50,
                       child: (imgFormat.last == 'svg')
-                          ? SvgPicture.asset(imgUrl, color: HexColor.fromHex("#FFFFFF"))
+                          ? SvgPicture.asset(imgUrl!, color: HexColor.fromHex("#FFFFFF"))
                           : Image.network(
-                              imgUrl,
+                              imgUrl!,
                               width: double.infinity,
                               height: 50,
                               fit: BoxFit.cover,

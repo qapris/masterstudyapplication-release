@@ -1,11 +1,8 @@
 import 'dart:developer';
 
-import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:masterstudy_app/data/models/purchase/UserPlansResponse.dart';
-import 'package:masterstudy_app/data/utils.dart';
 import 'package:masterstudy_app/main.dart';
 import 'package:masterstudy_app/ui/bloc/course/course_bloc.dart';
 import 'package:masterstudy_app/ui/bloc/course/course_event.dart';
@@ -17,7 +14,6 @@ class PurchaseDialog extends StatefulWidget {
 
   const PurchaseDialog({Key? key, this.courseToken}) : super(key: key);
 
-
   @override
   State<StatefulWidget> createState() => PurchaseDialogState();
 }
@@ -27,8 +23,6 @@ class PurchaseDialogState extends State<PurchaseDialog> {
   String courseToken = '';
 
   int selectedId = -1;
-
-
 
   @override
   void initState() {
@@ -64,7 +58,6 @@ class PurchaseDialogState extends State<PurchaseDialog> {
   }
 
   _buildPrices(LoadedCourseState state) {
-
     List<Widget> list = [];
 
     if(state.courseDetailResponse.price!.free == false) {
@@ -295,5 +288,73 @@ class PurchaseDialogState extends State<PurchaseDialog> {
             ],
           );
         });
+  }
+
+  _purchaseDialog() {
+    return showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      barrierColor: Colors.black.withAlpha(1),
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          height: double.infinity,
+          child: Stack(
+            children: <Widget>[
+              Container(
+                height: double.infinity,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.8),
+                      offset: Offset(0, 3), // changes position of shadow
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 25.0),
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    icon: Icon(
+                      Icons.close,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(left: 25, right: 25),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Material(
+                      color: Colors.transparent,
+                      child: Center(
+                        child: Text(
+                          "All purchases are going through the website only. In-app purchase is not available.\n Please, continue purchase on the website.",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                  ],
+                ),
+              )
+            ],
+          ),
+        );
+      },
+    );
   }
 }

@@ -218,7 +218,7 @@ class InjectorGraphResolver {
         } else {
           Iterable<LookupKey> children = mergedDependencies[parent]
                   ?.dependencies
-                  ?.map((injectedType) => injectedType.lookupKey) ??
+                  .map((injectedType) => injectedType.lookupKey) ??
               const [];
           for (var child in children) {
             checkForCycles(child);

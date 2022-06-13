@@ -6,8 +6,6 @@ import 'package:build_test/build_test.dart';
 import 'package:inject_generator/src/build/summary_builder.dart';
 import 'package:inject_generator/src/summary.dart';
 import 'package:logging/logging.dart';
-import 'package:matcher/matcher.dart';
-import 'package:meta/meta.dart';
 import 'package:test/test.dart';
 
 /// Tests that [buggyCode] produces the [expectedWarning].

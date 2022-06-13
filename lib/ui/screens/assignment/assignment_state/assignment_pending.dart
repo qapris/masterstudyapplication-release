@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
 import 'package:masterstudy_app/data/models/AssignmentResponse.dart';
@@ -72,7 +71,7 @@ class _AssignmentPendingWidgetState extends State<AssignmentPendingWidget> {
   }
 
   _filesList(List<FilesBean?> files) {
-    if (files == null || files.isEmpty) return Center();
+    if (files.isEmpty) return Center();
 
     return Padding(
       padding: EdgeInsets.only(top: 20.0),

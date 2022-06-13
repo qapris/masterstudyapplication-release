@@ -1,11 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
-import 'dart:io';
-import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,7 +14,6 @@ import 'package:masterstudy_app/ui/screens/orders/orders.dart';
 import 'package:masterstudy_app/ui/screens/profile_edit/profile_edit_screen.dart';
 import 'package:masterstudy_app/ui/screens/splash/splash_screen.dart';
 import 'package:package_info/package_info.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../data/utils.dart';
