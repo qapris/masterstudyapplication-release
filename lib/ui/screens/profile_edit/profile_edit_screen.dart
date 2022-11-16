@@ -13,6 +13,7 @@ import 'package:masterstudy_app/ui/screens/change_password/change_password_scree
 
 import '../../../data/utils.dart';
 import '../../widgets/dialog_author.dart';
+import '../splash/splash_screen.dart';
 
 class ProfileEditScreenArgs {
   final Account? account;
@@ -81,10 +82,10 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
     _facebookController.text = _bloc.account.meta!.facebook!;
     _twitterController.text = _bloc.account.meta!.twitter;
     _instagramController.text = _bloc.account.meta!.instagram;
-    if(preferences!.getBool('demo') == null) {
+    if(preferences.getBool('demo') == null) {
       demoEnableInputs = false;
     }else {
-      demoEnableInputs = preferences!.getBool('demo');
+      demoEnableInputs = preferences.getBool('demo')!;
     }
     super.initState();
   }
@@ -559,13 +560,34 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
               textColor: Colors.white,
             ),
           ),
+          //Button Delete Account
+          Padding(
+            padding: const EdgeInsets.only(left: 18.0, right: 18.0, top: 18.0),
+            child: new MaterialButton(
+              minWidth: double.infinity,
+              color: Colors.red.shade600,
+              onPressed: () {
+                if (demoEnableInputs) {
+                  showDialogError(context, 'Demo Mode');
+                } else {
+                  showDeleteAccountDialog(context);
+                  // Navigator.of(context).pushNamed(ChangePasswordScreen.routeName);
+                }
+              },
+              child: Text(
+                "DELETE ACCOUNT",
+                textScaleFactor: 1.0,
+              ),
+              textColor: Colors.white,
+            ),
+          ),
           //Cancel
           Padding(
             padding: const EdgeInsets.only(
               left: 18.0,
               right: 18.0,
             ),
-            child: FlatButton(
+            child: TextButton(
               child: Text(
                 localizations!.getLocalization("cancel_button"),
                 textScaleFactor: 1.0,
@@ -597,6 +619,55 @@ class _ProfileEditWidgetState extends State<_ProfileEditWidget> {
 
     // The pattern of the email didn't match the regex above.
     return localizations!.getLocalization("email_invalid_error_text");
+  }
+
+  showDeleteAccountDialog(BuildContext context) {
+    // set up the buttons
+    Widget cancelButton = TextButton(
+      child: Text(
+        localizations!.getLocalization("cancel_button"),
+        textScaleFactor: 1.0,
+        style: TextStyle(
+          color: mainColor,
+        ),
+      ),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+    Widget continueButton = TextButton(
+      child: Text(
+        "Delete",
+        textScaleFactor: 1.0,
+        style: TextStyle(color: mainColor),
+      ),
+      onPressed: () {
+        preferences!.setBool('demo', false);
+        BlocProvider.of<ProfileBloc>(context).add(LogoutProfileEvent());
+        Navigator.of(context).pushNamedAndRemoveUntil(SplashScreen.routeName, (Route<dynamic> route) => false);
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Delete Account", textScaleFactor: 1.0, style: TextStyle(color: Colors.black, fontSize: 20.0)),
+      content: Text(
+        "Do you really want to delete account?",
+        textScaleFactor: 1.0,
+      ),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 }
 

@@ -90,7 +90,7 @@ class _ReviewWriteScreenWidgetState extends State<_ReviewWriteScreenWidget> {
                   isLoading = false;
                 });
 
-                Scaffold.of(context).showSnackBar(SnackBar(
+                /*Scaffold.of(context).showSnackBar(SnackBar( // TODO: 331
                   content: Text(
                     state.reviewAddResponse.message,
                     textScaleFactor: 1.0,
@@ -102,7 +102,7 @@ class _ReviewWriteScreenWidgetState extends State<_ReviewWriteScreenWidget> {
                       Navigator.of(context).pop();
                     },
                   ),
-                ));
+                ));*/
               }else {
                 setState(() {
                   isLoading = false;

@@ -102,7 +102,7 @@ class QuestionAskWidgetState extends State<QuestionAskWidget> {
                 sendRequest = true;
               });
 
-              Scaffold.of(context).showSnackBar(SnackBar(
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(
                   state.questionAddResponse.message,
                   textScaleFactor: 1.0,
@@ -117,7 +117,7 @@ class QuestionAskWidgetState extends State<QuestionAskWidget> {
               startTimeout();
             } else {
               textController.clear();
-              Scaffold.of(context).showSnackBar(SnackBar(
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(
                   'Error with network, please resend!',
                   textScaleFactor: 1.0,

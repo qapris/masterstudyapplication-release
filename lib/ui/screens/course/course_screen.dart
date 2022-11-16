@@ -584,7 +584,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
                                       ),
                                     ),
                                     const SizedBox(height: 30),
-                                    Material(
+                                    /*Material(
                                       color: Colors.transparent,
                                       child: SizedBox(
                                         height: 45,
@@ -607,7 +607,7 @@ class _CourseScreenWidgetState extends State<_CourseScreenWidget> with TickerPro
                                           ),
                                         ),
                                       ),
-                                    ),
+                                    ),*/
                                   ],
                                 ),
                               )

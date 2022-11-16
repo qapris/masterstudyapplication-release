@@ -162,14 +162,14 @@ class _SignUpPageState extends State<_SignUpPage> {
         if (state is SuccessAuthState) {
             enableInputsDemo = false;
             enableInputs = true;
-          WidgetsBinding.instance?.addPostFrameCallback((_) => Navigator.pushReplacementNamed(context, MainScreen.routeName, arguments: MainScreenArgs(widget.optionsBean)));
+          WidgetsBinding.instance.addPostFrameCallback((_) => Navigator.pushReplacementNamed(context, MainScreen.routeName, arguments: MainScreenArgs(widget.optionsBean)));
         }
 
         if (state is ErrorAuthState) {
             enableInputs = true;
             enableInputsDemo = false;
             preferences!.setBool('demo', false);
-          WidgetsBinding.instance?.addPostFrameCallback((_) => showDialogError(context, state.message));
+          WidgetsBinding.instance.addPostFrameCallback((_) => showDialogError(context, state.message));
         }
 
         return Form(
@@ -445,7 +445,7 @@ class _SignInPageState extends State<_SignInPage> {
         var enableInputs = !(state is LoadingAuthState);
 
         if (state is SuccessAuthState) {
-          WidgetsBinding.instance?.addPostFrameCallback(
+          WidgetsBinding.instance.addPostFrameCallback(
             (_) => Navigator.pushReplacementNamed(
               context,
               MainScreen.routeName,

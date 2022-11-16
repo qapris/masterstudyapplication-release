@@ -345,7 +345,7 @@ class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
 
   showLogoutDialog(BuildContext context) {
     // set up the buttons
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text(
         localizations!.getLocalization("cancel_button"),
         textScaleFactor: 1.0,
@@ -357,7 +357,7 @@ class _ProfileScreenWidgetState extends State<ProfileScreenWidget> {
         Navigator.of(context).pop();
       },
     );
-    Widget continueButton = FlatButton(
+    Widget continueButton = TextButton(
       child: Text(
         localizations!.getLocalization("logout"),
         textScaleFactor: 1.0,

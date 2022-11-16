@@ -124,8 +124,8 @@ class QuizScreenWidgetState extends State<QuizScreenWidget> {
             onPageStarted: (some) {},
             onWebViewCreated: (controller) async {
 
-              String header = preferences!.get("apiToken");
-              Map<String, String> headers = {"token": header};
+              String? header = preferences.getString("apiToken");
+              Map<String, String> headers = {"token": header!};
 
               controller.clearCache();
               this._webViewController = controller;

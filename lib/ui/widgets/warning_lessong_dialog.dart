@@ -16,7 +16,7 @@ class WarningLessonDialog extends StatelessWidget{
         textScaleFactor: 1.0,
       ),
       actions: <Widget>[
-        FlatButton(
+        ElevatedButton( // TODO: 331
           child: Text(
             localizations!.getLocalization("ok_dialog_button"),
             textScaleFactor: 1.0,

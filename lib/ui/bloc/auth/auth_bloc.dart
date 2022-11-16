@@ -19,7 +19,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         await _repository.register(event.login, event.email, event.password);
         emit(SuccessAuthState());
       } on DioError catch (e) {
-        log(e.response.toString());
+        log(e.response!.data.toString());
         emit(ErrorAuthState(e.response?.data['message']));
       }
     });

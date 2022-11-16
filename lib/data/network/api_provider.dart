@@ -50,6 +50,8 @@ class UserApiProvider {
       "email": email,
       "password": password,
     });
+
+    log("${response}");
     return AuthResponse.fromJson(response.data);
   }
 

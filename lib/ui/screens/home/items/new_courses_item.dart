@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:html_unescape/html_unescape.dart';
@@ -53,6 +55,7 @@ class NewCoursesWidget extends StatelessWidget {
               num? reviews = 0;
               rating = item?.rating?.average?.toDouble();
               reviews = item?.rating?.total;
+
               return GestureDetector(
                 onTap: () {
                   Navigator.pushNamed(
@@ -63,7 +66,8 @@ class NewCoursesWidget extends StatelessWidget {
                 },
                 child: Padding(
                   padding: EdgeInsets.only(left: padding),
-                  child: _buildCard(context, item?.images?.small, item?.categories_object.first, "${item?.title}", rating, reviews, item?.price?.price, item?.price?.old_price, item?.price?.free),
+                  child: _buildCard(context, item?.images?.small, item?.categories_object.first ?? null, "${item?.title}", rating, reviews,
+                      item?.price?.price, item?.price?.old_price, item?.price?.free),
                 ),
               );
             },
@@ -170,7 +174,7 @@ class NewCoursesWidget extends StatelessWidget {
   }
 
   _buildPrice(context, price, oldPrice, free) {
-    if (free)
+    if (free) {
       return Padding(
         padding: const EdgeInsets.only(left: 18.0),
         child: Text(
@@ -179,27 +183,33 @@ class NewCoursesWidget extends StatelessWidget {
           style: Theme.of(context).primaryTextTheme.headline5?.copyWith(color: dark, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
         ),
       );
-    return Padding(
-      padding: const EdgeInsets.only(top: 8.0, left: 16.0, right: 16.0),
-      child: Row(
-        children: <Widget>[
-          Text(
-            price,
-            textScaleFactor: 1.0,
-            style: Theme.of(context).primaryTextTheme.headline5?.copyWith(color: dark, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
-          ),
-          Visibility(
-            visible: oldPrice != null,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Text(
-                oldPrice.toString(),
-                textScaleFactor: 1.0,
-                style: Theme.of(context).primaryTextTheme.headline5?.copyWith(color: HexColor.fromHex("#999999"), fontStyle: FontStyle.normal, decoration: TextDecoration.lineThrough),
-              ),
+    }
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 8.0, left: 16.0, right: 16.0),
+        child: Row(
+          children: <Widget>[
+            Text(
+              price,
+              textScaleFactor: 1.0,
+              style: Theme.of(context).primaryTextTheme.headline5?.copyWith(color: dark, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
             ),
-          )
-        ],
+            Visibility(
+              visible: oldPrice != null,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Text(
+                  oldPrice.toString(),
+                  textScaleFactor: 1.0,
+                  style: Theme.of(context)
+                      .primaryTextTheme
+                      .headline5
+                      ?.copyWith(color: HexColor.fromHex("#999999"), fontStyle: FontStyle.normal, decoration: TextDecoration.lineThrough),
+                ),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

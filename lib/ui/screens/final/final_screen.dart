@@ -377,7 +377,7 @@ class _FinalScreenState extends State<_FinalScreenWidget> {
 
   _downloadCertificate(String? downloadUrl) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String header = prefs.get("apiToken");
-    await launch(downloadUrl!, headers: {'token': header});
+    String? header = prefs.getString("apiToken");
+    await launch(downloadUrl!, headers: {'token': header!});
   }
 }

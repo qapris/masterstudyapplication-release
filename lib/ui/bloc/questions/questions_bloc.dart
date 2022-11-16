@@ -17,7 +17,7 @@ class QuestionsBloc extends Bloc<QuestionsEvent, QuestionsState> {
       try {
         //Get userID
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        var currentUserId = prefs.get("apiToken").split('|');
+        var currentUserId = prefs.getString("apiToken")!.split('|');
 
         QuestionsResponse questions = await _questionsRepository.getQuestions(event.lessonId, event.page, event.search, "");
         QuestionsResponse questionsMy = await _questionsRepository.getQuestions(event.lessonId, event.page, event.search, currentUserId[0]);
@@ -31,7 +31,7 @@ class QuestionsBloc extends Bloc<QuestionsEvent, QuestionsState> {
     on<MyQuestionAddEvent>((event, emit) async {
       try {
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        var currentUserId = prefs.get("apiToken").split('|');
+        var currentUserId = prefs.getString("apiToken")!.split('|');
 
         QuestionAddResponse addAnswer = await _questionsRepository.addQuestion(event.lessonId, event.comment, event.parent);
 

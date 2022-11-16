@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -52,12 +51,12 @@ class _VideoScreenState extends State<_VideoScreenWidget> {
 
   //Enable orientation
   void _enableRotation() {
-    if(isYoutube) {
+    if (isYoutube) {
       SystemChrome.setPreferredOrientations([
         DeviceOrientation.portraitUp,
         DeviceOrientation.portraitDown,
       ]);
-    }else {
+    } else {
       SystemChrome.setPreferredOrientations([
         DeviceOrientation.portraitUp,
         DeviceOrientation.portraitDown,
@@ -65,7 +64,6 @@ class _VideoScreenState extends State<_VideoScreenWidget> {
         DeviceOrientation.landscapeRight,
       ]);
     }
-
   }
 
   @override
@@ -109,7 +107,7 @@ class _VideoScreenState extends State<_VideoScreenWidget> {
 
   @override
   Widget build(BuildContext context) {
-      return BlocBuilder<VideoBloc, VideoState>(
+    return BlocBuilder<VideoBloc, VideoState>(
       bloc: _bloc,
       builder: (context, state) {
         return Scaffold(
@@ -167,19 +165,21 @@ class _VideoScreenState extends State<_VideoScreenWidget> {
 
   _buildBody(state, orientation) {
     if (state is LoadedVideoState) {
-      return isYoutube ? SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[loadPlayer(orientation)],
-        ),
-      ) : SizedBox(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[loadPlayer(orientation)],
-        ),
-      );
+      return isYoutube
+          ? SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[loadPlayer(orientation)],
+              ),
+            )
+          : SizedBox(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[loadPlayer(orientation)],
+              ),
+            );
     }
 
     if (state is InitialVideoState) {
@@ -209,14 +209,17 @@ class _VideoScreenState extends State<_VideoScreenWidget> {
                       SizedBox(
                           width: 42,
                           height: 30,
-                          child: FlatButton(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.all(0.0),
+                              backgroundColor: HexColor.fromHex("#000000"),
+                            ),
                             onPressed: () {
                               setState(() {
                                 _controller.value.isPlaying ? _controller.pause() : _controller.play();
                               });
                             },
-                            padding: EdgeInsets.all(0.0),
-                            color: HexColor.fromHex("#000000"),
+
                             child: Icon(
                               _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
                               color: HexColor.fromHex("#FFFFFF"),

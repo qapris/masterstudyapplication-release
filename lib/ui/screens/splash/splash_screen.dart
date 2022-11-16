@@ -116,19 +116,18 @@ class SplashWidgetState extends State<SplashWidget> {
       }
     } else {
       try {
-        final mcr = preferences!.getInt("main_color_r");
-        final mcg = preferences!.getInt("main_color_g");
-        final mcb = preferences!.getInt("main_color_b");
-        final mca = preferences!.getDouble("main_color_a");
+        final mcr = preferences.getInt("main_color_r");
+        final mcg = preferences.getInt("main_color_g");
+        final mcb = preferences.getInt("main_color_b");
+        final mca = preferences.getDouble("main_color_a");
 
-        final scr = preferences!.getInt("second_color_r");
-        final scg = preferences!.getInt("second_color_g");
-        final scb = preferences!.getInt("second_color_b");
-        final sca = preferences!.getDouble("second_color_a");
-
-        mainColor = Color.fromRGBO(mcr, mcg, mcb, mca);
+        final scr = preferences.getInt("second_color_r");
+        final scg = preferences.getInt("second_color_g");
+        final scb = preferences.getInt("second_color_b");
+        final sca = preferences.getDouble("second_color_a");
+        mainColor = Color.fromRGBO(mcr!, mcg!, mcb!, mca!);
         mainColorA = Color.fromRGBO(mcr, mcg, mcb, 0.999);
-        secondColor = Color.fromRGBO(scr, scg, scb, sca);
+        secondColor = Color.fromRGBO(scr!, scg!, scb!, sca!);
       } catch (e) {
         mainColor = blue_blue;
         mainColorA = blue_blue_a;

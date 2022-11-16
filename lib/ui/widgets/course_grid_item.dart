@@ -36,7 +36,7 @@ class CourseGridItem extends StatelessWidget {
     var unescape = new HtmlUnescape();
     double imgHeight = (MediaQuery.of(context).size.width > 450) ? 220.0 : 85.0;
     // ignore: unnecessary_null_comparison
-    String? categoryName = (coursesBean?.categories_object != null) ? coursesBean?.categories_object.first?.name : "";
+    String? categoryName = (coursesBean?.categories_object != null) ? coursesBean?.categories_object.first?.name  : "";
     return Padding(
       padding: const EdgeInsets.all(4.0),
       child: Card(

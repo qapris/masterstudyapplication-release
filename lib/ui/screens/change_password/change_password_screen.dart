@@ -58,7 +58,7 @@ class _ChangePasswordWidgetState extends State<ChangePasswordWidget> {
       bloc: _bloc,
       listener: (context, state) {
         if (state is SuccessChangePasswordState)
-          Scaffold.of(context).showSnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(localizations!.getLocalization("password_is_changed")),
               backgroundColor: Colors.green,
@@ -66,7 +66,7 @@ class _ChangePasswordWidgetState extends State<ChangePasswordWidget> {
           );
 
         if(state is ErrorChangePasswordState) {
-          WidgetsBinding.instance?.addPostFrameCallback((_) => showDialogError(context, state.message));
+          WidgetsBinding.instance.addPostFrameCallback((_) => showDialogError(context, state.message));
         }
       },
       child: BlocBuilder<ChangePasswordBloc, ChangePasswordState>(

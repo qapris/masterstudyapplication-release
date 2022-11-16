@@ -68,10 +68,10 @@ class WebCheckoutWidgetState extends State<WebCheckoutWidget> {
             },
             onWebViewCreated: (controller) async {
               SharedPreferences prefs = await SharedPreferences.getInstance();
-              String header = prefs.get("apiToken");
+              String? header = prefs.getString("apiToken");
               this._webViewController = controller;
               controller.clearCache();
-              _webViewController.loadUrl(widget.url + "&app=123", headers: {"token": header});
+              _webViewController.loadUrl(widget.url + "&app=123", headers: {"token": header!});
               print("MYHEADER: $header");
             },
             javascriptChannels: Set.from([

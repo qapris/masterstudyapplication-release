@@ -358,15 +358,15 @@ class UserCourseWidgetState extends State<UserCourseWidget> {
           : SizedBox(
               width: 50,
               height: 50,
-              child: FlatButton(
-                  shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
+              child: ElevatedButton( // TODO: 331
+                  // shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0)),
                   onPressed: () {
                     if (state is LoadedUserCourseState && !state.showCachingProgress! && !state.isCached!) {
                       _bloc.add(CacheCourseEvent(widget.args));
                     }
                   },
-                  padding: EdgeInsets.only(left: 0.0),
-                  color: HexColor.fromHex("#FFFFFF").withOpacity(0.1),
+                  // padding: EdgeInsets.only(left: 0.0),
+                  // color: HexColor.fromHex("#FFFFFF").withOpacity(0.1),
                   child: icon),
             );
     } else {

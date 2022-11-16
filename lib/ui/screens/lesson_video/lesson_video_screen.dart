@@ -1105,8 +1105,12 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
                 width: 35,
                 height: 35,
                 child: (state.lessonResponse.prev_lesson != "")
-                    ? FlatButton(
-                        shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0), side: BorderSide(color: HexColor.fromHex("#306ECE"))),
+                    ? ElevatedButton( // TODO:
+                        style: ElevatedButton.styleFrom(
+                          shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0), side: BorderSide(color: HexColor.fromHex("#306ECE"))),
+                          padding: EdgeInsets.all(0.0),
+                          backgroundColor: mainColor,
+                        ),
                         onPressed: () {
                           switch (state.lessonResponse.prev_lesson_type) {
                             case "video":
@@ -1141,10 +1145,7 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
                               );
                           }
                         },
-                        padding: EdgeInsets.all(0.0),
-                        color: mainColor,
-                        hoverColor: secondColor,
-                        focusColor: secondColor,
+
                         child: Icon(
                           Icons.chevron_left,
                           color: HexColor.fromHex("#273044"),
@@ -1171,8 +1172,8 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
                               });
                             }
                           } else {
-                            if (preferences!.getString('textLessonComplete') != null) {
-                              var existRecord = jsonDecode(preferences!.getString('textLessonComplete'));
+                            if (preferences.getString('textLessonComplete') != null) {
+                              var existRecord = jsonDecode(preferences.getString('textLessonComplete')!);
 
                               for (var el in existRecord) {
                                 if (el.toString().contains('added') && el['lesson_id'] == widget.lessonId) {
@@ -1184,7 +1185,7 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
                                     'added': 1,
                                   });
 
-                                  preferences!.setString('textLessonComplete', jsonEncode(recordMap));
+                                  preferences.setString('textLessonComplete', jsonEncode(recordMap));
 
                                   setState(() {
                                     completed = true;
@@ -1210,8 +1211,12 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
               SizedBox(
                 width: 35,
                 height: 35,
-                child: FlatButton(
-                  shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0), side: BorderSide(color: mainColor!)),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0), side: BorderSide(color: mainColor!)),
+                    padding: EdgeInsets.all(0.0),
+                    backgroundColor: mainColor,
+                  ),
                   onPressed: () {
                     if (state.lessonResponse.next_lesson != "") {
                       if (state.lessonResponse.next_lesson_available) {
@@ -1262,10 +1267,6 @@ class _LessonVideoScreenState extends State<_LessonVideoScreenWidget> {
                       });
                     }
                   },
-                  padding: EdgeInsets.all(0.0),
-                  color: mainColor,
-                  hoverColor: secondColor,
-                  focusColor: secondColor,
                   child: Icon(
                     Icons.chevron_right,
                     color: HexColor.fromHex("#273044"),

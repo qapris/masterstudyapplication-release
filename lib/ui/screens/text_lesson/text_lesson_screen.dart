@@ -188,16 +188,19 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
               : SizedBox(
                   width: 40,
                   height: 40,
-                  child: FlatButton(
-                    shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0), side: BorderSide(color: HexColor.fromHex("#3E4555"))),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: new RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(20.0), side: BorderSide(color: HexColor.fromHex("#3E4555"))),
+                      padding: EdgeInsets.all(0.0),
+                      backgroundColor: HexColor.fromHex("#3E4555"),
+                    ),
                     onPressed: () {
                       Navigator.of(context).pushNamed(
                         QuestionsScreen.routeName,
                         arguments: QuestionsScreenArgs(widget.lessonId, 1),
                       );
                     },
-                    padding: EdgeInsets.all(0.0),
-                    color: HexColor.fromHex("#3E4555"),
                     child: SizedBox(
                         width: 24,
                         height: 24,
@@ -216,15 +219,14 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
     if (state is InitialTextLessonState) return _buildLoading();
 
     if (state is LoadedTextLessonState) {
-      return  Column(
-          children: [
-            Expanded(
-              child:  _buildWebView(state, context),
-            ),
-            _buildLessonMaterials(state),
-          ],
-        );
-
+      return Column(
+        children: [
+          Expanded(
+            child: _buildWebView(state, context),
+          ),
+          _buildLessonMaterials(state),
+        ],
+      );
     }
   }
 
@@ -264,7 +266,7 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
 
   _buildLessonMaterials(LoadedTextLessonState state) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 25,vertical: 10),
+      padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
       margin: EdgeInsets.only(bottom: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -394,7 +396,9 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
                               }
 
                               //If file is jpeg/png/jpg
-                              if (item.url.toString().contains('jpeg') || item.url.toString().contains('png') || item.url.toString().contains('jpg')) {
+                              if (item.url.toString().contains('jpeg') ||
+                                  item.url.toString().contains('png') ||
+                                  item.url.toString().contains('jpg')) {
                                 setState(() {
                                   isLoadingImg = true;
                                 });
@@ -485,7 +489,10 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
                               ),
                             )
                           : Icon(
-                              _progressImg == 100 && item.url == progressMapImg!['item_url'] || progress == '${100}%' && item.url == progressMap!['item_url'] ? Icons.check : Icons.download,
+                              _progressImg == 100 && item.url == progressMapImg!['item_url'] ||
+                                      progress == '${100}%' && item.url == progressMap!['item_url']
+                                  ? Icons.check
+                                  : Icons.download,
                               color: Colors.white,
                             ),
                     ),
@@ -504,7 +511,9 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
 
     if (state is LoadedTextLessonState) {
       return Container(
-        decoration: BoxDecoration(color: HexColor.fromHex("#FFFFFF"), boxShadow: [BoxShadow(color: HexColor.fromHex("#000000").withOpacity(.1), offset: Offset(0, 0), blurRadius: 6, spreadRadius: 2)]),
+        decoration: BoxDecoration(
+            color: HexColor.fromHex("#FFFFFF"),
+            boxShadow: [BoxShadow(color: HexColor.fromHex("#000000").withOpacity(.1), offset: Offset(0, 0), blurRadius: 6, spreadRadius: 2)]),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Row(
@@ -514,45 +523,50 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
                   width: 35,
                   height: 35,
                   child: (state.lessonResponse.prev_lesson != "")
-                      ? FlatButton(
-                          shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0), side: BorderSide(color: mainColor!)),
+                      ? ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0), side: BorderSide(color: mainColor!)),
+                            padding: EdgeInsets.all(0.0),
+                            backgroundColor: mainColor,
+                          ),
                           onPressed: () {
                             switch (state.lessonResponse.prev_lesson_type) {
                               case "video":
                                 Navigator.of(context).pushReplacementNamed(
                                   LessonVideoScreen.routeName,
-                                  arguments:
-                                      LessonVideoScreenArgs(widget.courseId, int.tryParse(state.lessonResponse.prev_lesson)!, widget.authorAva, widget.authorName, widget.hasPreview, widget.trial),
+                                  arguments: LessonVideoScreenArgs(widget.courseId, int.tryParse(state.lessonResponse.prev_lesson)!, widget.authorAva,
+                                      widget.authorName, widget.hasPreview, widget.trial),
                                 );
                                 break;
                               case "quiz":
                                 Navigator.of(context).pushReplacementNamed(
                                   QuizLessonScreen.routeName,
-                                  arguments: QuizLessonScreenArgs(widget.courseId, int.tryParse(state.lessonResponse.prev_lesson)!, widget.authorAva, widget.authorName),
+                                  arguments: QuizLessonScreenArgs(
+                                      widget.courseId, int.tryParse(state.lessonResponse.prev_lesson)!, widget.authorAva, widget.authorName),
                                 );
                                 break;
                               case "assignment":
                                 Navigator.of(context).pushReplacementNamed(
                                   AssignmentScreen.routeName,
-                                  arguments: AssignmentScreenArgs(widget.courseId, int.tryParse(state.lessonResponse.prev_lesson)!, widget.authorAva, widget.authorName),
+                                  arguments: AssignmentScreenArgs(
+                                      widget.courseId, int.tryParse(state.lessonResponse.prev_lesson)!, widget.authorAva, widget.authorName),
                                 );
                                 break;
                               case "stream":
                                 Navigator.of(context).pushReplacementNamed(
                                   LessonStreamScreen.routeName,
-                                  arguments: LessonStreamScreenArgs(widget.courseId, int.tryParse(state.lessonResponse.prev_lesson)!, widget.authorAva, widget.authorName),
+                                  arguments: LessonStreamScreenArgs(
+                                      widget.courseId, int.tryParse(state.lessonResponse.prev_lesson)!, widget.authorAva, widget.authorName),
                                 );
                                 break;
                               default:
                                 Navigator.of(context).pushReplacementNamed(
                                   TextLessonScreen.routeName,
-                                  arguments:
-                                      TextLessonScreenArgs(widget.courseId, state.lessonResponse.prev_lesson!, widget.authorAva, widget.authorName, widget.hasPreview, widget.trial),
+                                  arguments: TextLessonScreenArgs(widget.courseId, state.lessonResponse.prev_lesson!, widget.authorAva,
+                                      widget.authorName, widget.hasPreview, widget.trial),
                                 );
                             }
                           },
-                          padding: EdgeInsets.all(0.0),
-                          color: mainColor,
                           child: Icon(Icons.chevron_left),
                         )
                       : Center()),
@@ -575,8 +589,8 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
                             });
                           }
                         } else {
-                          if (preferences!.getString('textLessonComplete') != null) {
-                            var existRecord = jsonDecode(preferences!.getString('textLessonComplete'));
+                          if (preferences.getString('textLessonComplete') != null) {
+                            var existRecord = jsonDecode(preferences.getString('textLessonComplete')!);
 
                             for (var el in existRecord) {
                               if (el.toString().contains('added') && el['lesson_id'] == widget.lessonId) {
@@ -588,7 +602,7 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
                                   'added': 1,
                                 });
 
-                                preferences!.setString('textLessonComplete', jsonEncode(recordMap));
+                                preferences.setString('textLessonComplete', jsonEncode(recordMap));
 
                                 setState(() {
                                   completed = true;
@@ -602,7 +616,7 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
                               'added': 1,
                             });
 
-                            preferences!.setString('textLessonComplete', jsonEncode(recordMap));
+                            preferences.setString('textLessonComplete', jsonEncode(recordMap));
                             setState(() {
                               completed = true;
                             });
@@ -615,8 +629,12 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
               SizedBox(
                 width: 35,
                 height: 35,
-                child: FlatButton(
-                  shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0), side: BorderSide(color: mainColor!)),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0), side: BorderSide(color: mainColor!)),
+                    padding: EdgeInsets.all(0.0),
+                    backgroundColor: mainColor,
+                  ),
                   onPressed: () {
                     if (state.lessonResponse.next_lesson != "") {
                       if (state.lessonResponse.next_lesson_available) {
@@ -624,31 +642,36 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
                           case "video":
                             Navigator.of(context).pushReplacementNamed(
                               LessonVideoScreen.routeName,
-                              arguments: LessonVideoScreenArgs(widget.courseId, int.tryParse(state.lessonResponse.next_lesson)!, widget.authorAva, widget.authorName, widget.hasPreview, widget.trial),
+                              arguments: LessonVideoScreenArgs(widget.courseId, int.tryParse(state.lessonResponse.next_lesson)!, widget.authorAva,
+                                  widget.authorName, widget.hasPreview, widget.trial),
                             );
                             break;
                           case "quiz":
                             Navigator.of(context).pushReplacementNamed(
                               QuizLessonScreen.routeName,
-                              arguments: QuizLessonScreenArgs(widget.courseId, int.tryParse(state.lessonResponse.next_lesson)!, widget.authorAva, widget.authorName),
+                              arguments: QuizLessonScreenArgs(
+                                  widget.courseId, int.tryParse(state.lessonResponse.next_lesson)!, widget.authorAva, widget.authorName),
                             );
                             break;
                           case "assignment":
                             Navigator.of(context).pushReplacementNamed(
                               AssignmentScreen.routeName,
-                              arguments: AssignmentScreenArgs(widget.courseId, int.tryParse(state.lessonResponse.next_lesson)!, widget.authorAva, widget.authorName),
+                              arguments: AssignmentScreenArgs(
+                                  widget.courseId, int.tryParse(state.lessonResponse.next_lesson)!, widget.authorAva, widget.authorName),
                             );
                             break;
                           case "stream":
                             Navigator.of(context).pushReplacementNamed(
                               LessonStreamScreen.routeName,
-                              arguments: LessonStreamScreenArgs(widget.courseId, int.tryParse(state.lessonResponse.next_lesson)!, widget.authorAva, widget.authorName),
+                              arguments: LessonStreamScreenArgs(
+                                  widget.courseId, int.tryParse(state.lessonResponse.next_lesson)!, widget.authorAva, widget.authorName),
                             );
                             break;
                           default:
                             Navigator.of(context).pushReplacementNamed(
                               TextLessonScreen.routeName,
-                              arguments: TextLessonScreenArgs(widget.courseId, state.lessonResponse.next_lesson!, widget.authorAva, widget.authorName, widget.hasPreview, widget.trial),
+                              arguments: TextLessonScreenArgs(widget.courseId, state.lessonResponse.next_lesson!, widget.authorAva, widget.authorName,
+                                  widget.hasPreview, widget.trial),
                             );
                         }
                       } else {
@@ -667,8 +690,6 @@ class TextLessonWidgetState extends State<TextLessonWidget> {
                       });
                     }
                   },
-                  padding: EdgeInsets.all(0.0),
-                  color: mainColor,
                   child: Icon(Icons.chevron_right),
                 ),
               )

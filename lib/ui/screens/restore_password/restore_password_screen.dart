@@ -44,10 +44,10 @@ class _RestorePasswordWidgetState extends State<_RestorePasswordWidget> {
       bloc: _bloc,
       listener: (context, state) {
         if (state is SuccessRestorePasswordState)
-          Scaffold.of(context).showSnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               // content: Text(localizations!.getLocalization("restore_password_sent_text")),
-              content: Text("Restore password, check email"),
+              content: Text("Restore password, check email"), // TODO: Добавить перевод
               backgroundColor: Colors.green,
             ),
           );

@@ -85,10 +85,10 @@ class QuestionDetailsWidgetState extends State<QuestionDetailsWidget> {
   @override
   void initState() {
     super.initState();
-    if (preferences!.getBool('demo') == null) {
+    if (preferences.getBool('demo') == null) {
       demo = false;
     } else {
-      demo = preferences!.getBool('demo');
+      demo = preferences.getBool('demo')!;
     }
     _bloc = BlocProvider.of<QuestionDetailsBloc>(context)..add(FetchEvent());
     aList = widget.questionBean.replies;

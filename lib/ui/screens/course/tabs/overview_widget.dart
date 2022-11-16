@@ -34,10 +34,10 @@ class _OverviewWidgetState extends State<OverviewWidget> with AutomaticKeepAlive
 
   @override
   void initState() {
-    if(preferences!.getBool('demo') == null) {
+    if(preferences.getBool('demo') == null) {
       demo = false;
     }else {
-      demo = preferences!.getBool('demo');
+      demo = preferences.getBool('demo')!;
     }
     super.initState();
   }

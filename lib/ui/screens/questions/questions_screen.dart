@@ -89,10 +89,10 @@ class QuestionsWidgetState extends State<QuestionsWidget> {
   @override
   void initState() {
     super.initState();
-    if (preferences!.getBool('demo') == null) {
+    if (preferences.getBool('demo') == null) {
       demo = false;
     } else {
-      demo = preferences!.getBool('demo');
+      demo = preferences.getBool('demo')!;
     }
     _bloc = BlocProvider.of<QuestionsBloc>(context);
     _bloc.add(FetchEvent(widget.lessonId, widget.page, "", ""));
