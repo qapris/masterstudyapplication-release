@@ -22,7 +22,7 @@ dependencies:
   #networking
   http: ^0.13.4
   rxdart: ^0.27.3
-  dio: ^4.0.4
+  dio: ">=4.0.4 <6.0.0"
   get_it: ^7.2.0
 
   #di
